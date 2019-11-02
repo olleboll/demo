@@ -1,24 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import PIXI, { createPixiApp } from './engine';
+
+import { characters } from './game/sprites';
+
+import Game from './game/game';
+
 function App() {
+  const [app, setApp] = useState();
+
+  //initialize
+  useEffect(() => {
+    async function initGame() {
+      if (!app) {
+        const { app: pixiApp, animate } = await createPixiApp({
+          div: 'game',
+          spritesheets: characters.source,
+        });
+        const s = Game(pixiApp);
+        pixiApp.stage.addChild(s.stage);
+        s.init();
+        pixiApp.ticker.add(s.animate);
+
+        setApp(pixiApp);
+      }
+    }
+
+    initGame();
+  }, [app]);
+
+  // cleanup
+  useEffect(
+    () => () => {
+      if (app) {
+        app.destroy();
+      }
+    },
+    [app],
+  );
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div id="game"></div>
     </div>
   );
 }

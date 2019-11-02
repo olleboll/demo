@@ -1,0 +1,15 @@
+[ignore]
+.*/build/.*
+.*/dist/.*
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper='^engine\(.*\)$' -> '<PROJECT_ROOT>/src/engine/\1'
+module.name_mapper='^game\(.*\)$' -> '<PROJECT_ROOT>/src/game/\1'
+
+[strict]
