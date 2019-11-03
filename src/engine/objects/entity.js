@@ -1,9 +1,6 @@
 // @flow
-
-import { DropShadowFilter } from 'pixi-filters';
-
 import PIXI, { getResource } from 'engine';
-import { calculateDistance, Point } from 'engine/utils';
+import type { Point } from 'engine/utils';
 
 import { characters } from 'game/sprites';
 
@@ -24,16 +21,16 @@ export type Entity = {
 
 export type EntityOptions = {
   spritesheet: string,
+  spriteKey: string,
   position: Point,
   speed: number,
-  world: PIXI.Container,
 };
 
 const createEntity = (opts: EntityOptions): Entity => {
-  const { spritesheet, position, speed: _speed, world } = opts;
+  const { spritesheet, spriteKey, position, speed: _speed } = opts;
 
   const container = new PIXI.Container();
-  const movementSprites = setUpSprites(spritesheet);
+  const movementSprites = setUpSprites(spritesheet, spriteKey);
   const movement = {
     up: false,
     down: false,
@@ -41,12 +38,13 @@ const createEntity = (opts: EntityOptions): Entity => {
     right: false,
   };
   let speed = _speed;
-  let currentSprite = movementSprites.down;
+  let currentSprite = movementSprites.up;
   container.position.x = position.x;
   container.position.y = position.y;
+  container.zIndex = container.position.y;
   container.addChild(currentSprite);
 
-  const swapSprite = (newSprite) => {
+  const swapSprite = (newSprite, cb) => {
     if (!newSprite.renderable) {
       console.warn('target sprite is not renderable');
       console.warn(newSprite);
@@ -60,9 +58,9 @@ const createEntity = (opts: EntityOptions): Entity => {
     container.removeChild(currentSprite);
     container.addChild(newSprite);
     currentSprite = newSprite;
-    if (isPlaying) {
-      currentSprite.animationSpeed = 0.1;
-      currentSprite.play();
+    currentSprite.play();
+    if (typeof cb === 'function') {
+      cb(newSprite);
     }
   };
 
@@ -79,17 +77,22 @@ const createEntity = (opts: EntityOptions): Entity => {
   };
 };
 
-const setUpSprites = (sheet) => {
+const setUpSprites = (sheet, key) => {
   const { animations } = getResource(sheet, 'spritesheet');
-  const up = new PIXI.AnimatedSprite(animations[`${characters.player}3`]);
-  const down = new PIXI.AnimatedSprite(animations[`${characters.player}0`]);
-  const left = new PIXI.AnimatedSprite(animations[`${characters.player}1`]);
-  const right = new PIXI.AnimatedSprite(animations[`${characters.player}2`]);
+  const up = new PIXI.AnimatedSprite(animations[`${key}3`]);
+  const down = new PIXI.AnimatedSprite(animations[`${key}0`]);
+  const left = new PIXI.AnimatedSprite(animations[`${key}1`]);
+  const right = new PIXI.AnimatedSprite(animations[`${key}2`]);
 
   up.animationSpeed = 0.1;
   down.animationSpeed = 0.1;
   left.animationSpeed = 0.1;
   right.animationSpeed = 0.1;
+
+  up.anchor.set(0.5, 0.5);
+  down.anchor.set(0.5, 0.5);
+  left.anchor.set(0.5, 0.5);
+  right.anchor.set(0.5, 0.5);
 
   return { up, down, left, right };
 };

@@ -1,4 +1,5 @@
 //@flow
+import * as _ from 'underscore';
 
 import PIXI from 'engine';
 declare interface Point {
@@ -10,13 +11,15 @@ interface Entity {
   position: Point;
   speed: number;
   currentSprite: PIXI.AnimatedSprite;
+  moveRequest: MoveRequest;
   movementSprites: {
     up: PIXI.AnimatedSprite,
     down: PIXI.AnimatedSprite,
     left: PIXI.AnimatedSprite,
     right: PIXI.AnimatedSprite,
   };
-  swapSprite: (sprite: string) => void;
+  swapSprite: (sprite: PIXI.Sprite) => void;
+  setCurrentSprite: (sprite: PIXI.Sprite) => void;
 }
 
 type MoveRequest = {
@@ -43,7 +46,6 @@ export const calculateDistance = (
 export const evaluateMove = (
   delta: number,
   entity: Entity,
-  moveRequest: MoveRequest,
   obstacles: Array<any>,
   bounds: Bounds,
 ): Point => {
@@ -54,8 +56,8 @@ export const evaluateMove = (
   let moving = false;
   let newX = entity.position.x;
   let newY = entity.position.y;
-  Object.keys(moveRequest).forEach((dir: string) => {
-    if (moveRequest[dir]) {
+  Object.keys(entity.moveRequest).forEach((dir: string) => {
+    if (entity.moveRequest[dir]) {
       moving = true;
       if (dir === 'up') {
         newY -= entity.speed * delta;
@@ -68,30 +70,217 @@ export const evaluateMove = (
       }
     }
   });
-
-  if (moveRequest.up) {
+  if (entity.moveRequest.up) {
     if (entity.currentSprite !== entity.movementSprites.up) {
-      entity.swapSprite(entity.movementSprites.up);
+      entity.swapSprite(entity.movementSprites.up, entity.setCurrentSprite);
     }
-  } else if (moveRequest.down) {
+  } else if (entity.moveRequest.down) {
     if (entity.currentSprite !== entity.movementSprites.down) {
-      entity.swapSprite(entity.movementSprites.down);
+      entity.swapSprite(entity.movementSprites.down, entity.setCurrentSprite);
     }
-  } else if (moveRequest.right) {
+  } else if (entity.moveRequest.right) {
     if (entity.currentSprite !== entity.movementSprites.right) {
-      entity.swapSprite(entity.movementSprites.right);
+      entity.swapSprite(entity.movementSprites.right, entity.setCurrentSprite);
     }
-  } else if (moveRequest.left) {
+  } else if (entity.moveRequest.left) {
     if (entity.currentSprite !== entity.movementSprites.left) {
-      entity.swapSprite(entity.movementSprites.left);
+      entity.swapSprite(entity.movementSprites.left, entity.setCurrentSprite);
     }
   }
-
   if (!moving) {
     entity.currentSprite.stop();
   } else if (moving && !entity.currentSprite.playing) {
     entity.currentSprite.play();
   }
 
-  return { x: newX, y: newY };
+  let collisionX = false;
+  let collisionY = false;
+
+  if (newX < minX || newX > maxX) {
+    collisionX = true;
+  }
+  if (newY < minY || newY > maxY) {
+    collisionY = true;
+  }
+
+  let newPosX = collisionX ? entity.position.x : newX;
+  let newPosY = collisionY ? entity.position.y : newY;
+
+  return { x: newPosX, y: newPosY };
+};
+
+export const calculateFieldOfView = (
+  fov,
+  graphics,
+  pos,
+  visible,
+  r,
+  mid,
+  parent,
+) => {
+  const visibleObjects = visible.children.filter((sprite) => {
+    if (sprite.children.length > 0 || sprite.transparent) {
+      return false;
+    }
+
+    if (sprite.name === 'backgroundImage') {
+      return false;
+    }
+
+    return fov.contains(sprite.x, sprite.y);
+  });
+  const lines = visibleObjects
+    .map((obj) => {
+      let { x: _bX, y: _bY, width, height } = obj.getBounds(); // (obj.getBox !== undefined) ?  obj.getBox() : obj.getBounds()
+      let { x: bX, y: bY } = parent.toLocal({ x: _bX, y: _bY });
+      let p1 = { x: bX + width / 6, y: bY + height / 6, n: 'topleft' };
+      let p2 = {
+        x: bX + width / 6,
+        y: bY - height / 6 + height,
+        n: 'bottomleft',
+      };
+      let p3 = { x: bX - width / 6 + width, y: bY + height / 6, n: 'topright' };
+      let p4 = {
+        x: bX - width / 6 + width,
+        y: bY - height / 6 + height,
+        n: 'bottomright',
+      };
+
+      p1.distance = calculateDistance(pos, p1);
+      p2.distance = calculateDistance(pos, p2);
+      p3.distance = calculateDistance(pos, p3);
+      p4.distance = calculateDistance(pos, p4);
+
+      let possiblePoints = _.sortBy(
+        [p1, p2, p3, p4],
+        (a) => a.distance.distance,
+      );
+      let returnPoints = [possiblePoints[1], possiblePoints[2]]; //.sort( (a, b) => a.distance.dx - b.distance.dx)
+      //console.log({returnPoints})
+      let lines = {
+        p1: returnPoints[0],
+        p2: returnPoints[1],
+        p3: possiblePoints[3],
+      };
+      let { dx, dy } = calculateDistance(lines.p1, lines.p2);
+      let midpoint = obj.position; //{x: lines.p2.x + dx, y: lines.p2.y + dy}
+      return {
+        p1: lines.p1,
+        p2: lines.p2,
+        midpoint,
+        p3: lines.p3,
+      };
+    })
+    .filter((l) => !l.transparent);
+  const drawingPoints = [];
+  let r2 = r;
+  let rotation = 722;
+  for (let i = 0; i < rotation; i++) {
+    let angle = (0.5 * i * Math.PI) / 180;
+    let x = pos.x + Math.cos(angle) * r;
+    let y = pos.y + Math.sin(angle) * r;
+    let far = { x, y };
+    let check = { p1: pos, p2: far };
+
+    for (let line of lines) {
+      if (intersects(check.p1, check.p2, line.p1, line.p2)) {
+        line.intersect = true;
+      } else {
+        line.intersect = false;
+      }
+    }
+
+    let intersectingLines = lines.filter((line) => line.intersect);
+    if (intersectingLines.length > 0) {
+      let closestLine = intersectingLines.sort((a, b) => {
+        let { distance: dA } = calculateDistance(pos, a.midpoint);
+        let { distance: dB } = calculateDistance(pos, b.midpoint);
+        return dA - dB;
+      })[0];
+
+      let g = { p1: pos, p2: closestLine };
+      let { distance } = calculateDistance(pos, closestLine.p1);
+      x = pos.x + Math.cos(angle) * distance;
+      y = pos.y + Math.sin(angle) * distance;
+    }
+    drawingPoints.push({ x, y });
+  }
+
+  let playerArea = new graphics()
+    .lineStyle(2, 0)
+    .beginFill(0xffffff, 1)
+    .moveTo(mid.x, mid.y);
+  for (let i = 0; i < drawingPoints.length; i++) {
+    playerArea.lineTo(
+      drawingPoints[i].x + (mid.x - pos.x),
+      drawingPoints[i].y + (mid.y - pos.y),
+    );
+  }
+  playerArea.endFill();
+
+  return playerArea;
+};
+
+export const adjustCenterToViewport = (
+  { totalWidth, totalHeight, viewWidth, viewHeight, farPos, nearPos },
+  pos,
+) => {
+  const coords = {};
+  if (Math.abs(pos.x) < totalWidth / 2 - viewWidth / 2) {
+    coords.x = viewWidth / 2;
+  } else if (pos.x > 0) {
+    let diff = pos.x - (totalWidth / 2 - viewWidth / 2);
+    coords.x = viewWidth / 2 + diff;
+  } else {
+    let diff = Math.abs(pos.x) - (totalWidth / 2 - viewWidth / 2);
+    coords.x = viewWidth / 2 - diff;
+  }
+  if (Math.abs(pos.y) < totalHeight / 2 - viewHeight / 2) {
+    coords.y = viewHeight / 2;
+  } else if (pos.y > 0) {
+    let diff = pos.y - (totalHeight / 2 - viewHeight / 2);
+    coords.y = viewHeight / 2 + diff;
+  } else {
+    let diff = Math.abs(pos.y) - (totalHeight / 2 - viewHeight / 2);
+    coords.y = viewHeight / 2 - diff;
+  }
+  return coords;
+};
+
+export const adjustCordToViewPort = (
+  { totalWidth, totalHeight, viewWidth, viewHeight, farPos, nearPos },
+  pos,
+) => {
+  const coords = {};
+  if (pos.x > nearPos.x && pos.x < farPos.x) {
+    let diff = pos.x - nearPos.x;
+    coords.x = diff;
+  } else if (pos.x > farPos.x) {
+    let diff = pos.x - farPos.x;
+    coords.x = viewWidth + diff;
+  } else {
+    let diff = nearPos.x - pos.x;
+    coords.x = pos.x - diff;
+  }
+
+  if (pos.y > nearPos.y && pos.y < farPos.y) {
+    let diff = pos.y - nearPos.y;
+    coords.y = diff;
+  } else if (pos.y > farPos.y) {
+    let diff = pos.y - farPos.y;
+    coords.y = viewHeight + diff;
+  } else {
+    let diff = pos.y - nearPos.y;
+    coords.y = pos.y + diff;
+  }
+  return coords;
+};
+
+const intersects = (p1, p2, p3, p4) => {
+  const CCW = (p1, p2, p3) => {
+    return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+  };
+  return (
+    CCW(p1, p3, p4) != CCW(p2, p3, p4) && CCW(p1, p2, p3) != CCW(p1, p2, p4)
+  );
 };

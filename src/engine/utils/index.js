@@ -1,3 +1,15 @@
-import { calculateDistance } from './utils';
+import {
+  evaluateMove,
+  calculateDistance,
+  calculateFieldOfView,
+  adjustCordToViewPort,
+  adjustCenterToViewport,
+} from './utils';
 
-export { calculateDistance };
+export {
+  evaluateMove,
+  calculateDistance,
+  calculateFieldOfView,
+  adjustCordToViewPort,
+  adjustCenterToViewport,
+};

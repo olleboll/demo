@@ -6,15 +6,15 @@ type PixiApp = {
   animate: () => void,
   destroy: () => void,
 };
+type Resource = {
+  src: string,
+  key: string,
+};
 type PixiAppOptions = {
   div: string,
   spritesheets: Array<Resource>,
   width?: number,
   height?: number,
-};
-type Resource = {
-  src: string,
-  key: string,
 };
 
 export const createPixiApp = (opts: PixiAppOptions): Promise<PixiApp> =>
@@ -28,8 +28,8 @@ export const createPixiApp = (opts: PixiAppOptions): Promise<PixiApp> =>
       } = opts;
 
       const app = new PIXI.Application({
-        width: width ? width : window.innerWidth,
-        height: height ? height : window.innerHeight,
+        width,
+        height,
       });
       const sceneContainer = document.getElementById(div);
       if (sceneContainer !== null) {

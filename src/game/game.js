@@ -1,70 +1,51 @@
-import { DropShadowFilter } from 'pixi-filters';
-
-import PIXI, { createPixiApp, getResource } from 'engine';
-import { calculateDistance } from 'engine/utils';
+//@flow
+import PIXI from 'engine';
 import { createKeyboardControls } from 'engine/controls';
+import { createEntity } from 'engine/objects';
+import { createLevel } from 'engine/level';
 
 import { characters as _characters } from './sprites';
 
 import { createPlayer } from './entities';
 
-const Game = ({ renderer, ticker }) => {
+// TYPES
+import type { Level, LevelOptions } from 'engine/level';
+
+const Game = ({ renderer, ticker, stage: _stage }) => {
   const stage = new PIXI.Container();
-  const world = new PIXI.Container();
-  world.light = {};
-  stage.addChild(world);
-  renderer.backgroundColor = 0xffffff;
+  const levelOptions: LevelOptions = {
+    name: 'map',
+    spriteKey: 'map',
+    centerCamera: true,
+    renderer,
+  };
+  const level: Level = createLevel(levelOptions);
+  stage.addChild(level.scene);
 
   let player;
   let characters = [];
-  let posX = renderer.width / 2;
-  let posY = renderer.height / 2;
 
-  let debbuger = 0;
-  const animate = () => {
-    player.animate();
-    for (let character of characters) {
-      const { dx, dy, distance } = calculateDistance(
-        {
-          x: posX,
-          y: posY,
-        },
-        {
-          x: character.position.x,
-          y: character.position.y,
-        },
-      );
-      let angle = Math.atan(dy / -dx);
-      if (dx < 0) angle += Math.PI;
-      character.shadow.angle = -angle;
-      character.shadow.distance = 5;
-    }
-    world.light.x = posX;
-    world.light.y = posY;
+  const animate = (delta) => {
+    player.animate(delta);
+    level.updateCamera(player.position, player.sightRange);
   };
 
   const init = () => {
     for (let i = 0; i < 10; i++) {
-      const { animations } = getResource('movements2', 'spritesheet');
-      let character = new PIXI.AnimatedSprite(
-        animations[`${_characters.joker}0`],
-      );
+      let x =
+        -level.scene.width / 2 + Math.floor(Math.random() * level.scene.width);
+      let y =
+        -level.scene.height / 2 +
+        Math.floor(Math.random() * level.scene.height);
+      let character = createEntity({
+        spritesheet: 'movements2',
+        spriteKey: _characters.joker,
+        position: { x, y },
+        world: level.scene,
+      });
 
-      character.position.x = Math.floor(Math.random() * renderer.width);
-      character.position.y = Math.floor(Math.random() * renderer.height);
-      character.anchor.set(0.5, 0.5);
-
-      let shadow = new DropShadowFilter();
-      shadow.color = 0x3c2020;
-      shadow.alpha = 1;
-      shadow.blur = 1;
-      shadow.angle = 0;
-      shadow.distance = 5;
-
-      character.shadow = shadow;
-      character.filters = [shadow];
       characters.push(character);
-      world.addChild(character);
+      level.addChild(character.container);
     }
 
     const keys = {
@@ -76,22 +57,24 @@ const Game = ({ renderer, ticker }) => {
     const controls = createKeyboardControls(keys);
     player = createPlayer({
       spritesheet: 'movements',
-      position: { x: 300, y: 300 },
+      spriteKey: _characters.player,
+      position: { x: -500, y: 0 },
       controls,
-      world,
+      world: level.scene,
     });
-    world.addChild(player.container);
-
-    console.log({ player });
-    console.log(world);
+    level.addChild(player.container);
   };
 
-  world.interactive = true;
-  world.on('mousemove', (event) => {
+  level.scene.interactive = true;
+  level.scene.on('mousedown', (event) => {
     const { x, y } = event.data.global;
-    posX = x;
-    posY = y;
+    console.log('CLICK AT');
+    console.log('screen: ', { x, y });
+    console.log('scene: ', level.scene.toLocal({ x, y }));
   });
+
+  console.log('***');
+  console.log({ level });
 
   return {
     stage,

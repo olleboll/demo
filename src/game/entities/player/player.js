@@ -2,7 +2,7 @@
 import { DropShadowFilter } from 'pixi-filters';
 
 import PIXI, { getResource } from 'engine';
-import { calculateDistance, Point } from 'engine/utils';
+import { evaluateMove } from 'engine/utils';
 import { createEntity } from 'engine/objects/entity';
 import type { Entity, EntityOptions } from 'engine/objects/entity';
 
@@ -15,22 +15,22 @@ type Player = Entity & {
     left: boolean,
     right: boolean,
   },
-  position: Point,
   controls: any,
+  sightRange: number,
 };
 
 type PlayerOptions = EntityOptions & {
   controls: any,
-  world: PIXI.Container,
 };
 const createPlayer = (opts: PlayerOptions): Player => {
-  const { spritesheet, position, controls, world } = opts;
-  let speed = 5;
+  const { spritesheet, spriteKey, position, controls, world } = opts;
+  const speed = 4;
+  const sightRange = 300;
   let { container, currentSprite, movementSprites, swapSprite } = createEntity({
     spritesheet,
+    spriteKey,
     position,
     speed,
-    world,
   });
   const movement = {
     up: false,
@@ -43,42 +43,42 @@ const createPlayer = (opts: PlayerOptions): Player => {
   container.position.y = position.y;
   container.addChild(currentSprite);
 
-  const animate = () => {
-    let newDir;
-    let isMoving = false;
-    Object.keys(controls).forEach((key) => {
-      if (controls[key].isDown) {
-        isMoving = true;
-        if (key === 'up') {
-          position.y -= 1 * speed;
-        }
-        if (key === 'down') {
-          position.y += 1 * speed;
-        }
-        if (key === 'right') {
-          position.x += 1 * speed;
-        }
-        if (key === 'left') {
-          position.x -= 1 * speed;
-        }
-        newDir = key;
-        container.position.x = position.x;
-        container.position.y = position.y;
-      } else {
-        movement[key] = false;
-      }
-    });
-    if (newDir) {
-      movement[newDir] = true;
-      swapSprite(movementSprites[newDir]);
-    }
-
-    if (isMoving && !currentSprite.playing) {
-      currentSprite.play();
-    } else if (!isMoving && currentSprite.playing) {
-      currentSprite.stop();
-    }
+  const setCurrentSprite = (sprite) => {
+    currentSprite = sprite;
   };
+
+  const animate = (delta) => {
+    Object.keys(controls).forEach((key) => {
+      movement[key] = controls[key].isDown;
+    });
+
+    const { x, y } = evaluateMove(
+      delta,
+      {
+        position,
+        speed,
+        currentSprite,
+        moveRequest: movement,
+        movementSprites,
+        swapSprite,
+        setCurrentSprite,
+      },
+      [],
+      {
+        maxX: world.width / 2,
+        maxY: world.height / 2,
+        minX: -world.width / 2,
+        minY: -world.height / 2,
+      },
+    );
+
+    position.x = x;
+    position.y = y;
+    container.position.x = position.x;
+    container.position.y = position.y;
+  };
+
+  console.log(world.width);
 
   return {
     container,
@@ -87,6 +87,7 @@ const createPlayer = (opts: PlayerOptions): Player => {
     movementSprites,
     movement,
     speed,
+    sightRange,
     position,
     animate,
     controls,
@@ -95,8 +96,6 @@ const createPlayer = (opts: PlayerOptions): Player => {
 
 const setUpSprites = (sheet) => {
   const { animations } = getResource(sheet, 'spritesheet');
-  console.log(animations);
-  console.log(characters);
   const up = new PIXI.AnimatedSprite(animations[`${characters.player}3`]);
   const down = new PIXI.AnimatedSprite(animations[`${characters.player}0`]);
   const left = new PIXI.AnimatedSprite(animations[`${characters.player}1`]);

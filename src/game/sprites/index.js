@@ -1,3 +1,4 @@
 import characters from './characters';
+import maps from './maps';
 
-export { characters };
+export { characters, maps };
