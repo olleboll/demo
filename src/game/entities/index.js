@@ -1,3 +1,4 @@
-import { createPlayer } from './player';
+import Player from './player';
+import Enemy from './enemy';
 
-export { createPlayer };
+export { Player, Enemy };

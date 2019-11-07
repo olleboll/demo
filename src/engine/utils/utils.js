@@ -43,6 +43,12 @@ export const calculateDistance = (
   return { dx, dy, distance };
 };
 
+export const checkCollision = (entity, point) => {
+  if (!entity.getCollisionBox) return false;
+  const bounds = entity.getCollisionBox();
+  return bounds.contains(point.x, point.y);
+};
+
 export const evaluateMove = (
   delta: number,
   entity: Entity,
@@ -70,23 +76,59 @@ export const evaluateMove = (
       }
     }
   });
-  if (entity.moveRequest.up) {
-    if (entity.currentSprite !== entity.movementSprites.up) {
-      entity.swapSprite(entity.movementSprites.up, entity.setCurrentSprite);
+
+  if (entity.aim) {
+    const { x, y } = entity.aim;
+
+    const dx = x - entity.position.x;
+    const dy = y - entity.position.y;
+
+    const dimension = Math.abs(dx) - Math.abs(dy) > 0 ? 'x' : 'y';
+
+    if (dimension === 'x') {
+      if (dx > 0) {
+        if (entity.currentSprite !== entity.movementSprites.right) {
+          entity.swapSprite(entity.movementSprites.right);
+        }
+      } else {
+        if (entity.currentSprite !== entity.movementSprites.left) {
+          entity.swapSprite(entity.movementSprites.left);
+        }
+      }
+    } else {
+      if (dy > 0) {
+        if (entity.currentSprite !== entity.movementSprites.down) {
+          entity.swapSprite(entity.movementSprites.down);
+        }
+      } else {
+        if (entity.currentSprite !== entity.movementSprites.up) {
+          entity.swapSprite(entity.movementSprites.up);
+        }
+      }
     }
-  } else if (entity.moveRequest.down) {
-    if (entity.currentSprite !== entity.movementSprites.down) {
-      entity.swapSprite(entity.movementSprites.down, entity.setCurrentSprite);
-    }
-  } else if (entity.moveRequest.right) {
-    if (entity.currentSprite !== entity.movementSprites.right) {
-      entity.swapSprite(entity.movementSprites.right, entity.setCurrentSprite);
-    }
-  } else if (entity.moveRequest.left) {
-    if (entity.currentSprite !== entity.movementSprites.left) {
-      entity.swapSprite(entity.movementSprites.left, entity.setCurrentSprite);
+  } else {
+    if (entity.moveRequest.up) {
+      if (entity.currentSprite !== entity.movementSprites.up) {
+        entity.swapSprite(entity.movementSprites.up, entity.setCurrentSprite);
+      }
+    } else if (entity.moveRequest.down) {
+      if (entity.currentSprite !== entity.movementSprites.down) {
+        entity.swapSprite(entity.movementSprites.down, entity.setCurrentSprite);
+      }
+    } else if (entity.moveRequest.right) {
+      if (entity.currentSprite !== entity.movementSprites.right) {
+        entity.swapSprite(
+          entity.movementSprites.right,
+          entity.setCurrentSprite,
+        );
+      }
+    } else if (entity.moveRequest.left) {
+      if (entity.currentSprite !== entity.movementSprites.left) {
+        entity.swapSprite(entity.movementSprites.left, entity.setCurrentSprite);
+      }
     }
   }
+
   if (!moving) {
     entity.currentSprite.stop();
   } else if (moving && !entity.currentSprite.playing) {
@@ -96,11 +138,20 @@ export const evaluateMove = (
   let collisionX = false;
   let collisionY = false;
 
-  if (newX < minX || newX > maxX) {
-    collisionX = true;
-  }
-  if (newY < minY || newY > maxY) {
-    collisionY = true;
+  for (let obj of obstacles) {
+    if (obj === entity.container) continue;
+    if (
+      checkCollision(obj, { x: newX, y: entity.position.y }) ||
+      (newX < minX || newX > maxX)
+    ) {
+      collisionX = true;
+    }
+    if (
+      checkCollision(obj, { x: entity.position.x, y: newY }) ||
+      (newY < minY || newY > maxY)
+    ) {
+      collisionY = true;
+    }
   }
 
   let newPosX = collisionX ? entity.position.x : newX;
@@ -113,13 +164,13 @@ export const calculateFieldOfView = (
   fov,
   graphics,
   pos,
-  visible,
+  obstacles,
   r,
   mid,
   parent,
 ) => {
-  const visibleObjects = visible.children.filter((sprite) => {
-    if (sprite.children.length > 0 || sprite.transparent) {
+  const visibleObjects = obstacles.filter((sprite) => {
+    if (sprite.los) {
       return false;
     }
 
@@ -130,9 +181,10 @@ export const calculateFieldOfView = (
     return fov.contains(sprite.x, sprite.y);
   });
   const lines = visibleObjects
+    .filter((obj) => obj.getLosBounds)
     .map((obj) => {
-      let { x: _bX, y: _bY, width, height } = obj.getBounds(); // (obj.getBox !== undefined) ?  obj.getBox() : obj.getBounds()
-      let { x: bX, y: bY } = parent.toLocal({ x: _bX, y: _bY });
+      let { x: bX, y: bY, width, height } = obj.getLosBounds(); // (obj.getBox !== undefined) ?  obj.getBox() : obj.getBounds()
+
       let p1 = { x: bX + width / 6, y: bY + height / 6, n: 'topleft' };
       let p2 = {
         x: bX + width / 6,
@@ -170,11 +222,12 @@ export const calculateFieldOfView = (
         midpoint,
         p3: lines.p3,
       };
-    })
-    .filter((l) => !l.transparent);
+    });
+
   const drawingPoints = [];
   let r2 = r;
   let rotation = 722;
+  let lastI = -1;
   for (let i = 0; i < rotation; i++) {
     let angle = (0.5 * i * Math.PI) / 180;
     let x = pos.x + Math.cos(angle) * r;
@@ -202,8 +255,10 @@ export const calculateFieldOfView = (
       let { distance } = calculateDistance(pos, closestLine.p1);
       x = pos.x + Math.cos(angle) * distance;
       y = pos.y + Math.sin(angle) * distance;
+      drawingPoints.push({ x, y });
+    } else {
+      drawingPoints.push({ x, y });
     }
-    drawingPoints.push({ x, y });
   }
 
   let playerArea = new graphics()
@@ -247,7 +302,7 @@ export const adjustCenterToViewport = (
   return coords;
 };
 
-export const adjustCordToViewPort = (
+export const adjustCoordToViewPort = (
   { totalWidth, totalHeight, viewWidth, viewHeight, farPos, nearPos },
   pos,
 ) => {
@@ -274,6 +329,38 @@ export const adjustCordToViewPort = (
     coords.y = pos.y + diff;
   }
   return coords;
+};
+
+export const generateRandomPoint = ({
+  minX,
+  maxX,
+  minY,
+  maxY,
+  sizeX,
+  sizeY,
+}) => {
+  let x = minX + Math.random() * (maxX - minX);
+  let y = minY + Math.random() * (maxY - minY);
+  let emergencyExit = 0;
+  while (x + sizeX > maxX || x - sizeX < minX) {
+    x = minX + Math.random() * (maxX - minX);
+    emergencyExit++;
+    if (emergencyExit > 100000) {
+      console.error('Stuck in while loop. exiting!');
+      return { x, y };
+    }
+  }
+  emergencyExit = 0;
+  while (y + sizeY > maxY || y - sizeY < minY) {
+    y = minY + Math.random() * (maxY - minY);
+    emergencyExit++;
+    if (emergencyExit > 100000) {
+      console.error('Stuck in while loop. exiting!');
+      return { x, y };
+    }
+  }
+
+  return { x, y };
 };
 
 const intersects = (p1, p2, p3, p4) => {

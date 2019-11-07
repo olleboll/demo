@@ -3,7 +3,8 @@ import './App.css';
 
 import { createPixiApp } from './engine';
 
-import { characters, maps } from './game/sprites';
+import { arrayOfAll } from './game/sprites';
+import Stats from './stats';
 
 import Game from './game/game';
 
@@ -14,13 +15,13 @@ function App() {
   useEffect(() => {
     async function initGame() {
       if (!app) {
-        const container = document.getElementById('container');
+        const container = document.getElementById('game');
         console.log(container.offsetWidth);
         const { app: pixiApp } = await createPixiApp({
           div: 'game',
           width: container.offsetWidth,
           height: container.offsetHeight,
-          spritesheets: [...characters.source, ...maps.source],
+          spritesheets: arrayOfAll,
         });
         const s = Game(pixiApp);
         pixiApp.stage.addChild(s.stage);
@@ -45,9 +46,12 @@ function App() {
   );
 
   return (
-    <div id="container" className="container">
-      <div id="game"></div>
-    </div>
+    <>
+      <Stats />
+      <div id="container" className="container">
+        <div id="game"></div>
+      </div>
+    </>
   );
 }
 

@@ -2,14 +2,16 @@ import {
   evaluateMove,
   calculateDistance,
   calculateFieldOfView,
-  adjustCordToViewPort,
+  adjustCoordToViewPort,
   adjustCenterToViewport,
+  generateRandomPoint,
 } from './utils';
 
 export {
   evaluateMove,
   calculateDistance,
   calculateFieldOfView,
-  adjustCordToViewPort,
+  adjustCoordToViewPort,
   adjustCenterToViewport,
+  generateRandomPoint,
 };

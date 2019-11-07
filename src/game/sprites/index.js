@@ -1,4 +1,13 @@
 import characters from './characters';
 import maps from './maps';
+import objects from './objects';
+import weapons from './weapons';
 
-export { characters, maps };
+const arrayOfAll = [
+  ...characters.source,
+  ...maps.source,
+  ...objects.source,
+  ...weapons.source,
+];
+
+export { characters, maps, objects, arrayOfAll };
