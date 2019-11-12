@@ -14,7 +14,14 @@ import { createFire } from './objects';
 // TYPES
 import type { Level, LevelOptions } from 'engine/level';
 
-const Game = ({ renderer, ticker, stage: _stage }) => {
+type GameOptions = {
+  renderer: PIXI.Renderer,
+  ticker: PIXI.Ticker,
+  stage: PIXI.Container,
+};
+
+const Game = (opts: GameOptions) => {
+  const { renderer, ticker, stage: _stage } = opts;
   const stage = new PIXI.Container();
   const levelOptions: LevelOptions = {
     name: 'map',
@@ -44,7 +51,7 @@ const Game = ({ renderer, ticker, stage: _stage }) => {
 
   /****************/
   let counter = 0;
-  const animate = (delta) => {
+  const animate = (delta: number) => {
     enemies.forEach((enemy) =>
       enemy.update(delta, level.visible.children, player),
     );

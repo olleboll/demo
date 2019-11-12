@@ -10,6 +10,23 @@ export type EntityOptions = {
 };
 
 class Entity {
+  container: PIXI.Container;
+  speed: number;
+  position: Point;
+  movementSprites: {
+    up: PIXI.AnimatedSprite,
+    down: PIXI.AnimatedSprite,
+    left: PIXI.AnimatedSprite,
+    right: PIXI.AnimatedSprite,
+  };
+  currentSprite: PIXI.AnimatedSprite;
+  movementRequest: {
+    up: boolean,
+    down: boolean,
+    left: boolean,
+    right: boolean,
+  };
+
   constructor(opts: EntityOptions) {
     const { spritesheet, spriteKey, position, speed } = opts;
 
@@ -32,7 +49,7 @@ class Entity {
     this.container.addChild(this.currentSprite);
   }
 
-  swapSprite(newSprite) {
+  swapSprite(newSprite: PIXI.AnimatedSprite) {
     if (!newSprite.renderable) {
       console.warn('target sprite is not renderable');
       console.warn(newSprite);
@@ -49,57 +66,6 @@ class Entity {
     this.currentSprite.play();
   }
 }
-
-const createEntity = (opts: EntityOptions): Entity => {
-  const { spritesheet, spriteKey, position, speed: _speed } = opts;
-
-  const container = new PIXI.Container();
-  const movementSprites = setUpSprites(spritesheet, spriteKey);
-  const movement = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-  };
-  let speed = _speed;
-  let currentSprite = movementSprites.up;
-  container.position.x = position.x;
-  container.position.y = position.y;
-  container.zIndex = container.position.y;
-  container.addChild(currentSprite);
-
-  const swapSprite = (newSprite, cb) => {
-    if (!newSprite.renderable) {
-      console.warn('target sprite is not renderable');
-      console.warn(newSprite);
-      return;
-    }
-    const isPlaying = currentSprite.playing;
-    if (isPlaying) {
-      currentSprite.stop();
-    }
-    newSprite.position = currentSprite.position;
-    container.removeChild(currentSprite);
-    container.addChild(newSprite);
-    currentSprite = newSprite;
-    currentSprite.play();
-    if (typeof cb === 'function') {
-      cb(newSprite);
-    }
-  };
-
-  const animate = () => {};
-
-  return {
-    container,
-    currentSprite,
-    movementSprites,
-    swapSprite,
-    speed,
-    position,
-    animate,
-  };
-};
 
 const setUpSprites = (sheet, key) => {
   const { animations } = getResource(sheet, 'spritesheet');
@@ -131,7 +97,5 @@ const setUpSprites = (sheet, key) => {
 
   return { up, down, left, right };
 };
-
-export { createEntity };
 
 export default Entity;

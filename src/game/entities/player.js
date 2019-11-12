@@ -1,4 +1,3 @@
-// @flow
 import { DropShadowFilter } from 'pixi-filters';
 
 import PIXI, { getResource } from 'engine';
@@ -8,10 +7,6 @@ import Entity from 'engine/objects/entity';
 import { createSword } from 'game/actions';
 
 import { characters } from 'game/sprites';
-
-type PlayerOptions = EntityOptions & {
-  controls: any,
-};
 
 class Player extends Entity {
   constructor({

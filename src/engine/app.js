@@ -79,7 +79,7 @@ const loadSpriteSheets = (spritesheets: Array<Resource>): any =>
     }
   });
 
-export const getResource = (key: string, opt: string) => {
+export const getResource = (key: string, opt?: string) => {
   const r = PIXI.Loader.shared.resources[key];
   if (!opt) {
     return r;

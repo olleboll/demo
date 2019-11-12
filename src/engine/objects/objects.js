@@ -12,6 +12,8 @@ export type ObjectOptions = {
   spritesheet: string,
   spriteKey: string,
   position: Point,
+  width: number,
+  height: number,
 };
 
 let once = 0;

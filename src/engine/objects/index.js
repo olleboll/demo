@@ -1,4 +1,4 @@
-import Entity, { createEntity } from './entity';
+import Entity from './entity';
 import { createObject } from './objects';
 
-export { createEntity, createObject, Entity };
+export { createObject, Entity };

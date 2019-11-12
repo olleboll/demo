@@ -1,4 +1,3 @@
-// @flow
 import { DropShadowFilter } from 'pixi-filters';
 
 import PIXI, { getResource } from 'engine';
@@ -9,21 +8,6 @@ import { Entity } from 'engine/objects';
 import { createSword } from 'game/actions';
 
 import { characters } from 'game/sprites';
-
-// type Enemy = Entity & {
-//   movement: {
-//     up: boolean,
-//     down: boolean,
-//     left: boolean,
-//     right: boolean,
-//   },
-//   controls: any,
-//   sightRange: number,
-// };
-
-type EnemyOptions = EntityOptions & {
-  controls: any,
-};
 
 class Enemy extends Entity {
   constructor({

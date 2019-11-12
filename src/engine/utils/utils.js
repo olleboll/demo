@@ -8,6 +8,7 @@ declare interface Point {
 }
 
 interface Entity {
+  container: PIXI.Container;
   position: Point;
   speed: number;
   currentSprite: PIXI.AnimatedSprite;
@@ -18,6 +19,8 @@ interface Entity {
     left: PIXI.AnimatedSprite,
     right: PIXI.AnimatedSprite,
   };
+  aim?: Point;
+  getCollisionBox?: () => PIXI.Rectangle;
   swapSprite: (sprite: PIXI.Sprite) => void;
   setCurrentSprite: (sprite: PIXI.Sprite) => void;
 }
@@ -43,7 +46,7 @@ export const calculateDistance = (
   return { dx, dy, distance };
 };
 
-export const checkCollision = (entity, point) => {
+export const checkCollision = (entity: Entity, point: Point) => {
   if (!entity.getCollisionBox) return false;
   const bounds = entity.getCollisionBox();
   return bounds.contains(point.x, point.y);
@@ -109,22 +112,19 @@ export const evaluateMove = (
   } else {
     if (entity.moveRequest.up) {
       if (entity.currentSprite !== entity.movementSprites.up) {
-        entity.swapSprite(entity.movementSprites.up, entity.setCurrentSprite);
+        entity.swapSprite(entity.movementSprites.up);
       }
     } else if (entity.moveRequest.down) {
       if (entity.currentSprite !== entity.movementSprites.down) {
-        entity.swapSprite(entity.movementSprites.down, entity.setCurrentSprite);
+        entity.swapSprite(entity.movementSprites.down);
       }
     } else if (entity.moveRequest.right) {
       if (entity.currentSprite !== entity.movementSprites.right) {
-        entity.swapSprite(
-          entity.movementSprites.right,
-          entity.setCurrentSprite,
-        );
+        entity.swapSprite(entity.movementSprites.right);
       }
     } else if (entity.moveRequest.left) {
       if (entity.currentSprite !== entity.movementSprites.left) {
-        entity.swapSprite(entity.movementSprites.left, entity.setCurrentSprite);
+        entity.swapSprite(entity.movementSprites.left);
       }
     }
   }
@@ -160,14 +160,20 @@ export const evaluateMove = (
   return { x: newPosX, y: newPosY };
 };
 
+type BoxPoint = {
+  x: number,
+  y: number,
+  n: string,
+  distance?: number,
+};
 export const calculateFieldOfView = (
-  fov,
-  graphics,
-  pos,
-  obstacles,
-  r,
-  mid,
-  parent,
+  fov: PIXI.Graphics,
+  graphics: PIXI.Graphics,
+  pos: Point,
+  obstacles: Array<PIXI.Container>,
+  r: number,
+  mid: Point,
+  parent: PIXI.Container,
 ) => {
   const visibleObjects = obstacles.filter((sprite) => {
     if (sprite.los) {
@@ -185,28 +191,33 @@ export const calculateFieldOfView = (
     .map((obj) => {
       let { x: bX, y: bY, width, height } = obj.getLosBounds(); // (obj.getBox !== undefined) ?  obj.getBox() : obj.getBounds()
 
-      let p1 = { x: bX + width / 6, y: bY + height / 6, n: 'topleft' };
-      let p2 = {
+      let p1: BoxPoint = {
+        x: bX + width / 6,
+        y: bY + height / 6,
+        n: 'topleft',
+      };
+      let p2: BoxPoint = {
         x: bX + width / 6,
         y: bY - height / 6 + height,
         n: 'bottomleft',
       };
-      let p3 = { x: bX - width / 6 + width, y: bY + height / 6, n: 'topright' };
-      let p4 = {
+      let p3: BoxPoint = {
+        x: bX - width / 6 + width,
+        y: bY + height / 6,
+        n: 'topright',
+      };
+      let p4: BoxPoint = {
         x: bX - width / 6 + width,
         y: bY - height / 6 + height,
         n: 'bottomright',
       };
 
-      p1.distance = calculateDistance(pos, p1);
-      p2.distance = calculateDistance(pos, p2);
-      p3.distance = calculateDistance(pos, p3);
-      p4.distance = calculateDistance(pos, p4);
+      p1.distance = calculateDistance(pos, p1).distance;
+      p2.distance = calculateDistance(pos, p2).distance;
+      p3.distance = calculateDistance(pos, p3).distance;
+      p4.distance = calculateDistance(pos, p4).distance;
 
-      let possiblePoints = _.sortBy(
-        [p1, p2, p3, p4],
-        (a) => a.distance.distance,
-      );
+      let possiblePoints = _.sortBy([p1, p2, p3, p4], (a) => a.distance);
       let returnPoints = [possiblePoints[1], possiblePoints[2]]; //.sort( (a, b) => a.distance.dx - b.distance.dx)
       //console.log({returnPoints})
       let lines = {
@@ -221,6 +232,7 @@ export const calculateFieldOfView = (
         p2: lines.p2,
         midpoint,
         p3: lines.p3,
+        intersect: false,
       };
     });
 
@@ -276,10 +288,23 @@ export const calculateFieldOfView = (
   return playerArea;
 };
 
-export const adjustCenterToViewport = (
-  { totalWidth, totalHeight, viewWidth, viewHeight, farPos, nearPos },
-  pos,
-) => {
+type Viewport = {
+  totalWidth: number,
+  totalHeight: number,
+  viewWidth: number,
+  viewHeight: number,
+  farPos: Point,
+  nearPos: Point,
+};
+export const adjustCenterToViewport = (viewport: Viewport, pos: Point) => {
+  const {
+    totalWidth,
+    totalHeight,
+    viewWidth,
+    viewHeight,
+    farPos,
+    nearPos,
+  } = viewport;
   const coords = {};
   if (Math.abs(pos.x) < totalWidth / 2 - viewWidth / 2) {
     coords.x = viewWidth / 2;
@@ -302,10 +327,15 @@ export const adjustCenterToViewport = (
   return coords;
 };
 
-export const adjustCoordToViewPort = (
-  { totalWidth, totalHeight, viewWidth, viewHeight, farPos, nearPos },
-  pos,
-) => {
+export const adjustCoordToViewPort = (viewport: Viewport, pos: Point) => {
+  const {
+    totalWidth,
+    totalHeight,
+    viewWidth,
+    viewHeight,
+    farPos,
+    nearPos,
+  } = viewport;
   const coords = {};
   if (pos.x > nearPos.x && pos.x < farPos.x) {
     let diff = pos.x - nearPos.x;
@@ -331,14 +361,16 @@ export const adjustCoordToViewPort = (
   return coords;
 };
 
-export const generateRandomPoint = ({
-  minX,
-  maxX,
-  minY,
-  maxY,
-  sizeX,
-  sizeY,
-}) => {
+type input = {
+  minX: number,
+  maxX: number,
+  minY: number,
+  maxY: number,
+  sizeX: number,
+  sizeY: number,
+};
+export const generateRandomPoint = (input: input) => {
+  const { minX, maxX, minY, maxY, sizeX, sizeY } = input;
   let x = minX + Math.random() * (maxX - minX);
   let y = minY + Math.random() * (maxY - minY);
   let emergencyExit = 0;

@@ -14,11 +14,14 @@ export type Level = {
   scene: PIXI.Container,
   visible: PIXI.Container,
   fogOfWar: PIXI.Container,
-  mask: Pixi.Container,
+  mask: PIXI.Container,
+  camera: any,
   addChild: (entity: Entity, shouldBeInFogOfWar: boolean) => void,
-  centerCamera: (center: Point, fovRange: number) => {},
   animate: () => void,
   destroy: () => void,
+  setMask: (key: string, newMask: any) => void,
+  removeMask: (key: string) => void,
+  setEffect: (effect: any) => void,
 };
 
 export type LevelOptions = {
@@ -26,6 +29,8 @@ export type LevelOptions = {
   spriteKey: string,
   centerCamera: boolean,
   renderer: PIXI.Renderer,
+  dark: number,
+  light: number,
 };
 
 const createLevel = (opts: LevelOptions): Level => {
