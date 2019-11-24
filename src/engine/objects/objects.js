@@ -46,6 +46,12 @@ const createObject = (opts: ObjectOptions): Object => {
     bHeight,
   );
 
+  // const debug = new PIXI.Graphics()
+  //   .lineStyle(2, 0)
+  //   .beginFill(0xffffff, 1)
+  //   .drawRect(-bWidth / 2, -bHeight, bWidth, bHeight)
+  //   .endFill();
+  // container.addChild(debug);
   container.getLosBounds = () => bounds;
 
   container.getCollisionBox = () => bounds;

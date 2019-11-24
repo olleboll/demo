@@ -4,8 +4,6 @@ import PIXI, { getResource } from 'engine';
 import { evaluateMove } from 'engine/utils';
 import Entity from 'engine/objects/entity';
 
-import { createSword } from 'game/actions';
-
 import { characters } from 'game/sprites';
 
 class Player extends Entity {
@@ -17,6 +15,7 @@ class Player extends Entity {
     world,
     speed = 2,
     dealDamage,
+    actions,
   }) {
     super({ spritesheet, spriteKey, position, speed });
 
@@ -35,16 +34,9 @@ class Player extends Entity {
 
     this.aim = {};
     this.speed = speed;
-    this.sword = createSword({
-      container: this.container,
-      spriteKey: 'sword_swing_4',
-      range: 50,
-      dealDamage,
-      player: true,
-    });
-    this.actions = {
-      swing: this.sword.swing,
-    };
+    this.actions = actions;
+    this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
+
     this.sightRange = 300;
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
     this.container.addChild(hpContainer);
@@ -81,6 +73,10 @@ class Player extends Entity {
     this.container.position.x = position.x;
     this.container.position.y = position.y;
     this.container.zIndex = position.y;
+
+    for (let action of this.actionsArray) {
+      action.update(delta, obstacles);
+    }
   }
   setUpHealthBar() {
     const hpContainer = new PIXI.Container();

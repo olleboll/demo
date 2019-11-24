@@ -4,7 +4,7 @@ const createFire = ({ position, radius }) => {
   const container = new PIXI.Container();
   const { animations } = getResource('fire', 'spritesheet');
   const animationSprite = new PIXI.AnimatedSprite(animations['fire_place']);
-
+  const originalRadius = radius;
   animationSprite.zIndex = position.y;
   animationSprite.animationSpeed = 0.1;
   animationSprite.loop = true;
@@ -17,12 +17,19 @@ const createFire = ({ position, radius }) => {
   container.position.y = position.y;
   let counter = 0;
   const getNewRadius = () => {
-    let newRadius = radius;
     if (counter % 4 === 0) {
-      newRadius = radius - 5 + Math.random() * 5;
+      radius = radius - 2 + Math.random() * 4;
+      if (radius > originalRadius + 3) {
+        radius = originalRadius + 3;
+      } else if (radius < originalRadius - 3) {
+        radius = originalRadius - 3;
+      }
     }
     counter++;
-    return newRadius;
+    if (counter > 400) {
+      counter = 0;
+    }
+    return radius;
   };
   return {
     id: Math.random(),

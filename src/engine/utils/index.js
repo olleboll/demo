@@ -5,6 +5,14 @@ import {
   adjustCoordToViewPort,
   adjustCenterToViewport,
   generateRandomPoint,
+  checkCollision,
+  generateFreePosition,
+  findClosestIntersectingLines,
+  findIntersectingLine,
+  findIntersectionPoint,
+  getLinesOfRect,
+  contains,
+  reachedTarget,
 } from './utils';
 
 export {
@@ -14,4 +22,12 @@ export {
   adjustCoordToViewPort,
   adjustCenterToViewport,
   generateRandomPoint,
+  checkCollision,
+  generateFreePosition,
+  findClosestIntersectingLines,
+  findIntersectingLine,
+  findIntersectionPoint,
+  getLinesOfRect,
+  contains,
+  reachedTarget,
 };

@@ -3,11 +3,12 @@ import PIXI from 'engine';
 import { createKeyboardControls } from 'engine/controls';
 import { createEntity, createObject } from 'engine/objects';
 import { createLevel } from 'engine/level';
-import { generateRandomPoint } from 'engine/utils';
+import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { characters as _characters, objects } from './sprites';
 
-import { Player, Enemy } from './entities';
+import { Enemy } from './entities';
+import { createPlayer, createEnemy } from './entities/factory';
 import { createRain } from './weather';
 import { createFire } from './objects';
 
@@ -30,6 +31,7 @@ const Game = (opts: GameOptions) => {
     renderer,
     dark: 0.2,
     light: 1.0,
+    hasCamera: true,
   };
   const level: Level = createLevel(levelOptions);
   stage.addChild(level.scene);
@@ -40,14 +42,14 @@ const Game = (opts: GameOptions) => {
   let lightSources = [];
   let enemies = [];
 
-  // const rain = createRain({
-  //   position: { x: -500, y: -500 },
-  //   width: 1000,
-  //   height: 1000,
-  //   intensity: 3,
-  //   container: level.visible,
-  //   brightness: 1.0,
-  // });
+  const rain = createRain({
+    position: { x: -500, y: -500 },
+    width: 1000,
+    height: 1000,
+    intensity: 3,
+    container: level.visible,
+    brightness: 1.0,
+  });
 
   /****************/
   let counter = 0;
@@ -101,17 +103,6 @@ const Game = (opts: GameOptions) => {
       dash: 32,
     };
     const controls = createKeyboardControls(keys);
-    console.log(dealDamage);
-    player = new Player({
-      spritesheet: 'movements',
-      spriteKey: _characters.player,
-      position: { x: -500, y: 0 },
-      controls,
-      world: level.scene,
-      speed: 3,
-      dealDamage,
-    });
-    level.addChild(player.container);
     const opts = {
       width: level.scene.width,
       height: level.scene.height,
@@ -119,24 +110,49 @@ const Game = (opts: GameOptions) => {
       dealDamage,
       remove,
     };
-    trees = generateRandomTrees(100, opts);
+
+    trees = generateRNGTrees(); //generateRandomTrees(3, opts);
     trees.forEach((tree) =>
       level.addChild(tree.container, tree.fogOfWarContainer),
     );
+
+    const playerPos = generateFreePosition(
+      level.scene.children,
+      null,
+      { x: 0, y: 0, width: level.scene.width, height: level.scene.height },
+      40,
+    );
+
+    player = createPlayer({
+      spritesheet: 'movements',
+      spriteKey: _characters.player,
+      position: { x: 0, y: 0 },
+      controls,
+      world: level,
+      speed: 3,
+      dealDamage,
+      renderer,
+    });
+    level.addChild(player.container);
 
     lightSources = generateRandomTorches(10, opts);
     lightSources.forEach((torch) => level.addChild(torch.container));
 
     enemies = generateRandomEnemies(10, opts);
     enemies.forEach((enemy) => level.addChild(enemy.container));
-    //aalevel.setEffect(rain);
+    level.setEffect(rain);
   };
 
   level.scene.interactive = true;
-  level.scene.on('mousedown', (event) => {
+  level.scene.on('mouseup', (event) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
-    player.actions.swing(target);
+    //player.actions.sword.swing(target);
+    player.actions.bow.execute('fire', target);
+  });
+
+  level.scene.on('mousedown', (event) => {
+    player.actions.bow.execute('draw');
   });
 
   level.scene.on('mousemove', (event) => {
@@ -166,7 +182,7 @@ const generateRandomEnemies = (
       sizeX: 30,
       sizeY: 30,
     });
-    const enemy = new Enemy({
+    const enemy = createEnemy({
       spritesheet: 'movements2',
       spriteKey: _characters.warrior,
       position: { x, y },
@@ -221,3 +237,94 @@ const generateRandomTrees = (number, { width, height }) => {
 };
 
 export default Game;
+
+const generateRNGTrees = () => {
+  let treeMap = [];
+
+  const chanceToStartAsOpen = 0.2;
+  const deathLimit = 2;
+  const birthLimit = 5;
+  const numberOfSteps = 8;
+  const width = 1600 / 25;
+  const height = 1600 / 25;
+
+  for (let i = 0; i < width; i++) {
+    treeMap[i] = [];
+    for (let j = 0; j < height; j++) {
+      if (Math.random() < chanceToStartAsOpen) {
+        treeMap[i][j] = true;
+      } else {
+        treeMap[i][j] = false;
+      }
+    }
+  }
+
+  const countNeighbours = (map, x, y) => {
+    let count = 0;
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        let n_x = x + i;
+        let n_y = y + j;
+
+        if (i === 0 && j === 0) {
+          continue;
+        } else if (
+          n_x < 0 ||
+          n_y < 0 ||
+          n_x >= map.length ||
+          n_y >= map[0].length
+        ) {
+          count++;
+        } else if (map[n_x][n_y]) {
+          count++;
+        }
+      }
+    }
+    return count;
+  };
+
+  const doSimulationStep = (map) => {
+    const newMap = [];
+
+    for (let i = 0; i < width; i++) {
+      newMap[i] = [];
+      for (let j = 0; j < height; j++) {
+        let nbs = countNeighbours(map, i, j);
+        if (map[i][j]) {
+          if (nbs < deathLimit) {
+            newMap[i][j] = false;
+          } else {
+            newMap[i][j] = true;
+          }
+        } else {
+          if (nbs > birthLimit) {
+            newMap[i][j] = true;
+          } else {
+            newMap[i][j] = false;
+          }
+        }
+      }
+    }
+    return newMap;
+  };
+
+  for (let i = 0; i < numberOfSteps; i++) {
+    treeMap = doSimulationStep(treeMap);
+  }
+  const trees = [];
+  for (let i = 0; i < width; i++) {
+    for (let j = 0; j < height; j++) {
+      if (treeMap[i][j] === true) {
+        let tree = createObject({
+          spritesheet: 'outside',
+          spriteKey: objects.tree,
+          position: { x: -800 + i * 25, y: -800 + j * 25 },
+          width: 64,
+          height: 64,
+        });
+        trees.push(tree);
+      }
+    }
+  }
+  return trees;
+};

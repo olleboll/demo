@@ -7,7 +7,11 @@ import { createCamera } from 'engine/camera';
 import type { Entity } from 'engine/objects';
 import type { Point } from 'engine/utils';
 
-import { calculateFieldOfView, adjustCenterToViewport } from 'engine/utils';
+import {
+  calculateFieldOfView,
+  adjustCenterToViewport,
+  checkCollision,
+} from 'engine/utils';
 
 export type Level = {
   name: string,
@@ -17,6 +21,7 @@ export type Level = {
   mask: PIXI.Container,
   camera: any,
   addChild: (entity: Entity, shouldBeInFogOfWar: boolean) => void,
+  removeChild: (entity: Entity) => void,
   animate: () => void,
   destroy: () => void,
   setMask: (key: string, newMask: any) => void,
@@ -31,10 +36,11 @@ export type LevelOptions = {
   renderer: PIXI.Renderer,
   dark: number,
   light: number,
+  hasCamera: boolean,
 };
 
 const createLevel = (opts: LevelOptions): Level => {
-  const { name, renderer, dark, light } = opts;
+  const { name, renderer, dark, light, hasCamera = false } = opts;
 
   const scene = new PIXI.Container();
   const visible = new PIXI.Container();
@@ -68,7 +74,10 @@ const createLevel = (opts: LevelOptions): Level => {
 
   scene.visible = visible;
 
-  const camera = createCamera({ renderer, scene });
+  let camera;
+  if (hasCamera) {
+    camera = createCamera({ renderer, scene });
+  }
 
   const addChild = (
     entity: PIXI.Container,
@@ -122,6 +131,7 @@ const createLevel = (opts: LevelOptions): Level => {
     setMask,
     removeMask,
     addChild,
+    removeChild,
     setEffect,
     animate,
     destroy,

@@ -1,0 +1,3 @@
+class Medallion {
+  constructor() {}
+}

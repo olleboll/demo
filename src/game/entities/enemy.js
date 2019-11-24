@@ -18,6 +18,7 @@ class Enemy extends Entity {
     speed = 2,
     dealDamage,
     remove,
+    actions,
   }) {
     super({ spritesheet, spriteKey, position, speed });
     this.remove = remove;
@@ -34,15 +35,8 @@ class Enemy extends Entity {
     this.world = world;
 
     this.speed = speed;
-    this.sword = createSword({
-      container: this.container,
-      spriteKey: 'sword_swing_4',
-      range: 40,
-      dealDamage,
-    });
-    this.actions = {
-      swing: this.sword.swing,
-    };
+
+    this.actions = actions;
     this.sightRange = 300;
     this.swingRange = 30;
 
@@ -54,6 +48,8 @@ class Enemy extends Entity {
         30,
       );
     };
+
+    this.container.takeDamage = this.takeDamage.bind(this);
 
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
     this.container.addChild(hpContainer);
@@ -79,11 +75,11 @@ class Enemy extends Entity {
         this.swingRange,
       );
       if (attackRadius.contains(target.position.x, target.position.y)) {
-        if (!this.sword.sprite.playing) {
-          this.sword.swing(target.position);
+        if (!this.actions.sword.coolDown()) {
+          this.actions.sword.swing(target.position);
         }
       } else {
-        moveRequest['right'] = Math.abs(dx) > this.speed && dx > 0;
+        moveRequest['right'] = Math.abs(dx) > this.speed && dx > this.speed * 2;
         moveRequest['left'] = Math.abs(dx) > this.speed && dx < this.speed * 2;
         moveRequest['down'] = Math.abs(dy) > this.speed && dy > this.speed * 2;
         moveRequest['up'] = Math.abs(dy) > this.speed && dy < this.speed * 2;

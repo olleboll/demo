@@ -46,10 +46,25 @@ export const calculateDistance = (
   return { dx, dy, distance };
 };
 
+export const reachedTarget = ({ position, target, offset }) => {
+  const { x: px, y: py } = position;
+  const { x: tx, y: ty } = target;
+  const { x: offsetX, y: offsetY } = offset;
+  return (
+    px > tx - Math.abs(offsetX) &&
+    px < tx + Math.abs(offsetX) &&
+    py > ty - Math.abs(offsetY) &&
+    py < ty + Math.abs(offsetY)
+  );
+};
+
 export const checkCollision = (entity: Entity, point: Point) => {
   if (!entity.getCollisionBox) return false;
   const bounds = entity.getCollisionBox();
-  return bounds.contains(point.x, point.y);
+  if (bounds.contains(point.x, point.y)) {
+    return entity;
+  }
+  return null;
 };
 
 export const evaluateMove = (
@@ -257,16 +272,12 @@ export const calculateFieldOfView = (
 
     let intersectingLines = lines.filter((line) => line.intersect);
     if (intersectingLines.length > 0) {
-      let closestLine = intersectingLines.sort((a, b) => {
-        let { distance: dA } = calculateDistance(pos, a.midpoint);
-        let { distance: dB } = calculateDistance(pos, b.midpoint);
-        return dA - dB;
-      })[0];
+      let closestLine = findClosestIntersectingLines(pos, intersectingLines);
 
       let g = { p1: pos, p2: closestLine };
-      let { distance } = calculateDistance(pos, closestLine.p1);
-      x = pos.x + Math.cos(angle) * distance;
-      y = pos.y + Math.sin(angle) * distance;
+      let { distance, dx, dy } = calculateDistance(pos, closestLine.p1);
+      x = pos.x + Math.cos(angle) * distance + Math.sign(dx) * 10;
+      y = pos.y + Math.sin(angle) * distance + Math.sign(dy) * 10;
       drawingPoints.push({ x, y });
     } else {
       drawingPoints.push({ x, y });
@@ -287,6 +298,39 @@ export const calculateFieldOfView = (
 
   return playerArea;
 };
+
+export const getLinesOfRect = ({ x, y, width, height }) => {
+  let p1 = {
+    x: x,
+    y: y,
+  };
+  let p2 = {
+    x: x + width,
+    y: y + height,
+  };
+  let p3 = {
+    x: x - width,
+    y: y + height,
+  };
+  let p4 = {
+    x: x - width,
+    y: y - height,
+  };
+
+  return [
+    { p1, p2 },
+    { p1: p2, p2: p3 },
+    { p1: p3, p2: p4 },
+    { p1: p4, p2: p1 },
+  ];
+};
+
+export const findClosestIntersectingLines = (pos, lines) =>
+  lines.sort((a, b) => {
+    let { distance: dA } = calculateDistance(pos, a.midpoint);
+    let { distance: dB } = calculateDistance(pos, b.midpoint);
+    return dA - dB;
+  })[0];
 
 type Viewport = {
   totalWidth: number,
@@ -395,7 +439,140 @@ export const generateRandomPoint = (input: input) => {
   return { x, y };
 };
 
-const intersects = (p1, p2, p3, p4) => {
+type circle = {
+  x: number,
+  y: number,
+  r: number,
+};
+
+type rect = {
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+};
+
+export const generateFreePosition = (
+  obstacles: Array<PIXI.Container>,
+  circle,
+  rect,
+  size,
+  maxTries = 1000,
+) => {
+  const generatePos = () => {
+    let x, y;
+    if (circle) {
+      x = circle.x - circle.r + Math.random(circle.r * 2);
+      y = circle.y - circle.r + Math.random(circle.r * 2);
+    } else {
+      x = rect.x + Math.random(rect.width);
+      y = rect.y + Math.random(rect.height);
+    }
+    return { x, y };
+  };
+
+  let tries;
+  let blocked = obstacles.length > 0;
+  console.log('blocked');
+  console.log(blocked);
+  let x, y;
+  while (blocked) {
+    const pos = generatePos();
+    x = pos.x;
+    y = pos.y;
+    if (tries > maxTries) {
+      console.log('I dont wanna get stuck, bailing.');
+      break;
+    }
+    for (let i = 0; i < obstacles.length; i++) {
+      tries++;
+      const area = new PIXI.Circle(x, y, size);
+      if (area.contains(obstacles[i].position)) {
+        console.log('does this run?');
+        break;
+      } else if (i === obstacles.length - 1) {
+        blocked = false;
+      }
+    }
+  }
+  return { x, y };
+};
+
+export const findIntersectingLine = (lines, line) => {
+  for (let l of lines) {
+    if (intersects(l.p1, l.p2, line.p1, line.p2)) {
+      return l;
+    }
+  }
+  return null;
+};
+
+export const findIntersectionPoint = (checkLine, lines) => {
+  const { p1, p2 } = checkLine;
+  const intersectionPoints = [];
+  for (let i = 0; i < lines.length; i++) {
+    const { p1: p3, p2: p4 } = lines[i];
+    const p = intersectionPoint(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
+    if (p) {
+      intersectionPoints.push(p);
+    }
+  }
+  return intersectionPoints;
+};
+
+const intersectionPoint = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+  // Check if none of the lines are of length 0
+  if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
+    return false;
+  }
+
+  let denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+
+  // Lines are parallel
+  if (denominator === 0) {
+    return false;
+  }
+
+  let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+  let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+  // is the intersection along the segments
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+    return false;
+  }
+
+  // Return a object with the x and y coordinates of the intersection
+  let x = x1 + ua * (x2 - x1);
+  let y = y1 + ua * (y2 - y1);
+
+  return { x, y };
+};
+
+export const contains = ({ p1, p2, p3, p4 }, { x, y }) => {
+  const checkLine = { p1: { x, y }, p2: { x: 10000, y: y } };
+
+  const rLines = [{ p1, p2 }, { p2, p3 }, { p3, p4 }, { p4, p1 }];
+  const rLine1 = { p1, p2 };
+  const rLine2 = { p1: p2, p2: p3 };
+  const rLine3 = { p1: p3, p2: p4 };
+  const rLine4 = { p1: p4, p2: p1 };
+  let intersections = 0;
+  intersections = intersects(checkLine.p1, checkLine.p2, rLine1.p1, rLine1.p2)
+    ? intersections + 1
+    : intersections;
+  intersections = intersects(checkLine.p1, checkLine.p2, rLine2.p1, rLine2.p2)
+    ? intersections + 1
+    : intersections;
+  intersections = intersects(checkLine.p1, checkLine.p2, rLine3.p1, rLine3.p2)
+    ? intersections + 1
+    : intersections;
+  intersections = intersects(checkLine.p1, checkLine.p2, rLine4.p1, rLine4.p2)
+    ? intersections + 1
+    : intersections;
+  return intersections === 1;
+};
+
+export const intersects = (p1, p2, p3, p4) => {
   const CCW = (p1, p2, p3) => {
     return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
   };

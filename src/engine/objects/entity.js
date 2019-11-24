@@ -69,7 +69,6 @@ class Entity {
 
 const setUpSprites = (sheet, key) => {
   const { animations } = getResource(sheet, 'spritesheet');
-  console.log(animations);
   const up = new PIXI.AnimatedSprite(animations[`${key}3`]);
   const down = new PIXI.AnimatedSprite(animations[`${key}0`]);
   const left = new PIXI.AnimatedSprite(animations[`${key}1`]);
