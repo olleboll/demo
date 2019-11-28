@@ -2,7 +2,7 @@
 import PIXI from 'engine';
 import { createKeyboardControls } from 'engine/controls';
 import { createEntity, createObject } from 'engine/objects';
-import { createLevel } from 'engine/level';
+import Level from 'engine/level';
 import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { characters as _characters, objects } from './sprites';
@@ -13,7 +13,7 @@ import { createRain } from './weather';
 import { createFire } from './objects';
 
 // TYPES
-import type { Level, LevelOptions } from 'engine/level';
+import type { LevelOptions } from 'engine/level';
 
 type GameOptions = {
   renderer: PIXI.Renderer,
@@ -33,7 +33,7 @@ const Game = (opts: GameOptions) => {
     light: 1.0,
     hasCamera: true,
   };
-  const level: Level = createLevel(levelOptions);
+  const level = new Level(levelOptions); //createLevel(levelOptions);
   stage.addChild(level.scene);
   /****************/
   // Game objects
@@ -42,14 +42,14 @@ const Game = (opts: GameOptions) => {
   let lightSources = [];
   let enemies = [];
 
-  const rain = createRain({
-    position: { x: -500, y: -500 },
-    width: 1000,
-    height: 1000,
-    intensity: 3,
-    container: level.visible,
-    brightness: 1.0,
-  });
+  // const rain = createRain({
+  //   position: { x: -500, y: -500 },
+  //   width: 1000,
+  //   height: 1000,
+  //   intensity: 3,
+  //   container: level.visible,
+  //   brightness: 1.0,
+  // });
 
   /****************/
   let counter = 0;
@@ -138,9 +138,9 @@ const Game = (opts: GameOptions) => {
     lightSources = generateRandomTorches(10, opts);
     lightSources.forEach((torch) => level.addChild(torch.container));
 
-    enemies = generateRandomEnemies(10, opts);
-    enemies.forEach((enemy) => level.addChild(enemy.container));
-    level.setEffect(rain);
+    // enemies = generateRandomEnemies(10, opts);
+    // enemies.forEach((enemy) => level.addChild(enemy.container));
+    // level.setEffect(rain);
   };
 
   level.scene.interactive = true;

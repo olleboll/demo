@@ -13,128 +13,100 @@ import {
   checkCollision,
 } from 'engine/utils';
 
-export type Level = {
-  name: string,
-  scene: PIXI.Container,
-  visible: PIXI.Container,
-  fogOfWar: PIXI.Container,
-  mask: PIXI.Container,
-  camera: any,
-  addChild: (entity: Entity, shouldBeInFogOfWar: boolean) => void,
-  removeChild: (entity: Entity) => void,
-  animate: () => void,
-  destroy: () => void,
-  setMask: (key: string, newMask: any) => void,
-  removeMask: (key: string) => void,
-  setEffect: (effect: any) => void,
-};
+class Level {
+  constructor({
+    name,
+    renderer,
+    dark,
+    light,
+    hasCamera = false,
+    backgroundSprite = 'map',
+  }) {
+    this.name = name;
+    const scene = new PIXI.Container();
+    const visible = new PIXI.Container();
+    const fogOfWar = new PIXI.Container();
+    const mask = new PIXI.Container();
+    this.effects = [];
 
-export type LevelOptions = {
-  name: string,
-  spriteKey: string,
-  centerCamera: boolean,
-  renderer: PIXI.Renderer,
-  dark: number,
-  light: number,
-  hasCamera: boolean,
-};
+    const { textures } = getResource('map');
 
-const createLevel = (opts: LevelOptions): Level => {
-  const { name, renderer, dark, light, hasCamera = false } = opts;
+    const background = new PIXI.Sprite(textures[backgroundSprite]);
+    background.zIndex = -background.height / 2;
+    background.name = 'backgroundImage';
+    background.position.x = -background.width / 2;
+    background.position.y = -background.height / 2;
+    visible.addChild(background);
+    visible.sortableChildren = true;
+    visible.filters = [new PIXI.filters.AlphaFilter(light)];
+    visible.mask = mask;
+    this.visibleMasks = {};
 
-  const scene = new PIXI.Container();
-  const visible = new PIXI.Container();
-  const fogOfWar = new PIXI.Container();
-  const mask = new PIXI.Container();
-  const effects = [];
+    const staticBackground = new PIXI.Sprite(textures[backgroundSprite]);
+    staticBackground.zIndex = -staticBackground / 2;
+    staticBackground.name = 'backgroundImage';
+    staticBackground.position.x = -staticBackground.width / 2;
+    staticBackground.position.y = -staticBackground.height / 2;
+    fogOfWar.addChild(staticBackground);
+    fogOfWar.sortableChildren = true;
+    fogOfWar.filters = [new PIXI.filters.AlphaFilter(dark)];
 
-  const { textures } = getResource('map');
+    scene.addChild(fogOfWar);
+    scene.addChild(visible);
+    scene.visible = visible;
 
-  const background = new PIXI.Sprite(textures.map);
-  background.zIndex = -background.height / 2;
-  background.name = 'backgroundImage';
-  background.position.x = -background.width / 2;
-  background.position.y = -background.height / 2;
-  visible.addChild(background);
-  visible.sortableChildren = true;
-  visible.filters = [new PIXI.filters.AlphaFilter(light)];
-  visible.mask = mask;
+    this.camera = createCamera({ renderer, scene });
 
-  const staticBackground = new PIXI.Sprite(textures.map);
-  staticBackground.zIndex = -staticBackground / 2;
-  staticBackground.name = 'backgroundImage';
-  staticBackground.position.x = -staticBackground.width / 2;
-  staticBackground.position.y = -staticBackground.height / 2;
-  fogOfWar.addChild(staticBackground);
-  fogOfWar.sortableChildren = true;
-  fogOfWar.filters = [new PIXI.filters.AlphaFilter(dark)];
+    this.scene = scene;
+    this.visible = visible;
+    this.fogOfWar = fogOfWar;
 
-  scene.addChild(fogOfWar);
-  scene.addChild(visible);
-  scene.visible = visible;
-
-  let camera;
-  if (hasCamera) {
-    camera = createCamera({ renderer, scene });
+    this.addChild = this.addChild.bind(this);
+    this.removeChild = this.removeChild.bind(this);
+    this.setMask = this.setMask.bind(this);
+    this.removeMask = this.removeMask.bind(this);
+    this.setEffect = this.setEffect.bind(this);
+    this.animate = this.animate.bind(this);
+    this.destroy = this.destroy.bind(this);
   }
 
-  const addChild = (
-    entity: PIXI.Container,
-    fogOfWarEntity?: PIXI.Container,
-  ) => {
-    visible.addChild(entity);
+  addChild(entity: PIXI.Container, fogOfWarEntity?: PIXI.Container) {
+    this.visible.addChild(entity);
     if (fogOfWarEntity) {
-      fogOfWar.addChild(fogOfWarEntity);
+      this.fogOfWar.addChild(fogOfWarEntity);
     }
-  };
+  }
 
-  const removeChild = (container) => {
-    visible.removeChild(container);
-    fogOfWar.removeChild(container);
-  };
+  removeChild(container) {
+    this.visible.removeChild(container);
+    this.fogOfWar.removeChild(container);
+  }
 
-  let visibleMasks = {};
-  const setMask = (key, newMask) => {
-    if (visibleMasks[key]) {
-      visible.mask.removeChild(visibleMasks[key]);
-      visibleMasks[key].destroy();
+  setMask(key, newMask) {
+    if (this.visibleMasks[key]) {
+      this.visible.mask.removeChild(this.visibleMasks[key]);
+      this.visibleMasks[key].destroy();
     }
-    visible.mask.addChild(newMask);
-    visibleMasks[key] = newMask;
-  };
+    this.visible.mask.addChild(newMask);
+    this.visibleMasks[key] = newMask;
+  }
 
-  const removeMask = (key) => {
-    visible.mask.removeChild(visibleMasks[key]);
-    visibleMasks[key].destroy();
-    delete visibleMasks[key];
-  };
-  const setEffect = (effect) => {
-    effects.push(effect);
-  };
-  const animate = (delta) => {
-    for (let effect of effects) {
+  removeMask(key) {
+    this.visible.mask.removeChild(this.visibleMasks[key]);
+    this.visibleMasks[key].destroy();
+    delete this.visibleMasks[key];
+  }
+  setEffect(effect) {
+    this.effects.push(effect);
+  }
+  animate(delta) {
+    for (let effect of this.effects) {
       effect.animate(delta);
     }
-  };
-  const destroy = () => {
-    scene.destroy({ children: true });
-  };
+  }
+  destroy() {
+    this.scene.destroy({ children: true });
+  }
+}
 
-  return {
-    name,
-    scene,
-    visible,
-    fogOfWar,
-    mask,
-    camera,
-    setMask,
-    removeMask,
-    addChild,
-    removeChild,
-    setEffect,
-    animate,
-    destroy,
-  };
-};
-
-export { createLevel };
+export default Level;

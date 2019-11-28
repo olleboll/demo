@@ -1,2 +1,1 @@
-import { createLevel } from './level';
-export { createLevel };
+export { default } from './level';
