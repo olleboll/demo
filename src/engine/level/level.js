@@ -3,7 +3,7 @@
 
 import PIXI, { getResource } from 'engine';
 
-import { createCamera } from 'engine/camera';
+import Camera from 'engine/camera';
 import type { Entity } from 'engine/objects';
 import type { Point } from 'engine/utils';
 
@@ -55,7 +55,7 @@ class Level {
     scene.addChild(visible);
     scene.visible = visible;
 
-    this.camera = createCamera({ renderer, scene });
+    this.camera = new Camera({ renderer, scene });
 
     this.scene = scene;
     this.visible = visible;

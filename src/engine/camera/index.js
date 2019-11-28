@@ -1,3 +1,1 @@
-import createCamera from './camera';
-
-export { createCamera };
+export { default } from './camera';

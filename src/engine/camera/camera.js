@@ -6,25 +6,30 @@ import {
   adjustCoordToViewPort,
 } from 'engine/utils';
 
-const createCamera = ({ renderer, scene }) => {
-  const SCENE_WIDTH = scene.width;
-  const SCENE_HEIGHT = scene.height;
-  const SCREEN_MID_X = renderer.width / 2;
-  const SCREEN_MID_Y = renderer.height / 2;
+class Camera {
+  constructor({ renderer, scene }) {
+    this.SCENE_WIDTH = scene.width;
+    this.SCENE_HEIGHT = scene.height;
+    this.SCREEN_MID_X = renderer.width / 2;
+    this.SCREEN_MID_Y = renderer.height / 2;
+    this.scene = scene;
+    this.renderer = renderer;
+    scene.position.x = this.SCREEN_MID_X;
+    scene.position.y = this.SCREEN_MID_Y;
 
-  scene.position.x = SCREEN_MID_X;
-  scene.position.y = SCREEN_MID_Y;
+    this.updateCamera = this.updateCamera.bind(this);
+    this.generateFieldOfView = this.generateFieldOfView.bind(this);
+    this.generateMask = this.generateMask.bind(this);
+  }
 
-  let visibleMask;
-
-  console.log(scene.width);
-  console.log(SCENE_HEIGHT);
-  console.log(SCREEN_MID_X);
-  console.log(renderer.width);
-  console.log(SCREEN_MID_Y);
-  console.log(renderer.height);
-
-  const updateCamera = (center: Point, fovRange: number) => {
+  updateCamera(center: Point, fovRange: number) {
+    const {
+      scene,
+      SCENE_WIDTH,
+      SCENE_HEIGHT,
+      SCREEN_MID_X,
+      SCREEN_MID_Y,
+    } = this;
     if (Math.abs(center.x) < SCENE_WIDTH / 2 - SCREEN_MID_X) {
       scene.pivot.x = center.x;
       scene.position.x = SCREEN_MID_X;
@@ -41,9 +46,10 @@ const createCamera = ({ renderer, scene }) => {
     } else {
       scene.pivot.y = -SCENE_HEIGHT / 2 + SCREEN_MID_Y;
     }
-  };
+  }
 
-  const generateFieldOfView = (viewPoint, fovRange, shouldLos) => {
+  generateFieldOfView(viewPoint, fovRange, shouldLos) {
+    const { scene, renderer, SCENE_WIDTH, SCENE_HEIGHT } = this;
     let mid = {};
 
     const rendererPositionFar = scene.toLocal({
@@ -79,9 +85,10 @@ const createCamera = ({ renderer, scene }) => {
       mid,
       scene.visible,
     );
-  };
+  }
 
-  const generateMask = (center, radius) => {
+  generateMask(center, radius) {
+    const { scene, renderer, SCENE_WIDTH, SCENE_HEIGHT } = this;
     const rendererPositionFar = scene.toLocal({
       x: renderer.width,
       y: renderer.height,
@@ -107,13 +114,7 @@ const createCamera = ({ renderer, scene }) => {
       .lineStyle(2, 0)
       .beginFill(0xffffff, 1)
       .drawCircle(mid.x, mid.y, radius);
-  };
+  }
+}
 
-  return {
-    updateCamera,
-    generateFieldOfView,
-    generateMask,
-  };
-};
-
-export default createCamera;
+export default Camera;
