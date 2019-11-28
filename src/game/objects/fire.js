@@ -15,6 +15,7 @@ const createFire = ({ position, radius }) => {
 
   container.position.x = position.x;
   container.position.y = position.y;
+  container.zIndex = position.y;
   let counter = 0;
   const getNewRadius = () => {
     if (counter % 4 === 0) {

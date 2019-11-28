@@ -72,7 +72,7 @@ class Bow {
     if (!this.drawn) return;
     this.drawn = false;
     if (this.arrows.length > this.quiverSize) return;
-    const power = Math.min(this.power, this.maxPower);
+    const power = this.power >= this.maxPower ? this.maxPower : this.power;
     const { x, y } = this.parent.position;
 
     this.power = this.minPower;
@@ -108,6 +108,7 @@ class Bow {
     });
 
     let arrowDestination = target;
+    let damageMultiplier = power === this.maxPower ? 20 : power;
     for (let o of targets) {
       if (!o.getCollisionBox) continue;
 
@@ -142,7 +143,7 @@ class Bow {
         })[0];
         arrowDestination = hit;
         if (o.takeDamage) {
-          o.takeDamage(10 + 3 * power);
+          o.takeDamage(10 + 3 * damageMultiplier);
         }
         // const debug = new PIXI.Graphics()
         //   .lineStyle(2, 0)

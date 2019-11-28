@@ -317,7 +317,7 @@ const generateRNGTrees = () => {
       if (treeMap[i][j] === true) {
         let tree = createObject({
           spritesheet: 'outside',
-          spriteKey: objects.tree,
+          spriteKey: objects.pine_tree,
           position: { x: -800 + i * 25, y: -800 + j * 25 },
           width: 64,
           height: 64,

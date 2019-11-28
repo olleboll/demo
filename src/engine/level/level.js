@@ -71,7 +71,6 @@ const createLevel = (opts: LevelOptions): Level => {
 
   scene.addChild(fogOfWar);
   scene.addChild(visible);
-
   scene.visible = visible;
 
   let camera;

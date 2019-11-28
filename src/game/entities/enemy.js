@@ -131,11 +131,11 @@ class Enemy extends Entity {
   }
 
   takeDamage(damage) {
+    this.hp -= damage;
     console.log('enemy taking damage');
     if (this.hp <= 0) {
       this.die();
     }
-    this.hp -= damage;
   }
 }
 

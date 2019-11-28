@@ -31,6 +31,7 @@ export const createPixiApp = (opts: PixiAppOptions): Promise<PixiApp> =>
         width,
         height,
       });
+      //app.stage.scale = new PIXI.Point(1.2, 1.2);
       const sceneContainer = document.getElementById(div);
       if (sceneContainer !== null) {
         sceneContainer.appendChild(app.view);
