@@ -45,14 +45,15 @@ class Player extends Entity {
     this.hpContainer = hpContainer;
     this.hpContainer.position.y -= 20;
     this.hp = 100;
+    this.debug = 0;
   }
 
   setAim({ x, y }) {
     this.aim.x = x;
     this.aim.y = y;
   }
-  update(delta, obstacles, targets) {
-    const { controls, moveRequest, position, container, world } = this;
+  update(delta, obstacles, world) {
+    const { controls, moveRequest, position, container } = this;
     Object.keys(controls).forEach((key) => {
       if (moveRequest[key] !== undefined) {
         moveRequest[key] = controls[key].isDown;
@@ -60,10 +61,10 @@ class Player extends Entity {
     });
 
     const { x, y } = evaluateMove(delta, this, obstacles, {
-      maxX: world.width / 2,
-      maxY: world.height / 2,
-      minX: -world.width / 2,
-      minY: -world.height / 2,
+      maxX: world.scene.width / 2,
+      maxY: world.scene.height / 2,
+      minX: -world.scene.width / 2,
+      minY: -world.scene.height / 2,
     });
 
     this.hpBar.width = (this.hpbg.width * this.hp) / 100;

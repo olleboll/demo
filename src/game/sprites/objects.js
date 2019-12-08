@@ -3,6 +3,8 @@ const objects = {
     { key: 'outside', src: '/static/assets/objects/outside.json' },
     { key: 'fire', src: '/static/assets/objects/fire.json' },
   ],
+  firespin: 'firespin',
+  fire: 'firex',
   tree: 'med_tree',
   pine_tree: 'pine_tree',
   fire_place: 'fire_place',

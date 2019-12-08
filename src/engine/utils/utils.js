@@ -59,7 +59,7 @@ export const reachedTarget = ({ position, target, offset }) => {
 };
 
 export const checkCollision = (entity: Entity, point: Point) => {
-  if (!entity.getCollisionBox) return false;
+  if (!entity || !entity.getCollisionBox) return false;
   const bounds = entity.getCollisionBox();
   if (bounds.contains(point.x, point.y)) {
     return entity;
@@ -156,14 +156,16 @@ export const evaluateMove = (
   for (let obj of obstacles) {
     if (obj === entity.container) continue;
     if (
-      checkCollision(obj, { x: newX, y: entity.position.y }) ||
-      (newX < minX || newX > maxX)
+      !collisionX &&
+      (checkCollision(obj, { x: newX, y: entity.position.y }) ||
+        (newX < minX || newX > maxX))
     ) {
       collisionX = true;
     }
     if (
-      checkCollision(obj, { x: entity.position.x, y: newY }) ||
-      (newY < minY || newY > maxY)
+      !collisionY &&
+      (checkCollision(obj, { x: entity.position.x, y: newY }) ||
+        (newY < minY || newY > maxY))
     ) {
       collisionY = true;
     }
@@ -181,6 +183,9 @@ type BoxPoint = {
   n: string,
   distance?: number,
 };
+
+let counter = 0;
+
 export const calculateFieldOfView = (
   fov: PIXI.Graphics,
   graphics: PIXI.Graphics,
@@ -191,6 +196,9 @@ export const calculateFieldOfView = (
   parent: PIXI.Container,
 ) => {
   const visibleObjects = obstacles.filter((sprite) => {
+    if (!sprite) {
+      return false;
+    }
     if (sprite.los) {
       return false;
     }
@@ -198,9 +206,16 @@ export const calculateFieldOfView = (
     if (sprite.name === 'backgroundImage') {
       return false;
     }
-
     return fov.contains(sprite.x, sprite.y);
   });
+  counter++;
+  if (counter === 200) {
+    console.log('**** DEBUG ***');
+    console.log(obstacles);
+    console.log(obstacles.length);
+    console.log(visibleObjects);
+    console.log(visibleObjects.length);
+  }
   const lines = visibleObjects
     .filter((obj) => obj.getLosBounds)
     .map((obj) => {
@@ -276,8 +291,8 @@ export const calculateFieldOfView = (
 
       let g = { p1: pos, p2: closestLine };
       let { distance, dx, dy } = calculateDistance(pos, closestLine.p1);
-      x = pos.x + Math.cos(angle) * distance + Math.sign(dx) * 10;
-      y = pos.y + Math.sin(angle) * distance + Math.sign(dy) * 10;
+      x = pos.x + Math.cos(angle) * distance;
+      y = pos.y + Math.sin(angle) * distance;
       drawingPoints.push({ x, y });
     } else {
       drawingPoints.push({ x, y });
@@ -473,8 +488,6 @@ export const generateFreePosition = (
 
   let tries;
   let blocked = obstacles.length > 0;
-  console.log('blocked');
-  console.log(blocked);
   let x, y;
   while (blocked) {
     const pos = generatePos();

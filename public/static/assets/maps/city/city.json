@@ -16,7 +16,7 @@
       "trimmed": false,
       "spriteSourceSize": {"x":0,"y":0,"w":1600,"h":1200},
       "sourceSize": {"w":1600,"h":1200},
-      "anchor": {"x":0.5,"y":0.5}
+      "anchor": {"x":0,"y":0}
     }
   }
 }

@@ -15,19 +15,11 @@ import {
 import { Enemy } from 'game/entities';
 
 class Bow {
-  constructor({
-    spriteKey,
-    dealDamage,
-    player,
-    world,
-    quiverSize = 100,
-    renderer,
-  }) {
+  constructor({ spriteKey, dealDamage, player, quiverSize = 100, renderer }) {
     const { textures } = getResource('bomb_arrow');
     this.texture = textures['obj_14'];
     this.isPlayer = player;
     this.dealDamage = dealDamage;
-    this.world = world;
     this.parent = null;
     this.renderer = renderer;
     this.arrows = [];
@@ -68,7 +60,7 @@ class Bow {
     this.drawn = true;
   }
 
-  shoot(target) {
+  shoot({ target, world }) {
     if (!this.drawn) return;
     this.drawn = false;
     if (this.arrows.length > this.quiverSize) return;
@@ -95,7 +87,7 @@ class Bow {
 
     const shot = { p1: this.parent.position, p2: target };
 
-    const targets = this.world.scene.visible.children.sort((a, b) => {
+    const targets = world.scene.visible.children.sort((a, b) => {
       let { distance: dA } = calculateDistance(shot.p1, {
         x: a.position.x,
         y: a.position.y,
@@ -151,7 +143,7 @@ class Bow {
         //   .drawRect(hit.x, hit.y, 10, 10)
         //   .endFill();
         // debug.zIndex = 2000;
-        // this.world.addChild(debug, debug.clone());
+        // world.addChild(debug, debug.clone());
         break;
       }
     }
@@ -159,9 +151,9 @@ class Bow {
     const trail = new PIXI.Graphics();
 
     trailContainer.addChild(trail);
-    this.world.addChild(trailContainer);
+    world.addChild(trailContainer);
 
-    this.world.addChild(sprite);
+    world.addChild(sprite);
     this.arrows.push({
       start: { x: this.parent.position.x, y: this.parent.position.y },
       velocity: { x: velX * power, y: velY * power },

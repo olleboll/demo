@@ -56,11 +56,22 @@ const createObject = (opts: ObjectOptions): Object => {
 
   container.getCollisionBox = () => bounds;
 
+  // const debugSprite = new PIXI.Graphics()
+  //   .lineStyle(2, 0)
+  //   .beginFill(0xffffff, 1)
+  //   .drawRect(-5, -5, 10, 10)
+  //   .endFill();
+  // debugSprite.zIndex = 2000;
+  // container.addChild(debugSprite);
+  // debugSprite.visible = ;
+  // container.showDebug = (shouldShow) => {
+  //   debugSprite.visible = shouldShow;
+  // };
+
   return {
     container,
     fogOfWarContainer,
     position,
-    container,
     sprite,
   };
 };

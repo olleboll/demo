@@ -1,0 +1,124 @@
+import { createObject } from 'engine/objects';
+import { generateRandomPoint, generateFreePosition } from 'engine/utils';
+
+import { createEnemy } from 'game/entities/factory';
+import { characters, objects } from 'game/sprites';
+
+export const generateRNGTrees = () => {
+  let treeMap = [];
+
+  const chanceToStartAsOpen = 0.2;
+  const deathLimit = 2;
+  const birthLimit = 5;
+  const numberOfSteps = 8;
+  const width = 1600 / 25;
+  const height = 1600 / 25;
+
+  for (let i = 0; i < width; i++) {
+    treeMap[i] = [];
+    for (let j = 0; j < height; j++) {
+      if (Math.random() < chanceToStartAsOpen) {
+        treeMap[i][j] = true;
+      } else {
+        treeMap[i][j] = false;
+      }
+    }
+  }
+
+  const countNeighbours = (map, x, y) => {
+    let count = 0;
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        let n_x = x + i;
+        let n_y = y + j;
+
+        if (i === 0 && j === 0) {
+          continue;
+        } else if (
+          n_x < 0 ||
+          n_y < 0 ||
+          n_x >= map.length ||
+          n_y >= map[0].length
+        ) {
+          count++;
+        } else if (map[n_x][n_y]) {
+          count++;
+        }
+      }
+    }
+    return count;
+  };
+
+  const doSimulationStep = (map) => {
+    const newMap = [];
+
+    for (let i = 0; i < width; i++) {
+      newMap[i] = [];
+      for (let j = 0; j < height; j++) {
+        let nbs = countNeighbours(map, i, j);
+        if (map[i][j]) {
+          if (nbs < deathLimit) {
+            newMap[i][j] = false;
+          } else {
+            newMap[i][j] = true;
+          }
+        } else {
+          if (nbs > birthLimit) {
+            newMap[i][j] = true;
+          } else {
+            newMap[i][j] = false;
+          }
+        }
+      }
+    }
+    return newMap;
+  };
+
+  for (let i = 0; i < numberOfSteps; i++) {
+    treeMap = doSimulationStep(treeMap);
+  }
+  const trees = [];
+  for (let i = 0; i < width; i++) {
+    for (let j = 0; j < height; j++) {
+      if (treeMap[i][j] === true) {
+        let tree = createObject({
+          spritesheet: 'outside',
+          spriteKey: objects.pine_tree,
+          position: { x: -800 + i * 25, y: -800 + j * 25 },
+          width: 64,
+          height: 64,
+        });
+        trees.push(tree);
+      }
+    }
+  }
+  return trees;
+};
+
+export const generateRandomEnemies = (
+  number,
+  { width, height, level, dealDamage, remove },
+) => {
+  const enemies = [];
+  for (let i = 0; i < number; i++) {
+    const { x, y } = generateRandomPoint({
+      minX: -width / 2,
+      maxX: width / 2,
+      minY: -height / 2,
+      maxY: height / 2,
+      sizeX: 30,
+      sizeY: 30,
+    });
+    const enemy = createEnemy({
+      spritesheet: 'movements2',
+      spriteKey: characters.warrior,
+      position: { x, y },
+      world: level.scene,
+      speed: 2,
+      dealDamage,
+      remove,
+    });
+    enemies.push(enemy);
+  }
+  return enemies;
+};

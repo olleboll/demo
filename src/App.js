@@ -27,7 +27,6 @@ function App() {
         pixiApp.stage.addChild(s.stage);
         s.init();
         pixiApp.ticker.add(s.animate);
-
         setApp(pixiApp);
       }
     }

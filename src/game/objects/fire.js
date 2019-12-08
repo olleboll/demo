@@ -2,11 +2,12 @@ import PIXI, { getResource } from 'engine';
 
 const createFire = ({ position, radius }) => {
   const container = new PIXI.Container();
-  const { animations } = getResource('fire', 'spritesheet');
-  const animationSprite = new PIXI.AnimatedSprite(animations['fire_place']);
+  const { animations } = getResource('fire2', 'spritesheet');
+  console.log(animations);
+  const animationSprite = new PIXI.AnimatedSprite(animations['fire']);
   const originalRadius = radius;
   animationSprite.zIndex = position.y;
-  animationSprite.animationSpeed = 0.1;
+  animationSprite.animationSpeed = 1;
   animationSprite.loop = true;
   animationSprite.visible = true;
   animationSprite.play();
