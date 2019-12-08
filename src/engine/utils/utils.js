@@ -276,8 +276,8 @@ export const calculateFieldOfView = (
 
       let g = { p1: pos, p2: closestLine };
       let { distance, dx, dy } = calculateDistance(pos, closestLine.p1);
-      x = pos.x + Math.cos(angle) * distance + Math.sign(dx) * 10;
-      y = pos.y + Math.sin(angle) * distance + Math.sign(dy) * 10;
+      x = pos.x + Math.cos(angle) * distance;
+      y = pos.y + Math.sin(angle) * distance;
       drawingPoints.push({ x, y });
     } else {
       drawingPoints.push({ x, y });
