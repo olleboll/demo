@@ -61,10 +61,10 @@ class Player extends Entity {
     });
 
     const { x, y } = evaluateMove(delta, this, obstacles, {
-      maxX: world.scene.width / 2,
-      maxY: world.scene.height / 2,
-      minX: -world.scene.width / 2,
-      minY: -world.scene.height / 2,
+      maxX: world.width / 2,
+      maxY: world.height / 2,
+      minX: -world.width / 2,
+      minY: -world.height / 2,
     });
 
     this.hpBar.width = (this.hpbg.width * this.hp) / 100;

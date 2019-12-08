@@ -60,8 +60,8 @@ class Enemy extends Entity {
     this.hp = 100;
   }
 
-  update(delta, obstacles, target) {
-    const { moveRequest, position, container, world } = this;
+  update(delta, obstacles, target, world) {
+    const { moveRequest, position, container } = this;
 
     const view = new PIXI.Circle(position.x, position.y, this.sightRange);
     this.hpBar.width = (this.hpbg.width * this.hp) / 100;

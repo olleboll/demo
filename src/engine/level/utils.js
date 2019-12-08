@@ -42,16 +42,25 @@ export const pointToSquare = (point, grid, mapSize) => {
 
 // rename. This shoiuld return a set of object within the supplied squares
 export const includeAdjecentSquares = ({ s1, s2, s3, s4 }, grid) => {
-  let allSquares = s1.square.concat(s2.square, s3.square, s4.square);
-  const returnSet = new Set(s1.square.concat(s2.square, s3.square, s4.square));
+  const allSquares = [];
+  Array.prototype.push.apply(
+    allSquares,
+    s1.square,
+    s2.square,
+    s3.square,
+    s4.square,
+  );
+
+  //let allSquares = s1.square.concat(s2.square, s3.square, s4.square);
 
   const diffX = s2.x - s1.x;
   const diffY = s4.y - s1.y;
 
   for (let x = 0; x < diffX; x++) {
     for (let y = 0; y < diffY; y++) {
-      allSquares = allSquares.concat(grid[s1.x + x][s1.y + y]);
+      Array.prototype.push.apply(allSquares, grid[s1.x + x][s1.y + y]);
     }
   }
+
   return new Set(allSquares);
 };

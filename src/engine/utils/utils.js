@@ -276,16 +276,13 @@ export const calculateFieldOfView = (
     let y = pos.y + Math.sin(angle) * r;
     let far = { x, y };
     let check = { p1: pos, p2: far };
-
+    let intersectingLines = [];
     for (let line of lines) {
       if (intersects(check.p1, check.p2, line.p1, line.p2)) {
-        line.intersect = true;
-      } else {
-        line.intersect = false;
+        intersectingLines.push(line);
       }
     }
 
-    let intersectingLines = lines.filter((line) => line.intersect);
     if (intersectingLines.length > 0) {
       let closestLine = findClosestIntersectingLines(pos, intersectingLines);
 
