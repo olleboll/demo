@@ -114,8 +114,10 @@ class Level {
       console.log({ s1, s2, s3, s4 });
       console.log(result);
     }
-
-    //result.forEach((e) => e && e.showDebug && e.showDebug(true));
+    const showDebug = range < 150;
+    result.forEach((e) => {
+      return e && e.showDebug && e.showDebug(showDebug);
+    });
 
     return Array.from(result);
   }

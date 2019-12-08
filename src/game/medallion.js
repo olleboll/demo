@@ -1,92 +1,92 @@
 class Medallion {
-  constructor(levels, startingLevel, player) {
+  constructor(levels, startingLevel, player, stage) {
+    this.stage = stage;
     this.levels = levels;
     this.currentLevel = this.levels[startingLevel];
     this.player = player;
     this.swappingUniverse = false;
     this.currentLevel.addChild(this.player.container);
     this.update = this.update.bind(this);
-    //this.swapUniverse = this.swapUniverse.bind(this);
+    this.swapUniverse = this.swapUniverse.bind(this);
   }
 
   update(delta) {
     if (!this.player) return;
     const { currentLevel, player } = this;
-    const obstacles = currentLevel.getObstacles(player.position, 40);
+    if (this.swappingUniverse) {
+      this.universeSwapAnimation.update();
+      return;
+    }
+    const obstacles = currentLevel.getObstacles(player.position, 100);
     //const obstacles = currentLevel.visible.children
     player.update(delta, obstacles, currentLevel.sceneSize);
     currentLevel.update(delta, player);
   }
 
-  // swapUniverse(onDone) {
-  //   this.swappingUniverse = true;
-  //
-  //   const onComplete = () => {
-  //     this.swappingUniverse = false;
-  //     onDone();
-  //   };
-  //
-  //   const onSwap = () => {
-  //     console.log('yep, swapping');
-  //     const cameraPosition = this.activeUniverse.map.position;
-  //     const cameraPivot = this.activeUniverse.map.pivot;
-  //     this.activeUniverse.visible.removeChild(this.player.container);
-  //     this.stage.removeChild(this.activeUniverse.stage);
-  //
-  //     this.activeUniverse.map.position.x = cameraPosition.x;
-  //     this.activeUniverse.map.position.y = cameraPosition.y;
-  //     this.activeUniverse.map.pivot.x = cameraPivot.x;
-  //     this.activeUniverse.map.pivot.y = cameraPivot.y;
-  //
-  //     this.activeUniverse.visible.addChild(this.player.container);
-  //     this.stage.addChild(this.activeUniverse.stage);
-  //     this.activeUniverse.updateCamera(this.player.position);
-  //     this.activeUniverse.setPlayer(this.player);
-  //   };
-  //   let next, old;
-  //   if (this.activeUniverse instanceof Forest) {
-  //     old = this.forest.map;
-  //     next = this.city.map;
-  //   } else {
-  //     next = this.forest.map;
-  //     old = this.city.map;
-  //   }
-  //
-  //   this.universeSwapAnimation = universeSwap({
-  //     fromWorld: old,
-  //     toWorld: next,
-  //     onSwap: onSwap.bind(this),
-  //     onComplete: onComplete.bind(this),
-  //   });
-  // }
+  swapUniverse(newWorld, onDone) {
+    console.log('swapping!?');
+    console.log(newWorld);
+    newWorld = this.currentLevel.name === 'forest' ? 'city' : 'forest';
+    console.log(newWorld);
+    console.log(this.currentLevel.name);
+    this.swappingUniverse = true;
+
+    const onComplete = () => {
+      this.swappingUniverse = false;
+      //onDone();
+    };
+
+    const onSwap = (delta) => {
+      console.log('yep, swapping');
+      this.currentLevel.visible.removeChild(this.player.container);
+      this.stage.removeChild(this.currentLevel.scene);
+
+      // this.currentLevel.map.position.x = cameraPosition.x;
+      // this.currentLevel.map.position.y = cameraPosition.y;
+      // this.currentLevel.map.pivot.x = cameraPivot.x;
+      // this.currentLevel.map.pivot.y = cameraPivot.y;
+      this.currentLevel = this.levels[newWorld];
+      this.currentLevel.visible.addChild(this.player.container);
+      this.stage.addChild(this.currentLevel.scene);
+      this.player.update(delta, [], this.currentLevel.sceneSize);
+      this.currentLevel.update(delta, this.player);
+    };
+
+    this.universeSwapAnimation = universeSwap({
+      fromWorld: this.currentLevel,
+      toWorld: this.levels[newWorld],
+      onSwap: onSwap.bind(this),
+      onComplete: onComplete.bind(this),
+    });
+  }
 }
 
 const universeSwap = ({ fromWorld, toWorld, onSwap, onComplete }) => {
-  const fromAlpha = fromWorld.alpha;
-  const toAlpha = toWorld.alpha;
+  const fromAlpha = fromWorld.scene.alpha;
+  const toAlpha = toWorld.scene.alpha;
 
-  toWorld.alpha = 0;
+  toWorld.scene.alpha = 0;
 
   let fadeIn = false;
   let fadeOut = true;
 
   const update = (delta) => {
     if (fadeOut) {
-      fromWorld.alpha -= 0.02;
+      fromWorld.scene.alpha -= 0.02;
     }
 
     if (fadeIn) {
-      if (toWorld.alpha >= toAlpha) {
+      if (toWorld.scene.alpha >= toAlpha) {
         onComplete();
         return;
       }
-      toWorld.alpha += 0.02;
+      toWorld.scene.alpha += 0.02;
     }
-    if (fromWorld.alpha < 0 && fadeOut) {
-      onSwap();
+    if (fromWorld.scene.alpha < 0 && fadeOut) {
+      onSwap(delta);
       fadeOut = false;
       fadeIn = true;
-      fromWorld.alpha = fromAlpha;
+      fromWorld.scene.alpha = fromAlpha;
     }
   };
   return {

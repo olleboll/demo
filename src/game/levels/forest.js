@@ -7,20 +7,21 @@ import { generateRNGTrees, generateRandomEnemies } from './utils';
 class ForestLevel extends Level {
   constructor(props) {
     super(props);
+    this.name = 'forest';
     this.dealDamage = props.dealDamage;
     this.trees = generateRNGTrees(); //generateRandomTrees(3, opts);
     this.trees.forEach((tree) =>
       this.addChild(tree.container, tree.fogOfWarContainer),
     );
     this.enemies = [];
-    this.enemies = generateRandomEnemies(10, {
-      width: this.scene.width,
-      height: this.scene.height,
-      level: this,
-      dealDamage: this.dealDamage,
-      remove: this.removeEnemy,
-    });
-    this.enemies.forEach((enemy) => this.addChild(enemy.container));
+    // this.enemies = generateRandomEnemies(10, {
+    //   width: this.scene.width,
+    //   height: this.scene.height,
+    //   level: this,
+    //   dealDamage: this.dealDamage,
+    //   remove: this.removeEnemy,
+    // });
+    // this.enemies.forEach((enemy) => this.addChild(enemy.container));
 
     const rain = createRain({
       position: { x: -750, y: -750 },

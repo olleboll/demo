@@ -84,7 +84,7 @@ const Game = (opts: GameOptions) => {
     forest: forestLevel,
     city: cityLevel,
   };
-  const medallion = new Medallion(levels, 'forest', player);
+  const medallion = new Medallion(levels, 'forest', player, stage);
   const level = medallion.currentLevel;
   stage.addChild(level.scene);
   /****************/
@@ -126,7 +126,7 @@ const Game = (opts: GameOptions) => {
   };
 
   level.scene.interactive = true;
-  level.scene.on('mouseup', (event) => {
+  const swapUniverse = (event) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
     //player.actions.sword.swing(target);
@@ -134,10 +134,14 @@ const Game = (opts: GameOptions) => {
       target,
       world: medallion.currentLevel,
     });
-  });
+    medallion.swapUniverse('city');
+  };
+  level.scene.on('mouseup', swapUniverse);
+  cityLevel.scene.interactive = true;
+  cityLevel.scene.on('mouseup', swapUniverse);
 
   level.scene.on('mousedown', (event) => {
-    player.actions.bow.execute('draw');
+    //player.actions.bow.execute('draw');
   });
 
   level.scene.on('mousemove', (event) => {
