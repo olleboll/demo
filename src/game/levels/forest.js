@@ -37,7 +37,7 @@ class ForestLevel extends Level {
   update(delta, player) {
     super.update(delta, player);
     this.enemies.forEach((enemy) =>
-      enemy.update(delta, this.getObstacles(enemy.position, 40), player),
+      enemy.update(delta, this.visible.children, player),
     );
   }
 

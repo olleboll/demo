@@ -52,7 +52,7 @@ const Game = (opts: GameOptions) => {
     spriteKey: _characters.player,
     position: { x: 0, y: 0 },
     controls,
-    speed: 2,
+    speed: 3,
     dealDamage,
     renderer,
   });
