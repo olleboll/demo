@@ -16,8 +16,19 @@ import {
 import { generateGrid, pointToSquare, includeAdjecentSquares } from './utils';
 
 class Level {
-  constructor({ name, renderer, dark, light, hasCamera = false, spriteKey }) {
+  constructor({
+    name,
+    renderer,
+    dark,
+    light,
+    hasCamera = false,
+    spriteKey,
+    sceneWidth,
+    sceneHeight,
+  }) {
     this.name = name;
+    this.sceneWidth = sceneWidth;
+    this.sceneHeight = sceneHeight;
     const scene = new PIXI.Container();
     const visible = new PIXI.Container();
     const fogOfWar = new PIXI.Container();
@@ -50,10 +61,19 @@ class Level {
     scene.addChild(visible);
     scene.visible = visible;
 
-    this.sceneSize = { width: scene.width, height: scene.height };
-    this.grid = generateGrid({ width: scene.width, height: scene.height }, 50);
+    this.sceneSize = { width: this.sceneWidth, height: this.sceneHeight };
+    this.grid = generateGrid(
+      { width: this.sceneWidth, height: this.sceneHeight },
+      100,
+    );
 
-    this.camera = new Camera({ renderer, scene, level: this });
+    this.camera = new Camera({
+      renderer,
+      scene,
+      level: this,
+      sceneWidth,
+      sceneHeight,
+    });
 
     this.scene = scene;
     this.visible = visible;
@@ -116,7 +136,7 @@ class Level {
     }
     const showDebug = range < 150;
     result.forEach((e) => {
-      return e && e.showDebug && e.showDebug(showDebug);
+      return e && showDebug && e.showDebug && e.showDebug(true);
     });
 
     return Array.from(result);

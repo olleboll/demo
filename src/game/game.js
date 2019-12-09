@@ -8,6 +8,7 @@ import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 import { characters as _characters, objects } from './sprites';
 
 import { CityLevel, ForestLevel } from './levels';
+import { generateRNGTrees } from './levels/utils';
 import Medallion from './medallion';
 import { Enemy } from './entities';
 import { createPlayer, createEnemy } from './entities/factory';
@@ -57,15 +58,20 @@ const Game = (opts: GameOptions) => {
     renderer,
   });
 
+  const trees = generateRNGTrees();
+
   const levelOptions: LevelOptions = {
     name: 'map',
     spriteKey: 'forest',
     centerCamera: true,
     renderer,
-    dark: 0.1,
+    dark: 0.4,
     light: 1.0,
+    sceneWidth: 1600,
+    sceneHeight: 1600,
     hasCamera: true,
     dealDamage,
+    trees,
   };
   const forestLevel = new ForestLevel(levelOptions); //createLevel(levelOptions);
 
@@ -74,10 +80,13 @@ const Game = (opts: GameOptions) => {
     spriteKey: 'city',
     centerCamera: true,
     renderer,
-    dark: 0.3,
+    dark: 0.4,
     light: 1.2,
+    sceneWidth: 1600,
+    sceneHeight: 1200,
     hasCamera: true,
     dealDamage,
+    trees,
   };
   const cityLevel = new CityLevel(levelOptions2); //createLevel(levelOptions);
   const levels = {
@@ -86,10 +95,8 @@ const Game = (opts: GameOptions) => {
   };
   const medallion = new Medallion(levels, 'forest', player, stage);
   const level = medallion.currentLevel;
-  stage.addChild(level.scene);
   /****************/
   // Game objects
-  let trees = [];
   let lightSources = [];
   let enemies = [];
 
@@ -145,6 +152,12 @@ const Game = (opts: GameOptions) => {
   });
 
   level.scene.on('mousemove', (event) => {
+    const { x, y } = event.data.global;
+    const aim = level.scene.toLocal({ x, y });
+    player.setAim(aim);
+  });
+
+  cityLevel.scene.on('mousemove', (event) => {
     const { x, y } = event.data.global;
     const aim = level.scene.toLocal({ x, y });
     player.setAim(aim);

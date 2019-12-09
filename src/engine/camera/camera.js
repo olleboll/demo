@@ -7,9 +7,9 @@ import {
 } from 'engine/utils';
 
 class Camera {
-  constructor({ renderer, scene, level }) {
-    this.SCENE_WIDTH = scene.width;
-    this.SCENE_HEIGHT = scene.height;
+  constructor({ renderer, scene, level, sceneWidth, sceneHeight }) {
+    this.SCENE_WIDTH = sceneWidth;
+    this.SCENE_HEIGHT = sceneHeight;
     this.SCREEN_MID_X = renderer.width / 2;
     this.SCREEN_MID_Y = renderer.height / 2;
     this.level = level;

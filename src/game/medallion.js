@@ -1,3 +1,5 @@
+import { generateRNGTrees, generateRandomEnemies } from './levels/utils';
+
 class Medallion {
   constructor(levels, startingLevel, player, stage) {
     this.stage = stage;
@@ -8,6 +10,7 @@ class Medallion {
     this.currentLevel.addChild(this.player.container);
     this.update = this.update.bind(this);
     this.swapUniverse = this.swapUniverse.bind(this);
+    this.stage.addChild(this.currentLevel.scene);
   }
 
   update(delta) {
@@ -17,39 +20,34 @@ class Medallion {
       this.universeSwapAnimation.update();
       return;
     }
-    const obstacles = currentLevel.getObstacles(player.position, 100);
-    //const obstacles = currentLevel.visible.children
+    const obstacles = currentLevel.getObstacles(player.position, 150);
+    //const obstacles = currentLevel.visible.children;
     player.update(delta, obstacles, currentLevel.sceneSize);
     currentLevel.update(delta, player);
   }
 
   swapUniverse(newWorld, onDone) {
-    console.log('swapping!?');
-    console.log(newWorld);
+    if (this.swappingUniverse) {
+      return;
+    }
     newWorld = this.currentLevel.name === 'forest' ? 'city' : 'forest';
-    console.log(newWorld);
-    console.log(this.currentLevel.name);
     this.swappingUniverse = true;
 
     const onComplete = () => {
       this.swappingUniverse = false;
-      //onDone();
     };
 
     const onSwap = (delta) => {
-      console.log('yep, swapping');
+      const cameraPosition = this.currentLevel.scene.position;
+      const cameraPivot = this.currentLevel.scene.pivot;
       this.currentLevel.visible.removeChild(this.player.container);
       this.stage.removeChild(this.currentLevel.scene);
-
-      // this.currentLevel.map.position.x = cameraPosition.x;
-      // this.currentLevel.map.position.y = cameraPosition.y;
-      // this.currentLevel.map.pivot.x = cameraPivot.x;
-      // this.currentLevel.map.pivot.y = cameraPivot.y;
       this.currentLevel = this.levels[newWorld];
+
+      this.currentLevel.camera.updateCamera(this.player.position, 30);
+      this.player.update(delta, [], this.currentLevel.sceneSize);
       this.currentLevel.visible.addChild(this.player.container);
       this.stage.addChild(this.currentLevel.scene);
-      this.player.update(delta, [], this.currentLevel.sceneSize);
-      this.currentLevel.update(delta, this.player);
     };
 
     this.universeSwapAnimation = universeSwap({

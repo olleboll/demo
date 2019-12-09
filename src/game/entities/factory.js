@@ -70,6 +70,7 @@ export const createEnemy = ({
   speed,
   dealDamage,
   remove,
+  level,
 }) => {
   const sword = new Sword({
     spriteKey: 'sword_swing_4',
@@ -90,6 +91,7 @@ export const createEnemy = ({
     spriteKey,
     position,
     world,
+    level,
     speed,
     dealDamage,
     remove,

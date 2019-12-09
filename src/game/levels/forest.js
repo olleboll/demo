@@ -3,25 +3,35 @@ import Level from 'engine/level';
 import { createRain } from 'game/weather';
 
 import { generateRNGTrees, generateRandomEnemies } from './utils';
+import { createObject } from 'engine/objects';
+import { objects } from 'game/sprites';
 
 class ForestLevel extends Level {
   constructor(props) {
     super(props);
     this.name = 'forest';
     this.dealDamage = props.dealDamage;
-    this.trees = generateRNGTrees(); //generateRandomTrees(3, opts);
+    this.trees = props.trees.map((pos) => {
+      return createObject({
+        spritesheet: 'outside',
+        spriteKey: objects.pine_tree,
+        position: pos,
+        width: 64,
+        height: 64,
+      });
+    });
     this.trees.forEach((tree) =>
       this.addChild(tree.container, tree.fogOfWarContainer),
     );
     this.enemies = [];
-    // this.enemies = generateRandomEnemies(10, {
-    //   width: this.scene.width,
-    //   height: this.scene.height,
-    //   level: this,
-    //   dealDamage: this.dealDamage,
-    //   remove: this.removeEnemy,
-    // });
-    // this.enemies.forEach((enemy) => this.addChild(enemy.container));
+    this.enemies = generateRandomEnemies(10, {
+      width: this.scene.width,
+      height: this.scene.height,
+      level: this,
+      dealDamage: this.dealDamage,
+      remove: this.removeEnemy,
+    });
+    this.enemies.forEach((enemy) => this.addChild(enemy.container));
 
     const rain = createRain({
       position: { x: -750, y: -750 },
@@ -37,9 +47,9 @@ class ForestLevel extends Level {
   }
   update(delta, player) {
     super.update(delta, player);
-    this.enemies.forEach((enemy) =>
-      enemy.update(delta, this.visible.children, player, this.sceneSize),
-    );
+    this.enemies.forEach((enemy) => {
+      enemy.update(delta, this.visible.children, player, this.sceneSize);
+    });
   }
 
   removeEnemy = (entity) => {

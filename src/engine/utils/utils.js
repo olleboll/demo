@@ -61,6 +61,7 @@ export const reachedTarget = ({ position, target, offset }) => {
 export const checkCollision = (entity: Entity, point: Point) => {
   if (!entity || !entity.getCollisionBox) return false;
   const bounds = entity.getCollisionBox();
+
   if (bounds.contains(point.x, point.y)) {
     return entity;
   }
@@ -329,12 +330,15 @@ export const getLinesOfRect = ({ x, y, width, height }) => {
     y: y - height,
   };
 
-  return [
-    { p1, p2 },
-    { p1: p2, p2: p3 },
-    { p1: p3, p2: p4 },
-    { p1: p4, p2: p1 },
-  ];
+  return {
+    lines: [
+      { p1, p2 },
+      { p1: p2, p2: p3 },
+      { p1: p3, p2: p4 },
+      { p1: p4, p2: p1 },
+    ],
+    points: { p1, p2, p3, p4 },
+  };
 };
 
 export const findClosestIntersectingLines = (pos, lines) =>
@@ -556,6 +560,16 @@ const intersectionPoint = (x1, y1, x2, y2, x3, y3, x4, y4) => {
   let y = y1 + ua * (y2 - y1);
 
   return { x, y };
+};
+
+export const checkCollision2 = (entity: Entity, point: Point) => {
+  if (!entity || !entity.getCollisionBox) return false;
+  const bounds = entity.getCollisionBox();
+  const { points } = getLinesOfRect(bounds);
+  if (contains(points, { x: point.x, y: point.y })) {
+    return entity;
+  }
+  return null;
 };
 
 export const contains = ({ p1, p2, p3, p4 }, { x, y }) => {

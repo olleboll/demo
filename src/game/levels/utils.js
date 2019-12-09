@@ -81,14 +81,7 @@ export const generateRNGTrees = () => {
   for (let i = 0; i < width; i++) {
     for (let j = 0; j < height; j++) {
       if (treeMap[i][j] === true) {
-        let tree = createObject({
-          spritesheet: 'outside',
-          spriteKey: objects.pine_tree,
-          position: { x: -800 + i * 25, y: -800 + j * 25 },
-          width: 64,
-          height: 64,
-        });
-        trees.push(tree);
+        trees.push({ x: -800 + i * 25, y: -800 + j * 25 });
       }
     }
   }
@@ -117,6 +110,7 @@ export const generateRandomEnemies = (
       speed: 2,
       dealDamage,
       remove,
+      level,
     });
     enemies.push(enemy);
   }

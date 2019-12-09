@@ -19,9 +19,11 @@ class Enemy extends Entity {
     dealDamage,
     remove,
     actions,
+    level,
   }) {
     super({ spritesheet, spriteKey, position, speed });
     this.remove = remove;
+    this.level = level;
     this.currentSprite.animationSpeed = 0.1;
 
     this.container.sortableChildren = true;
@@ -83,6 +85,8 @@ class Enemy extends Entity {
         moveRequest['left'] = Math.abs(dx) > this.speed && dx < this.speed * 2;
         moveRequest['down'] = Math.abs(dy) > this.speed && dy > this.speed * 2;
         moveRequest['up'] = Math.abs(dy) > this.speed && dy < this.speed * 2;
+
+        const _obstacles = this.level.getObstacles(this.position, 200);
 
         const { x, y } = evaluateMove(delta, this, obstacles, {
           maxX: world.width / 2,
