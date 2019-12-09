@@ -30,7 +30,7 @@ class Medallion {
     if (this.swappingUniverse) {
       return;
     }
-    newWorld = this.currentLevel.name === 'forest' ? 'city' : 'forest';
+    newWorld = this.currentLevel.name === 'forest' ? 'desert' : 'forest';
     this.swappingUniverse = true;
 
     const onComplete = () => {

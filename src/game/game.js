@@ -7,7 +7,7 @@ import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { characters as _characters, objects } from './sprites';
 
-import { CityLevel, ForestLevel } from './levels';
+import { WinterLevel, ForestLevel } from './levels';
 import { generateRNGTrees } from './levels/utils';
 import Medallion from './medallion';
 import { Enemy } from './entities';
@@ -77,7 +77,7 @@ const Game = (opts: GameOptions) => {
 
   const levelOptions2: LevelOptions = {
     name: 'map',
-    spriteKey: 'city',
+    spriteKey: 'winter',
     centerCamera: true,
     renderer,
     dark: 0.4,
@@ -88,10 +88,25 @@ const Game = (opts: GameOptions) => {
     dealDamage,
     trees,
   };
-  const cityLevel = new CityLevel(levelOptions2); //createLevel(levelOptions);
+  const winterLevel = new WinterLevel(levelOptions2); //createLevel(levelOptions);
+  const levelOptions3: LevelOptions = {
+    name: 'map',
+    spriteKey: 'desert',
+    centerCamera: true,
+    renderer,
+    dark: 0.4,
+    light: 1.2,
+    sceneWidth: 1600,
+    sceneHeight: 1600,
+    hasCamera: true,
+    dealDamage,
+    trees,
+  };
+  const desertLevel = new WinterLevel(levelOptions3); //createLevel(levelOptions);
   const levels = {
     forest: forestLevel,
-    city: cityLevel,
+    winter: winterLevel,
+    desert: desertLevel,
   };
   const medallion = new Medallion(levels, 'forest', player, stage);
   const level = medallion.currentLevel;
@@ -141,12 +156,13 @@ const Game = (opts: GameOptions) => {
       target,
       world: medallion.currentLevel,
     });
-    medallion.swapUniverse('city');
+    medallion.swapUniverse('winter');
   };
   level.scene.on('mouseup', swapUniverse);
-  cityLevel.scene.interactive = true;
-  cityLevel.scene.on('mouseup', swapUniverse);
-
+  winterLevel.scene.interactive = true;
+  winterLevel.scene.on('mouseup', swapUniverse);
+  desertLevel.scene.interactive = true;
+  desertLevel.scene.on('mouseup', swapUniverse);
   level.scene.on('mousedown', (event) => {
     //player.actions.bow.execute('draw');
   });
@@ -157,7 +173,12 @@ const Game = (opts: GameOptions) => {
     player.setAim(aim);
   });
 
-  cityLevel.scene.on('mousemove', (event) => {
+  winterLevel.scene.on('mousemove', (event) => {
+    const { x, y } = event.data.global;
+    const aim = level.scene.toLocal({ x, y });
+    player.setAim(aim);
+  });
+  desertLevel.scene.on('mousemove', (event) => {
     const { x, y } = event.data.global;
     const aim = level.scene.toLocal({ x, y });
     player.setAim(aim);

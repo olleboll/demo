@@ -12,7 +12,7 @@ class CityLevel extends Level {
     this.trees = props.trees.map((pos) => {
       return createObject({
         spritesheet: 'outside',
-        spriteKey: objects.pine_tree,
+        spriteKey: objects.tree,
         position: pos,
         width: 64,
         height: 64,
