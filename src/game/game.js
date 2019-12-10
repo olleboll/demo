@@ -108,7 +108,7 @@ const Game = (opts: GameOptions) => {
     winter: winterLevel,
     desert: desertLevel,
   };
-  const medallion = new Medallion(levels, 'desert', player, stage);
+  const medallion = new Medallion(levels, 'forest', player, stage);
   const level = medallion.currentLevel;
   /****************/
   // Game objects

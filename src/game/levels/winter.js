@@ -4,6 +4,8 @@ import { generateRNGTrees } from './utils';
 import { createObject } from 'engine/objects';
 import { objects } from 'game/sprites';
 
+import { createSnow } from 'game/weather';
+
 class WinterLevel extends Level {
   constructor(props) {
     super(props);
@@ -22,12 +24,16 @@ class WinterLevel extends Level {
     this.trees.forEach((tree) =>
       this.addChild(tree.container, tree.fogOfWarContainer),
     );
-    //this.trees = generateRNGTrees(); //generateRandomTrees(3, opts);
-    // this.trees.forEach((tree) =>
-    //   this.addChild(tree.container, tree.fogOfWarContainer),
-    // );
-    console.log(this.scene.width);
-    console.log(this.scene.height);
+
+    const snow = createSnow({
+      position: { x: -750, y: -750 },
+      width: 1400,
+      height: 1400,
+      intensity: 4,
+      container: this.visible,
+    });
+
+    this.setEffect(snow);
   }
 }
 

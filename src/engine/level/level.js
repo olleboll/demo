@@ -111,11 +111,6 @@ class Level {
 
   getObstacles(point, range) {
     if (!point.x) return [];
-    for (let e of this.visible.children) {
-      if (e.showDebug) {
-        e.showDebug(false);
-      }
-    }
     const p1 = { x: point.x - range, y: point.y - range };
     const p2 = { x: point.x + range, y: point.y - range };
     const p3 = { x: point.x + range, y: point.y + range };
