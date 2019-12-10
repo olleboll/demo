@@ -7,7 +7,7 @@ import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { characters as _characters, objects } from './sprites';
 
-import { WinterLevel, ForestLevel } from './levels';
+import { WinterLevel, ForestLevel, DesertLevel } from './levels';
 import { generateRNGTrees } from './levels/utils';
 import Medallion from './medallion';
 import { Enemy } from './entities';
@@ -83,7 +83,7 @@ const Game = (opts: GameOptions) => {
     dark: 0.4,
     light: 1.2,
     sceneWidth: 1600,
-    sceneHeight: 1200,
+    sceneHeight: 1600,
     hasCamera: true,
     dealDamage,
     trees,
@@ -102,13 +102,13 @@ const Game = (opts: GameOptions) => {
     dealDamage,
     trees,
   };
-  const desertLevel = new WinterLevel(levelOptions3); //createLevel(levelOptions);
+  const desertLevel = new DesertLevel(levelOptions3); //createLevel(levelOptions);
   const levels = {
     forest: forestLevel,
     winter: winterLevel,
     desert: desertLevel,
   };
-  const medallion = new Medallion(levels, 'forest', player, stage);
+  const medallion = new Medallion(levels, 'desert', player, stage);
   const level = medallion.currentLevel;
   /****************/
   // Game objects
@@ -129,25 +129,8 @@ const Game = (opts: GameOptions) => {
       level,
       dealDamage,
     };
-
-    // lightSources = generateRandomTorches(10, opts);
-    // lightSources.forEach((torch) => level.addChild(torch.container));
-
-    // const effect = createEffect({
-    //   spriteSrc: 'felspell',
-    //   spriteKey: 'felspell',
-    //   position: { x: 0, y: 0 },
-    //   repeat: true,
-    //   scale: 1,
-    // });
-    // level.addChild(effect.container);
-
-    // enemies = generateRandomEnemies(10, opts);
-    // enemies.forEach((enemy) => level.addChild(enemy.container));
-    // level.setEffect(rain);
   };
 
-  level.scene.interactive = true;
   const swapUniverse = (event) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
@@ -158,29 +141,29 @@ const Game = (opts: GameOptions) => {
     });
     medallion.swapUniverse('winter');
   };
-  level.scene.on('mouseup', swapUniverse);
-  winterLevel.scene.interactive = true;
-  winterLevel.scene.on('mouseup', swapUniverse);
-  desertLevel.scene.interactive = true;
-  desertLevel.scene.on('mouseup', swapUniverse);
-  level.scene.on('mousedown', (event) => {
+  forestLevel.scene.interactive = true;
+  forestLevel.scene.on('mouseup', swapUniverse);
+  forestLevel.scene.on('mousemove', (event) => {
+    const { x, y } = event.data.global;
+    const aim = forestLevel.scene.toLocal({ x, y });
+    player.setAim(aim);
+  });
+  forestLevel.scene.on('mousedown', (event) => {
     //player.actions.bow.execute('draw');
   });
 
-  level.scene.on('mousemove', (event) => {
-    const { x, y } = event.data.global;
-    const aim = level.scene.toLocal({ x, y });
-    player.setAim(aim);
-  });
-
+  winterLevel.scene.interactive = true;
+  winterLevel.scene.on('mouseup', swapUniverse);
   winterLevel.scene.on('mousemove', (event) => {
     const { x, y } = event.data.global;
-    const aim = level.scene.toLocal({ x, y });
+    const aim = winterLevel.scene.toLocal({ x, y });
     player.setAim(aim);
   });
+  desertLevel.scene.interactive = true;
+  desertLevel.scene.on('mouseup', swapUniverse);
   desertLevel.scene.on('mousemove', (event) => {
     const { x, y } = event.data.global;
-    const aim = level.scene.toLocal({ x, y });
+    const aim = desertLevel.scene.toLocal({ x, y });
     player.setAim(aim);
   });
 

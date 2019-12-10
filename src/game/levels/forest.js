@@ -12,9 +12,10 @@ class ForestLevel extends Level {
     this.name = 'forest';
     this.dealDamage = props.dealDamage;
     this.trees = props.trees.map((pos) => {
+      const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
       return createObject({
         spritesheet: 'outside',
-        spriteKey: objects.pine_tree,
+        spriteKey: sprite,
         position: pos,
         width: 64,
         height: 64,
@@ -24,14 +25,14 @@ class ForestLevel extends Level {
       this.addChild(tree.container, tree.fogOfWarContainer),
     );
     this.enemies = [];
-    this.enemies = generateRandomEnemies(10, {
-      width: this.scene.width,
-      height: this.scene.height,
-      level: this,
-      dealDamage: this.dealDamage,
-      remove: this.removeEnemy,
-    });
-    this.enemies.forEach((enemy) => this.addChild(enemy.container));
+    // this.enemies = generateRandomEnemies(10, {
+    //   width: this.scene.width,
+    //   height: this.scene.height,
+    //   level: this,
+    //   dealDamage: this.dealDamage,
+    //   remove: this.removeEnemy,
+    // });
+    // this.enemies.forEach((enemy) => this.addChild(enemy.container));
 
     const rain = createRain({
       position: { x: -750, y: -750 },

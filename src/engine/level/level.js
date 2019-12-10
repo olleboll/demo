@@ -88,6 +88,7 @@ class Level {
     this.animate = this.animate.bind(this);
     this.destroy = this.destroy.bind(this);
     this.update = this.update.bind(this);
+    this.updateFov = this.updateFov.bind(this);
 
     this.debug = 0;
   }
@@ -170,13 +171,16 @@ class Level {
   }
   update(delta, player) {
     this.camera.updateCamera(player.position);
+    this.updateFov(player);
+    this.animate(delta);
+  }
+  updateFov(player) {
     const fov = this.camera.generateFieldOfView(
       player.position,
       player.sightRange,
       true,
     );
     this.setMask('fieldOfView', fov);
-    this.animate(delta);
   }
   animate(delta) {
     for (let effect of this.effects) {

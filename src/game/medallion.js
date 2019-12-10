@@ -5,6 +5,8 @@ class Medallion {
     this.stage = stage;
     this.levels = levels;
     this.currentLevel = this.levels[startingLevel];
+    this.levelsOrder = Object.keys(levels);
+    this.levelIndex = this.levelsOrder.findIndex((l) => l === startingLevel);
     this.player = player;
     this.swappingUniverse = false;
     this.currentLevel.addChild(this.player.container);
@@ -30,7 +32,10 @@ class Medallion {
     if (this.swappingUniverse) {
       return;
     }
-    newWorld = this.currentLevel.name === 'forest' ? 'desert' : 'forest';
+    this.levelIndex =
+      this.levelIndex + 1 < this.levelsOrder.length ? this.levelIndex + 1 : 0;
+    newWorld = this.levelsOrder[this.levelIndex];
+    //newWorld = this.currentLevel.name === 'forest' ? 'winter' : 'forest';
     this.swappingUniverse = true;
 
     const onComplete = () => {
@@ -38,13 +43,12 @@ class Medallion {
     };
 
     const onSwap = (delta) => {
-      const cameraPosition = this.currentLevel.scene.position;
-      const cameraPivot = this.currentLevel.scene.pivot;
       this.currentLevel.visible.removeChild(this.player.container);
       this.stage.removeChild(this.currentLevel.scene);
       this.currentLevel = this.levels[newWorld];
 
       this.currentLevel.camera.updateCamera(this.player.position, 30);
+      this.currentLevel.updateFov(this.player);
       this.player.update(delta, [], this.currentLevel.sceneSize);
       this.currentLevel.visible.addChild(this.player.container);
       this.stage.addChild(this.currentLevel.scene);

@@ -10,7 +10,7 @@ const atlas = {
   animations: {},
 };
 
-let med_tree = {
+let tree = {
   rotated: false,
   trimmed: false,
   spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
@@ -20,6 +20,21 @@ let med_tree = {
     x: 270,
     y: 48,
     w: 64,
+    h: 64,
+  },
+};
+atlas.frames['tree'] = tree;
+
+let med_tree = {
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
+  sourceSize: { w: 832, h: 384 },
+  anchor: { x: 0.5, y: 0.8 },
+  frame: {
+    x: 388,
+    y: 112,
+    w: 48,
     h: 64,
   },
 };
@@ -39,6 +54,36 @@ let pine_tree = {
   },
 };
 atlas.frames['pine_tree'] = pine_tree;
+
+let dead_tree = {
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
+  sourceSize: { w: 832, h: 384 },
+  anchor: { x: 0.5, y: 0.8 },
+  frame: {
+    x: 496,
+    y: 52,
+    w: 32,
+    h: 64,
+  },
+};
+atlas.frames['dead_tree'] = dead_tree;
+
+let fall_tree = {
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
+  sourceSize: { w: 832, h: 384 },
+  anchor: { x: 0.5, y: 0.8 },
+  frame: {
+    x: 484,
+    y: 112,
+    w: 42,
+    h: 64,
+  },
+};
+atlas.frames['fall_tree'] = fall_tree;
 
 console.log(atlas);
 console.log(atlas.frames);

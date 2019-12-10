@@ -4,15 +4,16 @@ import { generateRNGTrees } from './utils';
 import { createObject } from 'engine/objects';
 import { objects } from 'game/sprites';
 
-class CityLevel extends Level {
+class WinterLevel extends Level {
   constructor(props) {
     super(props);
     this.name = 'city';
     this.dealDamage = props.dealDamage;
     this.trees = props.trees.map((pos) => {
+      const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
       return createObject({
-        spritesheet: 'outside',
-        spriteKey: objects.tree,
+        spritesheet: 'winter_outside',
+        spriteKey: sprite,
         position: pos,
         width: 64,
         height: 64,
@@ -30,4 +31,4 @@ class CityLevel extends Level {
   }
 }
 
-export default CityLevel;
+export default WinterLevel;
