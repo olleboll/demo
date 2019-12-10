@@ -26,7 +26,7 @@ function App() {
         const s = Game(pixiApp);
         pixiApp.stage.addChild(s.stage);
         s.init();
-        pixiApp.ticker.add(s.animate);
+        pixiApp.ticker.add(s.update);
         setApp(pixiApp);
       }
     }
@@ -47,6 +47,13 @@ function App() {
   return (
     <>
       <Stats />
+      <div>
+        <h4 className="instructions">
+          R: swap universe <br />
+          E: interact with the pink tree when close <br />
+          Mouse1: Arrows, Hold for more effect on ememies
+        </h4>
+      </div>
       <div id="container" className="container">
         <div id="game"></div>
       </div>

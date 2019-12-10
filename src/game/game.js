@@ -14,6 +14,7 @@ import { Enemy } from './entities';
 import { createPlayer, createEnemy } from './entities/factory';
 import { createRain } from './weather';
 import { createFire } from './objects';
+import Controller from './controller';
 
 // TYPES
 import type { LevelOptions } from 'engine/level';
@@ -31,19 +32,12 @@ const Game = (opts: GameOptions) => {
     right: 68,
     up: 87,
     down: 83,
-    dash: 32,
   };
   const controls = createKeyboardControls(keys);
   const stage = new PIXI.Container();
 
   const dealDamage = (aoe, damage, friendly = false) => {
-    if (friendly) {
-      for (let e of enemies) {
-        if (aoe.contains(e.position.x, e.position.y)) {
-          e.takeDamage(damage);
-        }
-      }
-    } else if (aoe.contains(player.position.x, player.position.y)) {
+    if (aoe.contains(player.position.x, player.position.y)) {
       player.takeDamage(damage);
     }
   };
@@ -65,7 +59,7 @@ const Game = (opts: GameOptions) => {
     spriteKey: 'forest',
     centerCamera: true,
     renderer,
-    dark: 0.4,
+    dark: 0.0,
     light: 1.0,
     sceneWidth: 1600,
     sceneHeight: 1600,
@@ -94,8 +88,8 @@ const Game = (opts: GameOptions) => {
     spriteKey: 'desert',
     centerCamera: true,
     renderer,
-    dark: 0.4,
-    light: 1.2,
+    dark: 0.8,
+    light: 1.1,
     sceneWidth: 1600,
     sceneHeight: 1600,
     hasCamera: true,
@@ -109,29 +103,25 @@ const Game = (opts: GameOptions) => {
     desert: desertLevel,
   };
   const medallion = new Medallion(levels, 'forest', player, stage);
-  const level = medallion.currentLevel;
-  /****************/
-  // Game objects
-  let lightSources = [];
-  let enemies = [];
+  const globalKeys = {
+    e: 69,
+    y: 89,
+    r: 82,
+    space: 32,
+  };
+  const controller = new Controller(medallion, globalKeys);
 
-  /****************/
-
-  let counter = 0;
-  const animate = (delta: number) => {
+  const update = (delta: number) => {
+    controller.update(delta);
     medallion.update(delta);
   };
 
-  const init = () => {
-    const opts = {
-      width: level.scene.width,
-      height: level.scene.height,
-      level,
-      dealDamage,
-    };
-  };
-
-  const swapUniverse = (event) => {
+  // Sets up bow handler
+  // Ok for now...
+  forestLevel.scene.interactive = true;
+  winterLevel.scene.interactive = true;
+  desertLevel.scene.interactive = true;
+  const shoot = (event, level) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
     //player.actions.sword.swing(target);
@@ -139,38 +129,40 @@ const Game = (opts: GameOptions) => {
       target,
       world: medallion.currentLevel,
     });
-    medallion.swapUniverse('winter');
   };
-  forestLevel.scene.interactive = true;
-  forestLevel.scene.on('mouseup', swapUniverse);
-  forestLevel.scene.on('mousemove', (event) => {
+
+  const setAim = (event, level) => {
     const { x, y } = event.data.global;
-    const aim = forestLevel.scene.toLocal({ x, y });
+    const aim = level.scene.toLocal({ x, y });
     player.setAim(aim);
-  });
+  };
+
+  forestLevel.scene.on('mouseup', (event) => shoot(event, forestLevel));
+  forestLevel.scene.on('mousemove', (event) => setAim(event, forestLevel));
   forestLevel.scene.on('mousedown', (event) => {
-    //player.actions.bow.execute('draw');
+    player.actions.bow.execute('draw');
   });
 
-  winterLevel.scene.interactive = true;
-  winterLevel.scene.on('mouseup', swapUniverse);
-  winterLevel.scene.on('mousemove', (event) => {
-    const { x, y } = event.data.global;
-    const aim = winterLevel.scene.toLocal({ x, y });
-    player.setAim(aim);
+  winterLevel.scene.on('mouseup', (event) => shoot(event, winterLevel));
+  winterLevel.scene.on('mousemove', (event) => setAim(event, winterLevel));
+  winterLevel.scene.on('mousedown', (event) => {
+    player.actions.bow.execute('draw');
   });
-  desertLevel.scene.interactive = true;
-  desertLevel.scene.on('mouseup', swapUniverse);
-  desertLevel.scene.on('mousemove', (event) => {
-    const { x, y } = event.data.global;
-    const aim = desertLevel.scene.toLocal({ x, y });
-    player.setAim(aim);
+
+  desertLevel.scene.on('mouseup', (event) => shoot(event, desertLevel));
+  desertLevel.scene.on('mousemove', (event) => setAim(event, winterLevel));
+  desertLevel.scene.on('mousedown', (event) => {
+    player.actions.bow.execute('draw');
   });
+
+  const init = () => {
+    console.log('LAUNCHING GAME');
+  };
 
   return {
     stage,
     init,
-    animate,
+    update,
   };
 };
 

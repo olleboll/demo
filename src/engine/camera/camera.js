@@ -18,8 +18,6 @@ class Camera {
     scene.position.x = this.SCREEN_MID_X;
     scene.position.y = this.SCREEN_MID_Y;
 
-    this.debug = 0;
-
     this.updateCamera = this.updateCamera.bind(this);
     this.generateFieldOfView = this.generateFieldOfView.bind(this);
     this.generateMask = this.generateMask.bind(this);
@@ -77,22 +75,9 @@ class Camera {
       viewPoint,
     );
 
-    //const obstacles = shouldLos ? scene.visible.children : [];
-
     const obstacles = shouldLos
       ? this.level.getObstacles(viewPoint, fovRange + 80)
       : [];
-
-    this.debug++;
-    if (this.debug === 200) {
-      console.log('****DEBUG IN CAMERA ***');
-      console.log(obstacles);
-    }
-
-    // return new PIXI.Graphics()
-    //   .lineStyle(2, 0)
-    //   .beginFill(0xffffff, 1)
-    //   .drawCircle(mid.x, mid.y, fovRange);
 
     return calculateFieldOfView(
       new PIXI.Circle(viewPoint.x, viewPoint.y, fovRange + 40),

@@ -12,7 +12,7 @@ const createRain = ({
   let active = true;
   let thunderCouldActivate = true;
   let thunder = null;
-  const particleContainer = new PIXI.Container(); //new new PIXI.particles.ParticleContainer()
+  const particleContainer = new PIXI.ParticleContainer();
   const bounds = {
     x: position.x,
     y: position.y,

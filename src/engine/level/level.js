@@ -89,8 +89,6 @@ class Level {
     this.destroy = this.destroy.bind(this);
     this.update = this.update.bind(this);
     this.updateFov = this.updateFov.bind(this);
-
-    this.debug = 0;
   }
 
   addChild(entity: PIXI.Container, fogOfWarEntity?: PIXI.Container) {
@@ -122,14 +120,6 @@ class Level {
 
     const result = includeAdjecentSquares({ s1, s2, s3, s4 }, this.grid);
 
-    //const result = new Set(s1.square.concat(s2.square, s3.square, s4.square));
-
-    this.debug++;
-    if (this.debug === 200) {
-      console.log('****DEBUG IN LEVEL ***');
-      console.log({ s1, s2, s3, s4 });
-      console.log(result);
-    }
     const showDebug = range < 150;
     result.forEach((e) => {
       return e && showDebug && e.showDebug && e.showDebug(true);

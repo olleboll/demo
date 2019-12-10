@@ -1,6 +1,4 @@
 export const generateGrid = (dimensions, squareSize) => {
-  console.log(dimensions);
-  console.log(squareSize);
   const { width, height } = dimensions;
   const numberOfSquaresX = Math.floor(width / squareSize);
   const numberOfSquaresY = Math.floor(height / squareSize);

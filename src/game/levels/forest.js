@@ -1,10 +1,13 @@
+import PIXI from 'engine';
 import Level from 'engine/level';
+import { createObject } from 'engine/objects';
 
 import { createRain } from 'game/weather';
 
 import { generateRNGTrees, generateRandomEnemies } from './utils';
-import { createObject } from 'engine/objects';
 import { objects } from 'game/sprites';
+
+import { test } from 'game/shaders/test';
 
 class ForestLevel extends Level {
   constructor(props) {
@@ -24,15 +27,16 @@ class ForestLevel extends Level {
     this.trees.forEach((tree) =>
       this.addChild(tree.container, tree.fogOfWarContainer),
     );
+    this.interactiveObjects = [];
     this.enemies = [];
-    // this.enemies = generateRandomEnemies(10, {
-    //   width: this.scene.width,
-    //   height: this.scene.height,
-    //   level: this,
-    //   dealDamage: this.dealDamage,
-    //   remove: this.removeEnemy,
-    // });
-    // this.enemies.forEach((enemy) => this.addChild(enemy.container));
+    this.enemies = generateRandomEnemies(10, {
+      width: this.scene.width,
+      height: this.scene.height,
+      level: this,
+      dealDamage: this.dealDamage,
+      remove: this.removeEnemy,
+    });
+    this.enemies.forEach((enemy) => this.addChild(enemy.container));
 
     const rain = createRain({
       position: { x: -750, y: -750 },

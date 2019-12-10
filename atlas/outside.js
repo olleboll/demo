@@ -85,6 +85,21 @@ let fall_tree = {
 };
 atlas.frames['fall_tree'] = fall_tree;
 
+let pink_tree = {
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
+  sourceSize: { w: 832, h: 384 },
+  anchor: { x: 0.5, y: 0.8 },
+  frame: {
+    x: 460,
+    y: 178,
+    w: 52,
+    h: 64,
+  },
+};
+atlas.frames['pink_tree'] = pink_tree;
+
 console.log(atlas);
 console.log(atlas.frames);
 fs.writeFile(
