@@ -3,6 +3,7 @@ import maps from './maps';
 import objects from './objects';
 import weapons from './weapons';
 import effects from './effects';
+import animals from './animals';
 
 const arrayOfAll = [
   ...characters.source,
@@ -10,6 +11,7 @@ const arrayOfAll = [
   ...objects.source,
   ...weapons.source,
   ...effects.source,
+  ...animals.source,
 ];
 
-export { characters, maps, objects, arrayOfAll };
+export { characters, maps, objects, animals, arrayOfAll };

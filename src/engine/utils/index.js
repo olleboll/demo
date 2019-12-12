@@ -15,6 +15,8 @@ import {
   reachedTarget,
 } from './utils';
 
+import { aStar } from './pathfinding';
+
 export {
   evaluateMove,
   calculateDistance,

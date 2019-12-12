@@ -57,6 +57,8 @@ class Level {
     fogOfWar.sortableChildren = true;
     fogOfWar.filters = [new PIXI.filters.AlphaFilter(dark)];
 
+    // WOW... comment fog of war out and animals are weird :O
+    // positions get messed up?
     scene.addChild(fogOfWar);
     scene.addChild(visible);
     scene.visible = visible;

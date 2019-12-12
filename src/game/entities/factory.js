@@ -4,6 +4,7 @@ import PIXI from 'engine';
 import Sword from 'game/actions/sword';
 import Bow from 'game/actions/bow';
 
+import ReinDeer from './animals/reindeer';
 import Player from './player';
 import Enemy from './enemy';
 
@@ -101,4 +102,28 @@ export const createEnemy = ({
   sword.setParent(enemy.container);
 
   return enemy;
+};
+
+export const createReinDeer = ({
+  spritesheet,
+  spriteKey,
+  position,
+  controls,
+  world,
+  speed,
+  dealDamage,
+  remove,
+  level,
+}) => {
+  return new ReinDeer({
+    spritesheet,
+    spriteKey,
+    position,
+    controls,
+    world,
+    speed,
+    dealDamage,
+    remove,
+    level,
+  });
 };

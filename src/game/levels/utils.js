@@ -1,8 +1,8 @@
 import { createObject } from 'engine/objects';
 import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
-import { createEnemy } from 'game/entities/factory';
-import { characters, objects } from 'game/sprites';
+import { createEnemy, createReinDeer } from 'game/entities/factory';
+import { characters, objects, animals } from 'game/sprites';
 
 export const generateRNGTrees = () => {
   let treeMap = [];
@@ -86,6 +86,35 @@ export const generateRNGTrees = () => {
     }
   }
   return trees;
+};
+
+export const generateRandomReindeer = (
+  number,
+  { width, height, level, dealDamage, remove, speed },
+) => {
+  const reindeer = [];
+  for (let i = 0; i < number; i++) {
+    const { x, y } = generateRandomPoint({
+      minX: -width / 2,
+      maxX: width / 2,
+      minY: -height / 2,
+      maxY: height / 2,
+      sizeX: 30,
+      sizeY: 30,
+    });
+    const deer = createReinDeer({
+      spritesheet: 'animals5',
+      spriteKey: animals.reinDeer,
+      position: { x, y },
+      world: level.scene,
+      speed,
+      dealDamage,
+      remove,
+      level,
+    });
+    reindeer.push(deer);
+  }
+  return reindeer;
 };
 
 export const generateRandomEnemies = (

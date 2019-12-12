@@ -102,7 +102,7 @@ const Game = (opts: GameOptions) => {
     winter: winterLevel,
     desert: desertLevel,
   };
-  const medallion = new Medallion(levels, 'forest', player, stage);
+  const medallion = new Medallion(levels, 'winter', player, stage);
   const globalKeys = {
     e: 69,
     y: 89,

@@ -46,6 +46,12 @@ export const calculateDistance = (
   return { dx, dy, distance };
 };
 
+// reached target functions are broken :(
+export const reachedTarget2 = ({ position, target, offset }) => {
+  const { dx, dy, distance } = calculateDistance(position, target);
+  return Math.abs(dx) < offset.x && Math.abs(dy) < offset.y;
+};
+
 export const reachedTarget = ({ position, target, offset }) => {
   const { x: px, y: py } = position;
   const { x: tx, y: ty } = target;
@@ -175,7 +181,7 @@ export const evaluateMove = (
   let newPosX = collisionX ? entity.position.x : newX;
   let newPosY = collisionY ? entity.position.y : newY;
 
-  return { x: newPosX, y: newPosY };
+  return { x: newPosX, y: newPosY, collisionX, collisionY };
 };
 
 type BoxPoint = {

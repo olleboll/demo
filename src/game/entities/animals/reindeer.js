@@ -1,15 +1,14 @@
-import { DropShadowFilter } from 'pixi-filters';
+import PIXI from 'engine';
 
-import PIXI, { getResource } from 'engine';
-import { evaluateMove, calculateDistance } from 'engine/utils';
-import { createEntity } from 'engine/objects/entity';
+import {
+  evaluateMove,
+  calculateDistance,
+  reachedTarget,
+  generateRandomPoint,
+} from 'engine/utils';
 import { Entity } from 'engine/objects';
 
-import { createSword } from 'game/actions';
-
-import { characters } from 'game/sprites';
-
-class Enemy extends Entity {
+class ReinDeer extends Entity {
   constructor({
     spritesheet,
     spriteKey,
@@ -25,22 +24,23 @@ class Enemy extends Entity {
     this.remove = remove;
     this.level = level;
     this.currentSprite.animationSpeed = 0.1;
-
     this.container.sortableChildren = true;
     this.container.los = true;
+    this.position = this.container.position;
+    this.moving = false;
     this.moveRequest = {
       up: false,
       down: false,
       left: false,
       right: false,
     };
+    this.target = {};
     this.world = world;
 
     this.speed = speed;
 
     this.actions = actions;
     this.sightRange = 300;
-    this.swingRange = 30;
 
     this.container.getCollisionBox = () => {
       return new PIXI.Rectangle(
@@ -59,41 +59,52 @@ class Enemy extends Entity {
     this.hpbg = hpbg;
     this.hpContainer = hpContainer;
     this.hpContainer.position.y -= 20;
-    this.hp = 100;
+    this.hp = 10;
   }
 
-  update(delta, obstacles, target, world) {
+  update(delta, obstacles, world) {
     const { moveRequest, position, container } = this;
-
-    const view = new PIXI.Circle(position.x, position.y, this.sightRange);
-    this.hpBar.width = (this.hpbg.width * this.hp) / 100;
-
-    if (view.contains(target.position.x, target.position.y)) {
-      const { dx, dy, distance } = calculateDistance(position, target.position);
-
-      const attackRadius = new PIXI.Circle(
-        position.x,
-        position.y,
-        this.swingRange,
+    const shouldStartMove = Math.random() < 0.02;
+    if (this.moving) {
+      const { dx, dy, distance } = calculateDistance(
+        this.position,
+        this.target,
       );
-      if (attackRadius.contains(target.position.x, target.position.y)) {
-        if (!this.actions.sword.coolDown()) {
-          this.actions.sword.swing(target.position);
-        }
-      } else {
-        moveRequest['right'] = dx > 0 && Math.abs(dx) > this.speed * delta;
-        moveRequest['left'] = dx < 0 && Math.abs(dx) > this.speed * delta;
-        moveRequest['down'] = dy > 0 && Math.abs(dy) > this.speed * delta;
-        moveRequest['up'] = dy < 0 && Math.abs(dy) > this.speed * delta;
 
+      moveRequest['right'] = dx > 0 && Math.abs(dx) > this.speed * delta;
+      moveRequest['left'] = dx < 0 && Math.abs(dx) > this.speed * delta;
+      moveRequest['down'] = dy > 0 && Math.abs(dy) > this.speed * delta;
+      moveRequest['up'] = dy < 0 && Math.abs(dy) > this.speed * delta;
+
+      if (Object.values(moveRequest).every((m) => !m)) {
+        this.moving = false;
+        this.target = {};
+        this.currentSprite.stop();
+      } else {
         const _obstacles = this.level.getObstacles(this.position, 200);
 
-        const { x, y } = evaluateMove(delta, this, obstacles, {
-          maxX: world.width / 2,
-          maxY: world.height / 2,
-          minX: -world.width / 2,
-          minY: -world.height / 2,
-        });
+        const { x, y, collisionX, collisionY } = evaluateMove(
+          delta,
+          this,
+          obstacles,
+          {
+            maxX: world.width / 2,
+            maxY: world.height / 2,
+            minX: -world.width / 2,
+            minY: -world.height / 2,
+          },
+        );
+
+        if (collisionX || collisionY) {
+          this.target = generateRandomPoint({
+            minX: this.position.x - 300,
+            maxX: this.position.x + 300,
+            minY: this.position.y - 300,
+            maxY: this.position.y + 300,
+            sizeX: 10,
+            sizeY: 10,
+          });
+        }
 
         this.position.x = x;
         this.position.y = y;
@@ -101,8 +112,16 @@ class Enemy extends Entity {
         this.container.position.y = position.y;
         this.container.zIndex = position.y;
       }
-    } else {
-      this.currentSprite.stop();
+    } else if (shouldStartMove) {
+      this.target = generateRandomPoint({
+        minX: this.position.x - 300,
+        maxX: this.position.x + 300,
+        minY: this.position.y - 300,
+        maxY: this.position.y + 300,
+        sizeX: 10,
+        sizeY: 10,
+      });
+      this.moving = true;
     }
   }
 
@@ -145,4 +164,4 @@ class Enemy extends Entity {
   }
 }
 
-export default Enemy;
+export default ReinDeer;
