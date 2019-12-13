@@ -1,19 +1,28 @@
+import { evaluateMove } from './evaluateMove';
+import { calculateFieldOfView } from './calculateFieldOfView';
 import {
-  evaluateMove,
-  calculateDistance,
-  calculateFieldOfView,
   adjustCoordToViewPort,
   adjustCenterToViewport,
-  generateRandomPoint,
-  checkCollision,
-  generateFreePosition,
+} from './adjustToViewPort.js';
+
+import { calculateDistance } from './calculateDistance';
+import { getLinesOfRect } from './getLinesOfRect';
+
+import {
   findClosestIntersectingLines,
   findIntersectingLine,
   findIntersectionPoint,
-  getLinesOfRect,
   contains,
-  reachedTarget,
-} from './utils';
+} from './intersections';
+
+import {
+  generateFreePosition,
+  generateRandomPoint,
+} from './generateRandomPoint';
+
+import { checkCollision } from './checkCollision';
+
+import { reachedTarget } from './reachedTarget';
 
 import { aStar } from './pathfinding';
 

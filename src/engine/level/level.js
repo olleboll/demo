@@ -4,8 +4,7 @@
 import PIXI, { getResource } from 'engine';
 
 import Camera from 'engine/camera';
-import type { Entity } from 'engine/objects';
-import type { Point } from 'engine/utils';
+import { getLinesOfRect } from 'engine/utils';
 
 import {
   calculateFieldOfView,
@@ -97,6 +96,12 @@ class Level {
     this.visible.addChild(entity);
     if (fogOfWarEntity) {
       this.fogOfWar.addChild(fogOfWarEntity);
+    }
+
+    if (entity.getLosBounds) {
+      const lines = getLinesOfRect(entity.getLosBounds());
+      entity.losLines = lines;
+      entity.corners = lines.points;
     }
 
     if (entity.getCollisionBox) {

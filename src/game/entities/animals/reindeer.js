@@ -86,7 +86,7 @@ class ReinDeer extends Entity {
         const { x, y, collisionX, collisionY } = evaluateMove(
           delta,
           this,
-          obstacles,
+          _obstacles,
           {
             maxX: world.width / 2,
             maxY: world.height / 2,
