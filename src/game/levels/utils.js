@@ -7,7 +7,7 @@ import { characters, objects, animals } from 'game/sprites';
 export const generateRNGTrees = () => {
   let treeMap = [];
 
-  const chanceToStartAsOpen = 0.1;
+  const chanceToStartAsOpen = 0.3;
   const deathLimit = 2;
   const birthLimit = 5;
   const numberOfSteps = 8;

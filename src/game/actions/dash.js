@@ -94,6 +94,9 @@ const dash = (
         if (o.removeVisibleFilter) {
           o.removeVisibleFilter('dash');
         }
+        if (o.removeFogFilter) {
+          o.removeVisibleFilter('dash');
+        }
       }
 
       onDone(delta);
@@ -101,8 +104,11 @@ const dash = (
     }
 
     for (let o of obstacles) {
-      if (o.addVisibleFilter) {
+      if (o.addVisibleFilter && !o.isPlayer) {
         o.addVisibleFilter('dash', filter);
+      }
+      if (o.addFogFilter && !o.isPlayer) {
+        o.addFogFilter('dash', filter);
       }
     }
 

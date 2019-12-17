@@ -25,6 +25,7 @@ class Player extends Entity {
     this.container.sortableChildren = true;
     this.container.los = true;
     this.controls = controls;
+    this.container.isPlayer = true;
 
     this.moveRequest = {
       up: false,
