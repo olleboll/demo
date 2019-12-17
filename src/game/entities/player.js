@@ -40,6 +40,7 @@ class Player extends Entity {
     this.defaultSpeed = speed;
     this.actions = actions;
     this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
+    this.dashDistance = 100;
 
     this.sightRange = 300;
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
@@ -120,8 +121,8 @@ class Player extends Entity {
 
     const normX = dx / distance;
     const normY = dy / distance;
-    dest.x = this.position.x + normX * 200;
-    dest.y = this.position.y + normY * 200;
+    dest.x = this.position.x + normX * this.dashDistance;
+    dest.y = this.position.y + normY * this.dashDistance;
     const { distance: d } = calculateDistance(this.position, dest);
     const onDone = () => {
       this.speed = this.defaultSpeed;

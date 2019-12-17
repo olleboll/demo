@@ -68,6 +68,7 @@ const dash = (
     }
 
     for (let o of obstacles) {
+      if (o.takeDamage) continue;
       if (!done.x && checkCollision(o, { x: newX, y: entity.position.y })) {
         done.x = true;
         target.x = entity.position.x;
