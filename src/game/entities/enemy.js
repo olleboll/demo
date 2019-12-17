@@ -141,7 +141,12 @@ class Enemy extends Entity {
     };
 
     this.update = (delta) => {
-      fadeOut(delta, this.container, { endAlpha: 0, fadeSpeed: 0.05 }, onDone);
+      fadeOut(
+        delta,
+        this.container,
+        { endAlpha: 0, fadeSpeed: 0.05 },
+        onDone.bind(this),
+      );
     };
   }
 

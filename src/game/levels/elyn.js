@@ -46,6 +46,14 @@ class Elyn extends Level {
       enemy.update(delta, this.visible.children, player, this.sceneSize);
     });
   }
+  removeEnemy = (entity) => {
+    this.enemies = this.enemies.filter((e) => e !== entity);
+    console.log('enemies remaining: ', this.enemies.length);
+    if (this.enemies.length === 0) {
+      alert('you win, well done');
+      window.location.reload();
+    }
+  };
 }
 
 export default Elyn;
