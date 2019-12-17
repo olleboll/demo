@@ -14,8 +14,8 @@ const createAtlas = (source) => {
   let width = 100;
   let height = 100;
   atlas.animations[`dash`] = [];
-  for (let j = 0; j < 7; j++) {
-    for (let i = 0; i < 6; i++) {
+  for (let j = 0; j < 5; j++) {
+    for (let i = 1; i < 6; i++) {
       let frame = {
         frame: {
           x: width * i,
@@ -29,7 +29,7 @@ const createAtlas = (source) => {
         sourceSize: { w: 700, h: 700 },
         anchor: { x: 0.5, y: 0.8 },
       };
-      if (j === 6 && i === 5) break;
+      if (j === 4 && i === 3) break;
 
       atlas.frames[`dash_${j * 6 + i}`] = frame;
       atlas.animations[`dash`].push(`dash_${j * 6 + i}`);
