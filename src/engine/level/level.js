@@ -25,12 +25,32 @@ class Level {
     sceneWidth,
     sceneHeight,
   }) {
+    // bind funcitons
+    this.addVisibleFilter = this.addVisibleFilter.bind(this);
+    this.addFogFilter = this.addFogFilter.bind(this);
+    this.removeVisibleFilter = this.removeVisibleFilter.bind(this);
+    this.removeFogFilter = this.removeFogFilter.bind(this);
+    this.addChild = this.addChild.bind(this);
+    this.getObstacles = this.getObstacles.bind(this);
+    this.removeChild = this.removeChild.bind(this);
+    this.setMask = this.setMask.bind(this);
+    this.removeMask = this.removeMask.bind(this);
+    this.setEffect = this.setEffect.bind(this);
+    this.animate = this.animate.bind(this);
+    this.destroy = this.destroy.bind(this);
+    this.update = this.update.bind(this);
+    this.updateFov = this.updateFov.bind(this);
+
+    // setup
     this.name = name;
     this.sceneWidth = sceneWidth;
     this.sceneHeight = sceneHeight;
     const scene = new PIXI.Container();
     const visible = new PIXI.Container();
     const fogOfWar = new PIXI.Container();
+    this.scene = scene;
+    this.visible = visible;
+    this.fogOfWar = fogOfWar;
     const mask = new PIXI.Container();
     this.effects = [];
 
@@ -41,9 +61,13 @@ class Level {
     background.name = 'backgroundImage';
     background.position.x = -background.width / 2;
     background.position.y = -background.height / 2;
+    this.background = background;
     visible.addChild(background);
     visible.sortableChildren = true;
-    visible.filters = [new PIXI.filters.AlphaFilter(light)];
+    const visibleAlphaFilter = new PIXI.filters.AlphaFilter(light);
+    visible.filters = [];
+    this.addVisibleFilter('_alpha', visibleAlphaFilter);
+
     visible.mask = mask;
     this.visibleMasks = {};
 
@@ -54,7 +78,9 @@ class Level {
     staticBackground.position.y = -staticBackground.height / 2;
     fogOfWar.addChild(staticBackground);
     fogOfWar.sortableChildren = true;
-    fogOfWar.filters = [new PIXI.filters.AlphaFilter(dark)];
+    const fogAlphaFilter = new PIXI.filters.AlphaFilter(dark);
+    fogOfWar.filters = [];
+    this.addFogFilter('_alpha', fogAlphaFilter);
 
     // WOW... comment fog of war out and animals are weird :O
     // positions get messed up?
@@ -75,21 +101,27 @@ class Level {
       sceneWidth,
       sceneHeight,
     });
+  }
 
-    this.scene = scene;
-    this.visible = visible;
-    this.fogOfWar = fogOfWar;
+  addVisibleFilter(key, filter) {
+    filter.key = key;
+    this.visible.filters.push(filter);
+  }
 
-    this.addChild = this.addChild.bind(this);
-    this.getObstacles = this.getObstacles.bind(this);
-    this.removeChild = this.removeChild.bind(this);
-    this.setMask = this.setMask.bind(this);
-    this.removeMask = this.removeMask.bind(this);
-    this.setEffect = this.setEffect.bind(this);
-    this.animate = this.animate.bind(this);
-    this.destroy = this.destroy.bind(this);
-    this.update = this.update.bind(this);
-    this.updateFov = this.updateFov.bind(this);
+  removeVisibleFilter(key) {
+    const i = this.visible.filters.findIndex((f) => f.key === key);
+    this.visible.filters.splice(i, 1);
+  }
+
+  addFogFilter(key, filter) {
+    console.log('key');
+    console.log(this);
+    filter.key = key;
+    this.fogOfWar.filters.push(filter);
+  }
+  removeFogFilter(key) {
+    const i = this.fogOfWar.filters.findIndex((f) => f.key === key);
+    this.fogOfWar.filters.splice(i, 1);
   }
 
   addChild(entity: PIXI.Container, fogOfWarEntity?: PIXI.Container) {

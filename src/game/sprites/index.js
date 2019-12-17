@@ -4,6 +4,7 @@ import objects from './objects';
 import weapons from './weapons';
 import effects from './effects';
 import animals from './animals';
+import settlements from './settlements';
 
 const arrayOfAll = [
   ...characters.source,
@@ -12,6 +13,7 @@ const arrayOfAll = [
   ...weapons.source,
   ...effects.source,
   ...animals.source,
+  ...settlements.source,
 ];
 
 export { characters, maps, objects, animals, arrayOfAll };

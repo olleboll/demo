@@ -1,5 +1,7 @@
 import PIXI from 'engine';
 
+import { fadeOut, fadeIn } from 'engine/animations/fade';
+
 import { generateRNGTrees, generateRandomEnemies } from './levels/utils';
 
 import Boulder from 'game/objects/boulder';
@@ -14,19 +16,22 @@ class Medallion {
     this.player = player;
     this.swappingUniverse = false;
     this.currentLevel.addChild(this.player.container);
-    const boulder = new Boulder({
-      spritesheet: 'outside',
-      spriteKey: 'pink_tree',
-      position: { x: player.position.x + 30, y: player.position.y },
-      width: 64,
-      height: 64,
-    });
-    this.currentLevel.addChild(boulder.container, boulder.fogOfWarContainer);
-    this.universal = [boulder];
+    this.universal = [];
+
+    // const boulder = new Boulder({
+    //   spritesheet: 'outside',
+    //   spriteKey: 'pink_tree',
+    //   position: { x: player.position.x + 30, y: player.position.y },
+    //   width: 64,
+    //   height: 64,
+    // });
+    // this.currentLevel.addChild(boulder.container, boulder.fogOfWarContainer);
+    // this.universal = [boulder];
     this.interacting = false;
     this.interactingObject = null;
     this.stage.addChild(this.currentLevel.scene);
     this.update = this.update.bind(this);
+    this.defaultUpdate = this.update;
     this.playerInteract = this.playerInteract.bind(this);
     this.swapUniverse = this.swapUniverse.bind(this);
   }
@@ -34,10 +39,6 @@ class Medallion {
   update(delta) {
     if (!this.player) return;
     const { currentLevel, player } = this;
-    if (this.swappingUniverse) {
-      this.universeSwapAnimation.update();
-      return;
-    }
     const obstacles = currentLevel.getObstacles(player.position, 150);
     //const obstacles = currentLevel.visible.children;
     player.update(delta, obstacles, currentLevel.sceneSize);
@@ -81,11 +82,11 @@ class Medallion {
     this.levelIndex =
       this.levelIndex + 1 < this.levelsOrder.length ? this.levelIndex + 1 : 0;
     newWorld = this.levelsOrder[this.levelIndex];
-    //newWorld = this.currentLevel.name === 'forest' ? 'winter' : 'forest';
     this.swappingUniverse = true;
 
     const onComplete = () => {
       this.swappingUniverse = false;
+      this.update = this.defaultUpdate.bind(this);
     };
 
     const onSwap = (delta) => {
@@ -99,14 +100,26 @@ class Medallion {
       this.currentLevel.updateFov(this.player);
       this.currentLevel.visible.addChild(this.player.container);
       this.stage.addChild(this.currentLevel.scene);
+
+      this.levels[newWorld].scene.alpha = 0;
+      this.update = (delta) => {
+        fadeIn(
+          delta,
+          this.levels[newWorld].scene,
+          { endAlpha: 1, fadeSpeed: 0.01 },
+          onComplete.bind(this),
+        );
+      };
     };
 
-    this.universeSwapAnimation = universeSwap({
-      fromWorld: this.currentLevel,
-      toWorld: this.levels[newWorld],
-      onSwap: onSwap.bind(this),
-      onComplete: onComplete.bind(this),
-    });
+    this.update = (delta) => {
+      fadeOut(
+        delta,
+        this.currentLevel.scene,
+        { endAlpha: 0, fadeSpeed: 0.01 },
+        onSwap.bind(this),
+      );
+    };
   }
 }
 

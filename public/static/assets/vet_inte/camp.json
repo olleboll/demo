@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "image": "untitled.png",
+    "size": {"w":240,"h":240},
+		"scale": "1"
+  },
+  "frames": {
+    "winter_camp": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 240
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {"x":0,"y":0,"w":240,"h":240},
+      "sourceSize": {"w":240,"h":240},
+      "anchor": {"x":0.5,"y":0.5}
+    }
+  }
+}

@@ -7,7 +7,7 @@ import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { characters as _characters, objects } from './sprites';
 
-import { WinterLevel, ForestLevel, DesertLevel } from './levels';
+import { WinterLevel, ForestLevel, DesertLevel, Elyn } from './levels';
 import { generateRNGTrees } from './levels/utils';
 import Medallion from './medallion';
 import { Enemy } from './entities';
@@ -97,12 +97,29 @@ const Game = (opts: GameOptions) => {
     trees,
   };
   const desertLevel = new DesertLevel(levelOptions3); //createLevel(levelOptions);
+
+  const levelOptions4: LevelOptions = {
+    name: 'map',
+    spriteKey: 'forest',
+    centerCamera: true,
+    renderer,
+    dark: 0.8,
+    light: 1.2,
+    sceneWidth: 1600,
+    sceneHeight: 1600,
+    hasCamera: true,
+    dealDamage,
+    trees,
+  };
+  const elyn = new Elyn(levelOptions4); //createLevel(levelOptions);
+
   const levels = {
     forest: forestLevel,
     winter: winterLevel,
     desert: desertLevel,
+    elyn,
   };
-  const medallion = new Medallion(levels, 'winter', player, stage);
+  const medallion = new Medallion(levels, 'elyn', player, stage);
   const globalKeys = {
     e: 69,
     y: 89,
@@ -121,6 +138,7 @@ const Game = (opts: GameOptions) => {
   forestLevel.scene.interactive = true;
   winterLevel.scene.interactive = true;
   desertLevel.scene.interactive = true;
+  elyn.scene.interactive = true;
   const shoot = (event, level) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
@@ -150,8 +168,14 @@ const Game = (opts: GameOptions) => {
   });
 
   desertLevel.scene.on('mouseup', (event) => shoot(event, desertLevel));
-  desertLevel.scene.on('mousemove', (event) => setAim(event, winterLevel));
+  desertLevel.scene.on('mousemove', (event) => setAim(event, desertLevel));
   desertLevel.scene.on('mousedown', (event) => {
+    player.actions.bow.execute('draw');
+  });
+
+  elyn.scene.on('mouseup', (event) => shoot(event, elyn));
+  elyn.scene.on('mousemove', (event) => setAim(event, elyn));
+  elyn.scene.on('mousedown', (event) => {
     player.actions.bow.execute('draw');
   });
 

@@ -1,4 +1,5 @@
 import createSword from './sword';
 import createBow from './bow';
+import dash from './dash';
 
-export { createSword, createBow };
+export { createSword, createBow, dash };

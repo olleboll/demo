@@ -8,6 +8,8 @@ import {
 } from 'engine/utils';
 import { Entity } from 'engine/objects';
 
+import { fadeOut } from 'engine/animations/fade';
+
 class ReinDeer extends Entity {
   constructor({
     spritesheet,
@@ -60,6 +62,8 @@ class ReinDeer extends Entity {
     this.hpContainer = hpContainer;
     this.hpContainer.position.y -= 20;
     this.hp = 10;
+    this.update = this.update.bind(this);
+    this.die = this.die.bind(this);
   }
 
   update(delta, obstacles, world) {
@@ -151,8 +155,14 @@ class ReinDeer extends Entity {
   }
 
   die() {
-    this.remove(this);
-    this.container.destroy({ children: true });
+    const onDone = () => {
+      this.remove(this);
+      this.container.destroy({ children: true });
+    };
+
+    this.update = (delta) => {
+      fadeOut(delta, this.container, { endAlpha: 0, fadeSpeed: 0.05 }, onDone);
+    };
   }
 
   takeDamage(damage) {

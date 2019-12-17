@@ -1,4 +1,5 @@
 import Level from 'engine/level';
+import PIXI, { getResource } from 'engine';
 
 import { generateRandomReindeer } from './utils';
 import { createObject } from 'engine/objects';
@@ -48,6 +49,14 @@ class WinterLevel extends Level {
 
     this.setEffect(snow);
     this.removeReindeer = this.removeReindeer.bind(this);
+
+    // test
+    // console.log(getResource('winter_camp'));
+    // const { winter_camp } = getResource('winter_camp').textures;
+    //
+    // const camp = new PIXI.Sprite(winter_camp);
+    // camp.zIndex = -500;
+    // this.addChild(camp);
   }
 
   update(delta, player) {

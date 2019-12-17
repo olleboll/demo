@@ -54,6 +54,30 @@ class StaticObject {
     this.fogOfWarContainer = fogOfWarContainer;
     this.sprite = sprite;
     this.fogSprite = fogSprite;
+    this.addVisibleFilter = this.addVisibleFilter.bind(this);
+    this.addFogFilter = this.addFogFilter.bind(this);
+    this.removeVisibleFilter = this.removeVisibleFilter.bind(this);
+    this.removeFogFilter = this.removeFogFilter.bind(this);
+  }
+  addVisibleFilter(key, filter) {
+    const i = this.container.filters.findIndex((f) => f.key === key);
+    if (i !== -1) return;
+    filter.key = key;
+    this.container.filters.push(filter);
+  }
+
+  removeVisibleFilter(key) {
+    const i = this.container.filters.findIndex((f) => f.key === key);
+    this.container.filters.splice(i, 1);
+  }
+
+  addFogFilter(key, filter) {
+    filter.key = key;
+    this.fogOfWarContainer.filters.push(filter);
+  }
+  removeFogFilter(key) {
+    const i = this.fogOfWarContainer.filters.findIndex((f) => f.key === key);
+    this.fogOfWarContainer.filters.splice(i, 1);
   }
 }
 

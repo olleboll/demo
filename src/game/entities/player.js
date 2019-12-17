@@ -1,8 +1,10 @@
 import { DropShadowFilter } from 'pixi-filters';
 
 import PIXI, { getResource } from 'engine';
-import { evaluateMove } from 'engine/utils';
+import { evaluateMove, calculateDistance } from 'engine/utils';
 import Entity from 'engine/objects/entity';
+
+import { dash } from 'game/actions';
 
 import { characters } from 'game/sprites';
 
@@ -34,6 +36,7 @@ class Player extends Entity {
 
     this.aim = {};
     this.speed = speed;
+    this.defaultSpeed = speed;
     this.actions = actions;
     this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
 
@@ -46,6 +49,8 @@ class Player extends Entity {
     this.hpContainer.position.y -= 20;
     this.hp = 100;
     this.debug = 0;
+    this.defaultUpdate = this.update.bind(this);
+    this.setAim = this.setAim.bind(this);
   }
 
   setAim({ x, y }) {
@@ -102,6 +107,40 @@ class Player extends Entity {
     hpContainer.addChild(hpbg);
     hpContainer.addChild(hpBar);
     return { hpContainer, hpBar, hpbg };
+  }
+
+  dash(target, world) {
+    if (this.performingDash) {
+      return;
+    }
+    const dest = {};
+    const { dx, dy, distance } = calculateDistance(this.position, target);
+    if (distance === 0) return;
+
+    const normX = dx / distance;
+    const normY = dy / distance;
+    dest.x = this.position.x + normX * 200;
+    dest.y = this.position.y + normY * 200;
+    const { distance: d } = calculateDistance(this.position, dest);
+    const onDone = () => {
+      this.speed = this.defaultSpeed;
+      this.update = this.defaultUpdate.bind(this);
+      this.performingDash = false;
+    };
+    this.performingDash = true;
+
+    this.aim.x = this.aim.x + dx;
+    this.aim.y = this.aim.y + dy;
+
+    const performDash = dash(this, {
+      target: dest,
+      velocity: { x: normX, y: normY },
+      onDone,
+      world,
+    });
+
+    this.update = (delta, obstacles, world) =>
+      performDash.update(delta, this, obstacles);
   }
 
   takeDamage(damage) {

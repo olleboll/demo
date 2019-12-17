@@ -17,8 +17,12 @@ class Controller {
       keysDown[key] = this.keyboard[key].isDown;
     });
 
-    if (keysDown.space) {
-      // player should dash?
+    if (keysDown.space && !this.keysCooldown.space) {
+      this.player.dash(this.player.aim, this.medallion.currentLevel);
+      this.keysCooldown.space = true;
+      setTimeout(() => {
+        this.keysCooldown.space = false;
+      }, 100);
     }
     if (keysDown.r) {
       this.medallion.swapUniverse();
