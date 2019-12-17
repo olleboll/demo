@@ -13,6 +13,7 @@ const dash = (
 ) => {
   const done = {};
   const collision = {};
+  const initalObstacles = obstacles;
 
   const { dx, dy, distance: totalDistance } = calculateDistance(
     entity.position,
@@ -89,7 +90,7 @@ const dash = (
 
       world.background.filters = [];
 
-      for (let o of obstacles) {
+      for (let o of initalObstacles) {
         if (o.removeVisibleFilter) {
           o.removeVisibleFilter('dash');
         }

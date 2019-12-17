@@ -40,6 +40,7 @@ class Level {
     this.destroy = this.destroy.bind(this);
     this.update = this.update.bind(this);
     this.updateFov = this.updateFov.bind(this);
+    this.updateGrid = this.updateGrid.bind(this);
 
     // setup
     this.name = name;
@@ -130,12 +131,6 @@ class Level {
       this.fogOfWar.addChild(fogOfWarEntity);
     }
 
-    if (entity.getLosBounds) {
-      const lines = getLinesOfRect(entity.getLosBounds());
-      entity.losLines = lines;
-      entity.corners = lines.points;
-    }
-
     if (entity.getCollisionBox) {
       const { square, x, y } = pointToSquare(
         { x: entity.position.x, y: entity.position.y },
@@ -197,7 +192,24 @@ class Level {
     this.camera.updateCamera(player.position);
     this.updateFov(player);
     this.animate(delta);
+    this.updateGrid();
   }
+
+  updateGrid() {
+    this.grid = generateGrid(
+      { width: this.sceneWidth, height: this.sceneHeight },
+      100,
+    );
+    for (let entity of this.visible.children) {
+      const { square, x, y } = pointToSquare(
+        { x: entity.position.x, y: entity.position.y },
+        this.grid,
+        this.sceneSize,
+      );
+      square.push(entity);
+    }
+  }
+
   updateFov(player) {
     const fov = this.camera.generateFieldOfView(
       player.position,

@@ -137,6 +137,7 @@ class Player extends Entity {
       velocity: { x: normX, y: normY },
       onDone,
       world,
+      obstacles: world.getObstacles(this.position, 350),
     });
 
     this.update = (delta, obstacles, world) =>

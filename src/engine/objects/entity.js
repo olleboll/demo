@@ -36,6 +36,7 @@ class Entity {
     container.zIndex = container.position.y;
 
     this.container = container;
+    this.container.filters = [];
     this.speed = speed;
     this.position = position;
     this.movementSprites = setUpSprites(spritesheet, spriteKey);
@@ -51,6 +52,8 @@ class Entity {
     this.addFogFilter = this.addFogFilter.bind(this);
     this.removeVisibleFilter = this.removeVisibleFilter.bind(this);
     this.removeFogFilter = this.removeFogFilter.bind(this);
+    container.addVisibleFilter = this.addVisibleFilter.bind(this);
+    container.removeVisibleFilter = this.removeVisibleFilter.bind(this);
   }
 
   swapSprite(newSprite: PIXI.AnimatedSprite) {
