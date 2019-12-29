@@ -18,7 +18,16 @@ export type ObjectOptions = {
 
 class StaticObject {
   constructor(opts) {
-    const { spritesheet, spriteKey, position, width, height } = opts;
+    const {
+      spritesheet,
+      spriteKey,
+      position,
+      width,
+      height,
+      backgroundObject = false,
+      collidable = true,
+      los = true,
+    } = opts;
 
     const container = new PIXI.Container();
     const fogOfWarContainer = new PIXI.Container();
@@ -29,6 +38,7 @@ class StaticObject {
     container.position.x = position.x;
     container.position.y = position.y;
     container.zIndex = position.y;
+    container.cacheAsBitmap = true;
     this.sprite = sprite;
 
     const fogSprite = new PIXI.Sprite(textures[spriteKey]);
@@ -37,7 +47,7 @@ class StaticObject {
     fogOfWarContainer.position.x = position.x;
     fogOfWarContainer.position.y = position.y;
     fogOfWarContainer.zIndex = position.y;
-    this.fogSprite = fogSprite;
+    fogOfWarContainer.cacheAsBitmap = true;
 
     const bWidth = width ? width / 2 : sprite.width;
     const bHeight = height ? height / 2 : sprite.height;
@@ -48,12 +58,19 @@ class StaticObject {
       bHeight,
     );
 
-    container.getCollisionBox = () => bounds;
+    if (collidable) {
+      container.getCollisionBox = () => bounds;
+    }
+
+    if (los) {
+      container.getLosBounds = () => bounds;
+    }
 
     this.container = container;
     this.fogOfWarContainer = fogOfWarContainer;
     this.sprite = sprite;
     this.fogSprite = fogSprite;
+    this.backgroundObject = backgroundObject;
     this.addVisibleFilter = this.addVisibleFilter.bind(this);
     this.addFogFilter = this.addFogFilter.bind(this);
     this.removeVisibleFilter = this.removeVisibleFilter.bind(this);

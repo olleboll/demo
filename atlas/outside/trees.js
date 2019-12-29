@@ -34,14 +34,14 @@ for (let y = 0; y < 2; y++) {
   }
 }
 
-const logFrame = {
+const forestTree = {
   rotated: false,
   trimmed: false,
   spriteSourceSize: { x: 0, y: 0, w: 512, h: 512 },
   sourceSize: { w: 512, h: 512 },
   anchor: { x: 0.5, y: 0.5 },
   frame: {
-    x: 256,
+    x: 0,
     y: 0,
     w: 32,
     h: 32,
@@ -49,7 +49,7 @@ const logFrame = {
 };
 
 for (let x = 0; x < 7; x++) {
-  let sprite = logFrame;
+  let sprite = forestTree;
   sprite.frame.x = frame.w * x;
   sprite.frame.y = frame.y * y;
   atlas.frames[`log_${x}`];

@@ -14,6 +14,8 @@ import {
 
 import { generateGrid, pointToSquare, includeAdjecentSquares } from './utils';
 
+const SCALE = 1;
+
 class Level {
   constructor({
     name,
@@ -44,8 +46,8 @@ class Level {
 
     // setup
     this.name = name;
-    this.sceneWidth = sceneWidth;
-    this.sceneHeight = sceneHeight;
+    this.sceneWidth = sceneWidth * SCALE;
+    this.sceneHeight = sceneHeight * SCALE;
     const scene = new PIXI.Container();
     const visible = new PIXI.Container();
     const fogOfWar = new PIXI.Container();
@@ -58,14 +60,19 @@ class Level {
     const { map } = getResource(spriteKey).textures;
 
     const background = new PIXI.Sprite(map);
-    background.zIndex = -background.height / 2;
+    background.zIndex = (-background.height / 2) * SCALE;
     background.name = 'backgroundImage';
-    background.position.x = -background.width / 2;
-    background.position.y = -background.height / 2;
+    background.position.x = (-background.width / 2) * SCALE;
+    background.position.y = (-background.height / 2) * SCALE;
+    background.width = background.width * SCALE;
+    background.height = background.height * SCALE;
     this.background = background;
+    console.log('BG');
+    console.log(background);
     visible.addChild(background);
     visible.sortableChildren = true;
     const visibleAlphaFilter = new PIXI.filters.AlphaFilter(light);
+    console.log(this.background);
     visible.filters = [];
     this.addVisibleFilter('_alpha', visibleAlphaFilter);
 
@@ -73,10 +80,12 @@ class Level {
     this.visibleMasks = {};
 
     const staticBackground = new PIXI.Sprite(map);
-    staticBackground.zIndex = -staticBackground / 2;
+    staticBackground.zIndex = (-staticBackground / 2) * SCALE;
     staticBackground.name = 'backgroundImage';
-    staticBackground.position.x = -staticBackground.width / 2;
-    staticBackground.position.y = -staticBackground.height / 2;
+    staticBackground.position.x = (-staticBackground.width / 2) * SCALE;
+    staticBackground.position.y = (-staticBackground.height / 2) * SCALE;
+    staticBackground.width = staticBackground.width * SCALE;
+    staticBackground.height = staticBackground.height * SCALE;
     fogOfWar.addChild(staticBackground);
     fogOfWar.sortableChildren = true;
     const fogAlphaFilter = new PIXI.filters.AlphaFilter(dark);
@@ -88,19 +97,22 @@ class Level {
     scene.addChild(fogOfWar);
     scene.addChild(visible);
     scene.visible = visible;
+    scene.scale.x = SCALE;
+    scene.scale.y = SCALE;
 
-    this.sceneSize = { width: this.sceneWidth, height: this.sceneHeight };
-    this.grid = generateGrid(
-      { width: this.sceneWidth, height: this.sceneHeight },
-      100,
-    );
+    this.sceneSize = {
+      width: this.sceneWidth,
+      height: this.sceneHeight,
+    };
+    console.log(this.sceneSize);
+    this.grid = generateGrid(this.sceneSize, 100);
 
     this.camera = new Camera({
       renderer,
       scene,
       level: this,
-      sceneWidth,
-      sceneHeight,
+      sceneSize: this.sceneSize,
+      scale: SCALE,
     });
   }
 
@@ -115,8 +127,6 @@ class Level {
   }
 
   addFogFilter(key, filter) {
-    console.log('key');
-    console.log(this);
     filter.key = key;
     this.fogOfWar.filters.push(filter);
   }
@@ -126,12 +136,15 @@ class Level {
   }
 
   addChild(entity: PIXI.Container, fogOfWarEntity?: PIXI.Container) {
-    this.visible.addChild(entity);
+    if (entity) {
+      this.visible.addChild(entity);
+    }
     if (fogOfWarEntity) {
       this.fogOfWar.addChild(fogOfWarEntity);
     }
 
-    if (entity.getCollisionBox) {
+    // TODO:
+    if (entity) {
       const { square, x, y } = pointToSquare(
         { x: entity.position.x, y: entity.position.y },
         this.grid,
@@ -192,21 +205,25 @@ class Level {
     this.camera.updateCamera(player.position);
     this.updateFov(player);
     this.animate(delta);
-    this.updateGrid();
+    //this.updateGrid();
   }
 
   updateGrid() {
+    // Oh so broken
+    // We never delete it from the old square...
     this.grid = generateGrid(
       { width: this.sceneWidth, height: this.sceneHeight },
       100,
     );
     for (let entity of this.visible.children) {
-      const { square, x, y } = pointToSquare(
-        { x: entity.position.x, y: entity.position.y },
-        this.grid,
-        this.sceneSize,
-      );
-      square.push(entity);
+      if (entity.getCollisionBox && entity.getLosBounds) {
+        const { square, x, y } = pointToSquare(
+          { x: entity.position.x, y: entity.position.y },
+          this.grid,
+          this.sceneSize,
+        );
+        square.push(entity);
+      }
     }
   }
 

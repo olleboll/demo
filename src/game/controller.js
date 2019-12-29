@@ -22,7 +22,7 @@ class Controller {
       this.keysCooldown.space = true;
       setTimeout(() => {
         this.keysCooldown.space = false;
-      }, 100);
+      }, 200);
     }
     if (keysDown.r) {
       this.medallion.swapUniverse();
@@ -33,14 +33,14 @@ class Controller {
       this.keysCooldown.e = true;
       setTimeout(() => {
         this.keysCooldown.e = false;
-      }, 100);
+      }, 200);
     } else if (keysDown.e && this.keysToggle.e && !this.keysCooldown.e) {
       this.medallion.playerInteract(false);
       this.keysToggle.e = false;
       this.keysCooldown.e = true;
       setTimeout(() => {
         this.keysCooldown.e = false;
-      }, 100);
+      }, 200);
     }
   }
 }

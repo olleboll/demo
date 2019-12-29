@@ -88,20 +88,20 @@ export const evaluateMove = (
 
   for (let obj of obstacles) {
     if (obj === entity.container) continue;
-    if (
-      !collisionX &&
-      (checkCollision(obj, { x: newX, y: entity.position.y }) ||
-        (newX < minX || newX > maxX))
-    ) {
+    if (!collisionX && checkCollision(obj, { x: newX, y: entity.position.y })) {
       collisionX = true;
     }
-    if (
-      !collisionY &&
-      (checkCollision(obj, { x: entity.position.x, y: newY }) ||
-        (newY < minY || newY > maxY))
-    ) {
+    if (!collisionY && checkCollision(obj, { x: entity.position.x, y: newY })) {
       collisionY = true;
     }
+  }
+
+  if (!collisionX && (newX < minX || newX > maxX)) {
+    collisionX = true;
+  }
+
+  if (!collisionY && (newY < minY || newY > maxY)) {
+    collisionY = true;
   }
 
   let newPosX = collisionX ? entity.position.x : newX;

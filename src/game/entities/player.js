@@ -40,9 +40,9 @@ class Player extends Entity {
     this.defaultSpeed = speed;
     this.actions = actions;
     this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
-    this.dashDistance = 100;
+    this.dashDistance = 200;
 
-    this.sightRange = 300;
+    this.sightRange = 200;
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
     this.container.addChild(hpContainer);
     this.hpBar = hpBar;

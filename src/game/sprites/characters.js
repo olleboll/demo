@@ -9,8 +9,8 @@ const characters = {
       src: '/static/assets/characters/movements2.json',
     },
   ],
-  player: 'move_0_3_',
-  assassin: 'move_0_0',
+  assassin: 'move_0_3_',
+  player: 'move_1_4_',
   joker: 'move2_0_1_',
   warrior: 'move2_1_3_',
 };

@@ -9,8 +9,6 @@ import {
   intersectionPoint,
 } from './intersections';
 
-let counter = 0;
-
 export const calculateFieldOfView = (
   fov: PIXI.Graphics,
   graphics: PIXI.Graphics,
@@ -19,6 +17,7 @@ export const calculateFieldOfView = (
   r: number,
   mid: Point,
   parent: PIXI.Container,
+  scale: number,
 ) => {
   const visibleObjects = obstacles.filter((sprite) => {
     if (!sprite) {
@@ -37,14 +36,6 @@ export const calculateFieldOfView = (
     }
     return fov.contains(sprite.x, sprite.y);
   });
-  counter++;
-  if (counter === 200) {
-    console.log('**** DEBUG ***');
-    console.log(obstacles);
-    console.log(obstacles.length);
-    console.log(visibleObjects);
-    console.log(visibleObjects.length);
-  }
   const lines = visibleObjects
     .filter((obj) => obj.getLosBounds)
     .map((obj) => {
@@ -117,8 +108,8 @@ export const calculateFieldOfView = (
 
       let g = { p1: pos, p2: closestLine };
       let { distance, dx, dy } = calculateDistance(pos, closestLine.p1);
-      x = pos.x + Math.cos(angle) * distance;
-      y = pos.y + Math.sin(angle) * distance;
+      x = pos.x + Math.cos(angle) * (distance + 10);
+      y = pos.y + Math.sin(angle) * (distance + 10);
       drawingPoints.push({ x, y });
     } else {
       drawingPoints.push({ x, y });
@@ -176,15 +167,7 @@ export const calculateFieldOfView2 = (
       lines.push(...sprite.losLines.lines);
       return lines;
     }, []);
-  counter++;
-  if (counter === 1) {
-    console.log('**** DEBUG ***');
-    //console.log(lines);
-    // console.log(obstacles);
-    // console.log(obstacles.length);
-    // console.log(visibleObjects);
-    // console.log(visibleObjects.length);
-  }
+
   //
   // const lines = visibleObjects
   //   .filter((obj) => obj.getLosBounds)

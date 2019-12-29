@@ -1,6 +1,6 @@
 import PIXI from 'engine';
 import Level from 'engine/level';
-import { createObject } from 'engine/objects';
+import { StaticObject } from 'engine/objects';
 
 import { createRain } from 'game/weather';
 
@@ -16,7 +16,7 @@ class ForestLevel extends Level {
     this.dealDamage = props.dealDamage;
     this.trees = props.trees.map((pos) => {
       const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
-      return createObject({
+      return new StaticObject({
         spritesheet: 'outside',
         spriteKey: sprite,
         position: pos,

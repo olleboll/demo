@@ -46,15 +46,12 @@ class Sword {
   }
 
   setParent(container) {
-    console.log('settting parent');
-    console.log(this);
     this.parent = container;
     this.parent.addChildAt(this.animationSprite);
     this.parent.addChildAt(this.animationSprite2);
   }
 
   swing(target) {
-    console.log(this);
     const { animationSprite, animationSprite2 } = this;
     if (animationSprite.playing) {
       const { currentFrame: current, totalFrames: total } = animationSprite;

@@ -1,7 +1,7 @@
 //@flow
 import PIXI from 'engine';
 import { createKeyboardControls } from 'engine/controls';
-import { createEntity, createObject } from 'engine/objects';
+import { createEntity, StaticObject } from 'engine/objects';
 import { createEffect } from 'engine/effects';
 import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
@@ -35,6 +35,7 @@ const Game = (opts: GameOptions) => {
   };
   const controls = createKeyboardControls(keys);
   const stage = new PIXI.Container();
+  const gui = new PIXI.Container();
 
   const dealDamage = (aoe, damage, friendly = false) => {
     if (aoe.contains(player.position.x, player.position.y)) {
@@ -45,14 +46,37 @@ const Game = (opts: GameOptions) => {
   const player = createPlayer({
     spritesheet: 'movements',
     spriteKey: _characters.player,
-    position: { x: 0, y: 0 },
+    position: { x: -320, y: -560 },
     controls,
     speed: 3,
     dealDamage,
     renderer,
   });
 
-  const trees = generateRNGTrees();
+  const xTreeStart = 56 * 16;
+  const yTreeStart = 37 * 16;
+
+  const trees = generateRNGTrees({
+    startX: 0,
+    startY: 0,
+    w: 1600,
+    h: 1600,
+    mapWidth: 1600,
+    mapHeight: 1600,
+    size: 25,
+  });
+
+  // const trees2 = generateRNGTrees({
+  //   startX: 0,
+  //   startY: yTreeStart,
+  //   w: 1600,
+  //   h: 1600 - yTreeStart,
+  //   mapWidth: 1600,
+  //   mapHeight: 1600,
+  //   size: 25,
+  // });
+  //
+  // const trees = trees1.concat(trees2);
 
   const levelOptions: LevelOptions = {
     name: 'map',
@@ -100,7 +124,7 @@ const Game = (opts: GameOptions) => {
 
   const levelOptions4: LevelOptions = {
     name: 'map',
-    spriteKey: 'forest',
+    spriteKey: 'elyn',
     centerCamera: true,
     renderer,
     dark: 0.8,
@@ -116,10 +140,10 @@ const Game = (opts: GameOptions) => {
   const levels = {
     forest: forestLevel,
     winter: winterLevel,
-    desert: desertLevel,
+    //desert: desertLevel,
     elyn,
   };
-  const medallion = new Medallion(levels, 'elyn', player, stage);
+  const medallion = new Medallion(levels, 'elyn', player, stage, gui);
   const globalKeys = {
     e: 69,
     y: 89,
@@ -218,7 +242,7 @@ const generateRandomTrees = (number, { width, height }) => {
       sizeX: 64,
       sizeY: 64,
     });
-    let tree = createObject({
+    let tree = new StaticObject({
       spritesheet: 'outside',
       spriteKey: objects.tree,
       position: { x, y },

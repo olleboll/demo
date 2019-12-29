@@ -10,6 +10,21 @@ const atlas = {
   animations: {},
 };
 
+let sign_small = {
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
+  sourceSize: { w: 832, h: 384 },
+  anchor: { x: 0.5, y: 0.5 },
+  frame: {
+    x: 16,
+    y: 16,
+    w: 16,
+    h: 16,
+  },
+};
+atlas.frames['sign_small'] = sign_small;
+
 let tree = {
   rotated: false,
   trimmed: false,

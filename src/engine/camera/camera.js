@@ -7,7 +7,8 @@ import {
 } from 'engine/utils';
 
 class Camera {
-  constructor({ renderer, scene, level, sceneWidth, sceneHeight }) {
+  constructor({ renderer, scene, level, sceneSize, scale = 1.0 }) {
+    const { width: sceneWidth, height: sceneHeight } = sceneSize;
     this.SCENE_WIDTH = sceneWidth;
     this.SCENE_HEIGHT = sceneHeight;
     this.SCREEN_MID_X = renderer.width / 2;
@@ -87,6 +88,7 @@ class Camera {
       fovRange,
       mid,
       scene.visible,
+      this.scale,
     );
   }
 

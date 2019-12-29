@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "image": "elyn.png",
+    "size": {"w":1600,"h":1600},
+		"scale": "1"
+  },
+  "frames": {
+    "map": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 1600,
+        "h": 1600
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {"x":0,"y":0,"w":1600,"h":1600},
+      "sourceSize": {"w":1600,"h":1600},
+      "anchor": {"x":0,"y":0}
+    }
+  }
+}

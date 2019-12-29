@@ -33,9 +33,6 @@ export const createPlayer = ({
     renderer,
   });
 
-  console.log('sword created');
-  console.log(bow);
-
   const playerAbilities = {
     // sword: {
     //   swing: sword.swing,

@@ -4,15 +4,23 @@ import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 import { createEnemy, createReinDeer } from 'game/entities/factory';
 import { characters, objects, animals } from 'game/sprites';
 
-export const generateRNGTrees = () => {
+export const generateRNGTrees = ({
+  startX,
+  startY,
+  w,
+  h,
+  size = 25,
+  mapWidth,
+  mapHeight,
+}) => {
   let treeMap = [];
 
   const chanceToStartAsOpen = 0.3;
   const deathLimit = 2;
   const birthLimit = 5;
   const numberOfSteps = 8;
-  const width = 1600 / 25;
-  const height = 1600 / 25;
+  const width = w / size;
+  const height = h / size;
 
   for (let i = 0; i < width; i++) {
     treeMap[i] = [];
@@ -81,7 +89,10 @@ export const generateRNGTrees = () => {
   for (let i = 0; i < width; i++) {
     for (let j = 0; j < height; j++) {
       if (treeMap[i][j] === true) {
-        trees.push({ x: -800 + i * 25, y: -800 + j * 25 });
+        trees.push({
+          x: -mapWidth / 2 + startX + i * size,
+          y: -mapHeight / 2 + startY + j * size,
+        });
       }
     }
   }
@@ -132,8 +143,8 @@ export const generateRandomEnemies = (
       sizeY: 30,
     });
     const enemy = createEnemy({
-      spritesheet: 'movements2',
-      spriteKey: characters.warrior,
+      spritesheet: 'movements',
+      spriteKey: characters.assassin,
       position: { x, y },
       world: level.scene,
       speed: 2,

@@ -7,8 +7,9 @@ import { generateRNGTrees, generateRandomEnemies } from './levels/utils';
 import Boulder from 'game/objects/boulder';
 
 class Medallion {
-  constructor(levels, startingLevel, player, stage) {
+  constructor(levels, startingLevel, player, stage, gui) {
     this.stage = stage;
+    this.gui = gui;
     this.levels = levels;
     this.currentLevel = this.levels[startingLevel];
     this.levelsOrder = Object.keys(levels);
@@ -30,6 +31,7 @@ class Medallion {
     this.interacting = false;
     this.interactingObject = null;
     this.stage.addChild(this.currentLevel.scene);
+    this.stage.addChild(this.gui);
     this.update = this.update.bind(this);
     this.defaultUpdate = this.update;
     this.playerInteract = this.playerInteract.bind(this);
@@ -47,11 +49,12 @@ class Medallion {
 
   playerInteract(active) {
     // create a set with all interactive objects in this level. including universal
+    const local = this.currentLevel.interactiveObjects;
     if (this.interacting && active) {
       return;
     } else if (active) {
       // started interacting
-      const setOfObjects = new Set(this.universal);
+      const setOfObjects = new Set(this.universal.concat(local));
       const arr = [...setOfObjects];
       const aoe = new PIXI.Circle(
         this.player.position.x,

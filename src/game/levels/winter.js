@@ -2,7 +2,7 @@ import Level from 'engine/level';
 import PIXI, { getResource } from 'engine';
 
 import { generateRandomReindeer } from './utils';
-import { createObject } from 'engine/objects';
+import { StaticObject } from 'engine/objects';
 import { objects } from 'game/sprites';
 
 import { createSnow } from 'game/weather';
@@ -14,7 +14,7 @@ class WinterLevel extends Level {
     this.dealDamage = props.dealDamage;
     this.trees = props.trees.map((pos) => {
       const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
-      return createObject({
+      return new StaticObject({
         spritesheet: 'winter_outside',
         spriteKey: sprite,
         position: pos,

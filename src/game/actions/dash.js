@@ -14,6 +14,10 @@ const dash = (
   const done = {};
   const collision = {};
   const initalObstacles = obstacles;
+  const maxX = world.width / 2;
+  const maxY = world.height / 2;
+  const minX = -world.width / 2;
+  const minY = -world.height / 2;
 
   const { dx, dy, distance: totalDistance } = calculateDistance(
     entity.position,
@@ -79,6 +83,18 @@ const dash = (
         target.y = entity.position.y;
         newY = entity.position.y;
       }
+    }
+
+    if (!done.x && (newX < minX || newX > maxX)) {
+      done.x = true;
+      target.x = entity.position.x;
+      newX = entity.position.x;
+    }
+
+    if (!done.y && (newY < minY || newY > maxY)) {
+      done.y = true;
+      target.y = entity.position.y;
+      newY = entity.position.y;
     }
 
     if (done.x && done.y) {

@@ -1,7 +1,7 @@
 import Level from 'engine/level';
 
 import { generateRNGTrees } from './utils';
-import { createObject } from 'engine/objects';
+import { StaticObject } from 'engine/objects';
 import { objects } from 'game/sprites';
 
 class DesertLevel extends Level {
@@ -11,7 +11,7 @@ class DesertLevel extends Level {
     this.dealDamage = props.dealDamage;
     this.trees = props.trees.map((pos) => {
       const sprite = Math.random() > 0.7 ? 'fall_tree' : 'dead_tree';
-      return createObject({
+      return new StaticObject({
         spritesheet: 'outside',
         spriteKey: sprite,
         position: pos,
