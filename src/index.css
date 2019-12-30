@@ -11,14 +11,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.stats {
-  height: 20px;
-  width: 200px;
-  background-color: #000;
-  color: #00e05e;
-}
-
-.instructions {
-  color: #00e05e;
-}

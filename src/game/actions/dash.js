@@ -14,10 +14,10 @@ const dash = (
   const done = {};
   const collision = {};
   const initalObstacles = obstacles;
-  const maxX = world.width / 2;
-  const maxY = world.height / 2;
-  const minX = -world.width / 2;
-  const minY = -world.height / 2;
+  const maxX = world.sceneSize.width / 2;
+  const maxY = world.sceneSize.height / 2;
+  const minX = -world.sceneSize.width / 2;
+  const minY = -world.sceneSize.height / 2;
 
   const { dx, dy, distance: totalDistance } = calculateDistance(
     entity.position,
@@ -35,6 +35,7 @@ const dash = (
   animation.visible = true;
   animation.play();
 
+  // TODO: should probably not hard set the filters of bg sprite
   const filter = new PIXI.filters.BlurFilter(4);
   world.background.filters = [filter];
   //world.addVisibleFilter('dash', filter);
@@ -91,7 +92,10 @@ const dash = (
       newX = entity.position.x;
     }
 
-    if (!done.y && (newY < minY || newY > maxY)) {
+    if (
+      !done.y &&
+      (newY - entity.currentSprite.height / 3 < minY || newY > maxY)
+    ) {
       done.y = true;
       target.y = entity.position.y;
       newY = entity.position.y;

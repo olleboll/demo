@@ -42,7 +42,7 @@ class Player extends Entity {
     this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
     this.dashDistance = 200;
 
-    this.sightRange = 200;
+    this.sightRange = 300;
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
     this.container.addChild(hpContainer);
     this.hpBar = hpBar;

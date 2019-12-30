@@ -100,7 +100,11 @@ export const evaluateMove = (
     collisionX = true;
   }
 
-  if (!collisionY && (newY < minY || newY > maxY)) {
+  // Divide by tree to accomodate anchor of sprite
+  if (
+    !collisionY &&
+    (newY - entity.currentSprite.height / 3 < minY || newY > maxY)
+  ) {
     collisionY = true;
   }
 

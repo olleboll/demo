@@ -48,7 +48,7 @@ const Game = (opts: GameOptions) => {
     spriteKey: _characters.player,
     position: { x: -320, y: -560 },
     controls,
-    speed: 3,
+    speed: 2,
     dealDamage,
     renderer,
   });
@@ -127,7 +127,7 @@ const Game = (opts: GameOptions) => {
     spriteKey: 'elyn',
     centerCamera: true,
     renderer,
-    dark: 0.8,
+    dark: 0.0,
     light: 1.2,
     sceneWidth: 1600,
     sceneHeight: 1600,
