@@ -167,6 +167,8 @@ const Game = (opts: GameOptions) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
     //player.actions.sword.swing(target);
+    console.log('target');
+    console.log({ x, y });
     player.actions.bow.execute('fire', {
       target,
       world: medallion.currentLevel,
@@ -181,27 +183,25 @@ const Game = (opts: GameOptions) => {
 
   forestLevel.scene.on('mouseup', (event) => shoot(event, forestLevel));
   forestLevel.scene.on('mousemove', (event) => setAim(event, forestLevel));
-  forestLevel.scene.on('mousedown', (event) => {
-    player.actions.bow.execute('draw');
-  });
+  forestLevel.scene.on('mousedown', (event) =>
+    player.actions.bow.execute('draw'),
+  );
 
   winterLevel.scene.on('mouseup', (event) => shoot(event, winterLevel));
   winterLevel.scene.on('mousemove', (event) => setAim(event, winterLevel));
-  winterLevel.scene.on('mousedown', (event) => {
-    player.actions.bow.execute('draw');
-  });
+  winterLevel.scene.on('mousedown', (event) =>
+    player.actions.bow.execute('draw'),
+  );
 
   desertLevel.scene.on('mouseup', (event) => shoot(event, desertLevel));
   desertLevel.scene.on('mousemove', (event) => setAim(event, desertLevel));
-  desertLevel.scene.on('mousedown', (event) => {
-    player.actions.bow.execute('draw');
-  });
+  desertLevel.scene.on('mousedown', (event) =>
+    player.actions.bow.execute('draw'),
+  );
 
   elyn.scene.on('mouseup', (event) => shoot(event, elyn));
   elyn.scene.on('mousemove', (event) => setAim(event, elyn));
-  elyn.scene.on('mousedown', (event) => {
-    player.actions.bow.execute('draw');
-  });
+  elyn.scene.on('mousedown', (event) => player.actions.bow.execute('draw'));
 
   const init = () => {
     console.log('LAUNCHING GAME');

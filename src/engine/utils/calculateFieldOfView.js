@@ -17,7 +17,6 @@ export const calculateFieldOfView = (
   r: number,
   mid: Point,
   parent: PIXI.Container,
-  scale: number,
 ) => {
   const visibleObjects = obstacles.filter((sprite) => {
     if (!sprite) {

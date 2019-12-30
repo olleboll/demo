@@ -57,6 +57,7 @@ class Bow {
   }
 
   draw() {
+    console.log('drawn');
     this.drawn = true;
   }
 

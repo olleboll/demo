@@ -1,3 +1,5 @@
+import { Howl, Howler } from 'howler';
+
 import PIXI from 'engine';
 import Level from 'engine/level';
 import { StaticObject, InteractiveObject } from 'engine/objects';
@@ -98,6 +100,11 @@ class Elyn extends Level {
 
     this.interactiveObjects = [sign];
     this.enemies = [];
+
+    this.ambience = new Howl({
+      src: ['/static/audio/helios/city_above_the_clouds.mp3'],
+    });
+    this.ambience.play();
   }
   update(delta, player) {
     super.update(delta, player);

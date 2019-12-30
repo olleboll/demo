@@ -14,8 +14,6 @@ import {
 
 import { generateGrid, pointToSquare, includeAdjecentSquares } from './utils';
 
-const SCALE = 1;
-
 class Level {
   constructor({
     name,
@@ -46,59 +44,48 @@ class Level {
 
     // setup
     this.name = name;
-    this.sceneWidth = sceneWidth * SCALE;
-    this.sceneHeight = sceneHeight * SCALE;
+    this.sceneWidth = sceneWidth;
+    this.sceneHeight = sceneHeight;
     const scene = new PIXI.Container();
     const visible = new PIXI.Container();
     const fogOfWar = new PIXI.Container();
     this.scene = scene;
     this.visible = visible;
     this.fogOfWar = fogOfWar;
-    const mask = new PIXI.Container();
+    this.visibleMask = new PIXI.Container();
     this.effects = [];
 
     const { map } = getResource(spriteKey).textures;
 
     const background = new PIXI.Sprite(map);
-    background.zIndex = (-background.height / 2) * SCALE;
+    background.zIndex = -background.height / 2;
     background.name = 'backgroundImage';
-    background.position.x = (-background.width / 2) * SCALE;
-    background.position.y = (-background.height / 2) * SCALE;
-    background.width = background.width * SCALE;
-    background.height = background.height * SCALE;
+    background.position.x = -background.width / 2;
+    background.position.y = -background.height / 2;
     this.background = background;
-    console.log('BG');
-    console.log(background);
     visible.addChild(background);
     visible.sortableChildren = true;
     const visibleAlphaFilter = new PIXI.filters.AlphaFilter(light);
-    console.log(this.background);
     visible.filters = [];
     this.addVisibleFilter('_alpha', visibleAlphaFilter);
 
-    visible.mask = mask;
+    visible.mask = this.visibleMask;
     this.visibleMasks = {};
 
     const staticBackground = new PIXI.Sprite(map);
-    staticBackground.zIndex = (-staticBackground / 2) * SCALE;
+    staticBackground.zIndex = -staticBackground / 2;
     staticBackground.name = 'backgroundImage';
-    staticBackground.position.x = (-staticBackground.width / 2) * SCALE;
-    staticBackground.position.y = (-staticBackground.height / 2) * SCALE;
-    staticBackground.width = staticBackground.width * SCALE;
-    staticBackground.height = staticBackground.height * SCALE;
+    staticBackground.position.x = -staticBackground.width / 2;
+    staticBackground.position.y = -staticBackground.height / 2;
     fogOfWar.addChild(staticBackground);
     fogOfWar.sortableChildren = true;
     const fogAlphaFilter = new PIXI.filters.AlphaFilter(dark);
     fogOfWar.filters = [];
     this.addFogFilter('_alpha', fogAlphaFilter);
 
-    // WOW... comment fog of war out and animals are weird :O
-    // positions get messed up?
     scene.addChild(fogOfWar);
     scene.addChild(visible);
     scene.visible = visible;
-    scene.scale.x = SCALE;
-    scene.scale.y = SCALE;
 
     this.sceneSize = {
       width: this.sceneWidth,
@@ -112,7 +99,6 @@ class Level {
       scene,
       level: this,
       sceneSize: this.sceneSize,
-      scale: SCALE,
     });
   }
 
@@ -139,9 +125,9 @@ class Level {
     if (entity) {
       this.visible.addChild(entity);
     }
-    if (fogOfWarEntity) {
-      this.fogOfWar.addChild(fogOfWarEntity);
-    }
+    // if (fogOfWarEntity) {
+    //   this.fogOfWar.addChild(fogOfWarEntity);
+    // }
 
     // TODO:
     if (entity) {
@@ -182,10 +168,10 @@ class Level {
 
   setMask(key, newMask) {
     if (this.visibleMasks[key]) {
-      this.visible.mask.removeChild(this.visibleMasks[key]);
+      this.visibleMask.removeChild(this.visibleMasks[key]);
       this.visibleMasks[key].destroy();
     }
-    this.visible.mask.addChild(newMask);
+    this.visibleMask.addChild(newMask);
     this.visibleMasks[key] = newMask;
   }
 

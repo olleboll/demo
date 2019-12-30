@@ -30,8 +30,8 @@ class ForestLevel extends Level {
     this.interactiveObjects = [];
     this.enemies = [];
     this.enemies = generateRandomEnemies(10, {
-      width: this.scene.width,
-      height: this.scene.height,
+      width: this.sceneWidth,
+      height: this.sceneHeight,
       level: this,
       dealDamage: this.dealDamage,
       remove: this.removeEnemy,
