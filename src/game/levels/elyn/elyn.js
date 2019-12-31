@@ -103,8 +103,10 @@ class Elyn extends Level {
 
     this.ambience = new Howl({
       src: ['/static/audio/helios/city_above_the_clouds.mp3'],
+      loop: true,
     });
-    this.ambience.play();
+    // this.onEnter = this.onEnter.bind(this);
+    // this.onLeave = this.onLeave.bind(this);
   }
   update(delta, player) {
     super.update(delta, player);
@@ -112,14 +114,30 @@ class Elyn extends Level {
       enemy.update(delta, this.visible.children, player, this.sceneSize);
     });
   }
-  removeEnemy = (entity) => {
+  removeEnemy(entity) {
     this.enemies = this.enemies.filter((e) => e !== entity);
     console.log('enemies remaining: ', this.enemies.length);
     if (this.enemies.length === 0) {
       alert('you win, well done');
       window.location.reload();
     }
-  };
+  }
+  // onEnter() {
+  //   if (!this.ambience) return;
+  //   console.log('play');
+  //   this.ambienceId = this.ambience.play();
+  //   console.log(this.ambienceId);
+  //   this.ambience.fade(0, 1, 1000, this.ambienceId);
+  //   console.log('done');
+  // }
+  //
+  // onLeave() {
+  //   console.log(this);
+  //   if (!this.ambience) return;
+  //   console.log(this.ambienceId);
+  //   this.ambience.pause(this.ambienceId);
+  //   console.log('wtf?');
+  // }
 }
 
 export default Elyn;

@@ -41,6 +41,8 @@ class Level {
     this.update = this.update.bind(this);
     this.updateFov = this.updateFov.bind(this);
     this.updateGrid = this.updateGrid.bind(this);
+    this.onEnter = this.onEnter.bind(this);
+    this.onLeave = this.onLeave.bind(this);
 
     // setup
     this.name = name;
@@ -100,6 +102,8 @@ class Level {
       level: this,
       sceneSize: this.sceneSize,
     });
+
+    this.ambience = undefined;
   }
 
   addVisibleFilter(key, filter) {
@@ -225,6 +229,19 @@ class Level {
     for (let effect of this.effects) {
       effect.animate(delta);
     }
+  }
+  onEnter() {
+    return;
+    if (!this.ambience) return;
+    this.ambienceId = this.ambience.play();
+    this.ambience.fade(0, 1, 1000, this.ambienceId);
+  }
+
+  onLeave() {
+    return;
+    if (!this.ambience) return;
+    this.ambience.fade(1, 0, 1000, this.ambienceId);
+    this.ambience.on('fade', () => this.ambience.pause(this.ambienceId));
   }
 }
 

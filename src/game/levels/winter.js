@@ -49,6 +49,8 @@ class WinterLevel extends Level {
 
     this.setEffect(snow);
     this.removeReindeer = this.removeReindeer.bind(this);
+    this.onEnter = this.onEnter.bind(this);
+    this.onLeave = this.onLeave.bind(this);
 
     // test
     // console.log(getResource('winter_camp'));
@@ -69,6 +71,23 @@ class WinterLevel extends Level {
   removeReindeer = (entity) => {
     this.reindeer = this.reindeer.filter((e) => e !== entity);
   };
+
+  // onEnter() {
+  //   if (!this.ambience) return;
+  //   console.log('play');
+  //   this.ambienceId = this.ambience.play();
+  //   console.log(this.ambienceId);
+  //   this.ambience.fade(0, 1, 1000, this.ambienceId);
+  //   console.log('done');
+  // }
+  //
+  // onLeave() {
+  //   console.log(this);
+  //   if (!this.ambience) return;
+  //   console.log(this.ambienceId);
+  //   this.ambience.pause(this.ambienceId);
+  //   console.log('wtf?');
+  // }
 }
 
 export default WinterLevel;

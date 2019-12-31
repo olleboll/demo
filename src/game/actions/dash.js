@@ -1,3 +1,5 @@
+import { Howl, Howler } from 'howler';
+
 import PIXI, { getResource } from 'engine';
 import {
   reachedTarget,
@@ -6,6 +8,14 @@ import {
   checkCollision,
   generateRandomPoint,
 } from 'engine/utils';
+
+const sound = new Howl({
+  src: ['/static/audio/woosh.m4a'],
+  autoplay: true,
+  sprite: {
+    dash: [4000, 1000],
+  },
+});
 
 const dash = (
   entity,
@@ -44,6 +54,8 @@ const dash = (
   if (dx < 0) rotation += Math.PI;
   animation.rotation = rotation + Math.PI;
   entity.container.addChild(animation);
+
+  const soundId = sound.play('dash');
 
   const update = (delta, entity, obstacles) => {
     const { distance } = calculateDistance(entity.position, target);

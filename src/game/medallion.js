@@ -86,8 +86,11 @@ class Medallion {
       this.levelIndex + 1 < this.levelsOrder.length ? this.levelIndex + 1 : 0;
     newWorld = this.levelsOrder[this.levelIndex];
     this.swappingUniverse = true;
+    console.log(this);
+    this.currentLevel.onLeave();
 
     const onComplete = () => {
+      this.currentLevel.onEnter();
       this.swappingUniverse = false;
       this.update = this.defaultUpdate.bind(this);
     };

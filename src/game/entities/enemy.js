@@ -1,3 +1,5 @@
+import { Howl, Howler } from 'howler';
+
 import { DropShadowFilter } from 'pixi-filters';
 
 import PIXI, { getResource } from 'engine';
@@ -10,6 +12,14 @@ import { fadeOut } from 'engine/animations/fade';
 import { createSword } from 'game/actions';
 
 import { characters } from 'game/sprites';
+
+const sound = new Howl({
+  src: ['/static/audio/woosh.m4a'],
+  autoplay: true,
+  sprite: {
+    swing: [7200, 1000],
+  },
+});
 
 class Enemy extends Entity {
   constructor({
@@ -81,6 +91,7 @@ class Enemy extends Entity {
       );
       if (attackRadius.contains(target.position.x, target.position.y)) {
         if (!this.actions.sword.coolDown()) {
+          const soundId = sound.play('swing');
           this.actions.sword.swing(target.position);
         }
       } else {

@@ -144,6 +144,8 @@ const Game = (opts: GameOptions) => {
     elyn,
   };
   const medallion = new Medallion(levels, 'elyn', player, stage, gui);
+  medallion.currentLevel.onEnter();
+
   const globalKeys = {
     e: 69,
     y: 89,
