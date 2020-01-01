@@ -4,6 +4,7 @@ export const createFromLayer = (
   sceneWidth,
   sceneHeight,
   creatorFunc,
+  spread = true,
 ) => {
   const { data } = resource.layers.find((l) => l.name === layernName);
   if (!data) {
@@ -14,10 +15,11 @@ export const createFromLayer = (
   const result = data
     .reduce((current, data, i) => {
       if (data !== 0) {
+        const spreadX = spread ? Math.random() * 5 : 0;
+        const spreadY = spread ? Math.random() * 5 : 0;
         const last = current[current.length - 1];
-        const x = -sceneWidth / 2 + ((i * 16) % sceneWidth) + Math.random() * 5;
-        const y =
-          -sceneHeight / 2 + Math.floor(i / 100) * 16 + Math.random() * 5;
+        const x = -sceneWidth / 2 + ((i * 16) % sceneWidth) + spreadX;
+        const y = -sceneHeight / 2 + Math.floor(i / 200) * 16 + spreadY;
         current.push({ x, y, i });
       }
       return current;

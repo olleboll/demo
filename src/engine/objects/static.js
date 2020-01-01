@@ -77,6 +77,9 @@ class StaticObject {
     this.removeFogFilter = this.removeFogFilter.bind(this);
   }
   addVisibleFilter(key, filter) {
+    if (!this.container.filters) {
+      this.container.filters = [];
+    }
     const i = this.container.filters.findIndex((f) => f.key === key);
     if (i !== -1) return;
     filter.key = key;
@@ -84,7 +87,9 @@ class StaticObject {
   }
 
   removeVisibleFilter(key) {
+    if (!this.container.filters) return;
     const i = this.container.filters.findIndex((f) => f.key === key);
+    if (i !== -1) return;
     this.container.filters.splice(i, 1);
   }
 

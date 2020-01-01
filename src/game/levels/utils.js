@@ -12,13 +12,13 @@ export const generateRNGTrees = ({
   size = 25,
   mapWidth,
   mapHeight,
+  chanceToStartAsOpen = 0.2,
+  deathLimit = 2,
+  birthLimit = 5,
+  numberOfSteps = 8,
 }) => {
   let treeMap = [];
 
-  const chanceToStartAsOpen = 0.3;
-  const deathLimit = 2;
-  const birthLimit = 5;
-  const numberOfSteps = 8;
   const width = w / size;
   const height = h / size;
 

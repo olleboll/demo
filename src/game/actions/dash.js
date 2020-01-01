@@ -85,8 +85,10 @@ const dash = (
     }
 
     for (let o of obstacles) {
-      if (o.takeDamage) continue;
+      if (o.takeDamage || o.jumpable) continue;
       if (!done.x && checkCollision(o, { x: newX, y: entity.position.y })) {
+        console.log('colidding :O');
+        console.log(o);
         done.x = true;
         target.x = entity.position.x;
         newX = entity.position.x;

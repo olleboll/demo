@@ -2,7 +2,11 @@ import { Howl, Howler } from 'howler';
 
 import PIXI from 'engine';
 import Level from 'engine/level';
-import { StaticObject, InteractiveObject } from 'engine/objects';
+import {
+  StaticObject,
+  InteractiveObject,
+  CollideableObject,
+} from 'engine/objects';
 
 import { createRain } from 'game/weather';
 
@@ -11,7 +15,9 @@ import { objects } from 'game/sprites';
 
 import { createFromLayer } from 'game/levels/utils/createFromLayer';
 
-import resource from './elyn.json';
+import { blackBorderFilter } from 'game/shaders/blackBorder';
+
+import resource from './elyn_big.json';
 
 class Elyn extends Level {
   constructor(props) {
@@ -19,6 +25,29 @@ class Elyn extends Level {
 
     this.name = 'elyn';
     this.dealDamage = props.dealDamage;
+
+    console.log(resource);
+
+    const fall = createFromLayer(
+      resource,
+      'water',
+      this.sceneWidth,
+      this.sceneHeight,
+      (data, i) => {
+        return new CollideableObject({
+          position: data,
+          width: 16,
+          height: 16,
+          jumpable: true,
+        });
+      },
+      false,
+    );
+
+    fall.forEach((tree) => {
+      console.log(tree);
+      this.addChild(tree.container);
+    });
 
     const levelTrees = createFromLayer(
       resource,
@@ -38,14 +67,36 @@ class Elyn extends Level {
     );
     const w = 928;
     const h = 1008;
+    //const randomTrees = [];
     const randomTrees = generateRNGTrees({
-      startX: 0,
-      startY: 597,
-      w,
-      h,
+      startX: this.sceneWidth / 2,
+      startY: 0,
+      w: this.sceneWidth / 2,
+      h: this.sceneHeight,
       mapWidth: this.sceneWidth,
       mapHeight: this.sceneHeight,
       size: 25,
+      chanceToStartAsOpen: 0.2,
+    }).map((pos) => {
+      const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
+      return new StaticObject({
+        spritesheet: 'outside',
+        spriteKey: sprite,
+        position: pos,
+        width: 64,
+        height: 64,
+      });
+    });
+
+    const randomTrees2 = generateRNGTrees({
+      startX: 0,
+      startY: this.sceneHeight / 2,
+      w: this.sceneWidth,
+      h: this.sceneHeight / 2,
+      mapWidth: this.sceneWidth,
+      mapHeight: this.sceneHeight,
+      size: 25,
+      chanceToStartAsOpen: 0.2,
     }).map((pos) => {
       const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
       return new StaticObject({
@@ -70,14 +121,10 @@ class Elyn extends Level {
 
     const genericTrees = [];
 
-    this.trees = levelTrees.concat(randomTrees);
+    this.trees = levelTrees.concat(randomTrees, randomTrees2);
 
     this.trees.forEach((tree) => {
-      if (tree.backgroundObject) {
-        this.addChild(null, tree.fogOfWarContainer);
-      } else {
-        this.addChild(tree.container, tree.fogOfWarContainer);
-      }
+      this.addChild(tree.container, tree.fogOfWarContainer);
     });
 
     const [sign] = createFromLayer(

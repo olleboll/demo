@@ -36,6 +36,7 @@ class Entity {
     container.zIndex = container.position.y;
 
     this.container = container;
+    this.container.noCull = true;
     this.container.filters = [];
     this.speed = speed;
     this.position = position;

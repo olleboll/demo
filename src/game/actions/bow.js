@@ -65,6 +65,7 @@ class Bow {
     if (!this.drawn) return;
     this.drawn = false;
     if (this.arrows.length > this.quiverSize) return;
+    this.world = world;
     const power = this.power >= this.maxPower ? this.maxPower : this.power;
     const { x, y } = this.parent.position;
 
@@ -148,13 +149,15 @@ class Bow {
         break;
       }
     }
+    const spriteContainer = new PIXI.Container();
     const trailContainer = new PIXI.Container();
     const trail = new PIXI.Graphics();
 
     trailContainer.addChild(trail);
     world.addChild(trailContainer);
 
-    world.addChild(sprite);
+    spriteContainer.addChild(sprite);
+    world.addChild(spriteContainer);
     this.arrows.push({
       start: { x: this.parent.position.x, y: this.parent.position.y },
       velocity: { x: velX * power, y: velY * power },
@@ -189,10 +192,12 @@ class Bow {
         arrow.trail.alpha -= 0.1;
         arrow.linger -= 1 * delta;
         if (arrow.linger < 0) {
+          this.world.removeChild(arrow.sprite);
           arrow.sprite.destroy({ children: true });
           this.arrows.splice(i - 1, 1);
         }
         if (arrow.linger < this.trailLinger) {
+          this.world.removeChild(arrow.trail);
           arrow.trail.destroy({ children: true });
         }
       } else {
