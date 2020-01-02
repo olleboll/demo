@@ -49,21 +49,21 @@ class StaticObject {
     fogOfWarContainer.zIndex = position.y;
     fogOfWarContainer.cacheAsBitmap = true;
 
-    const bWidth = width ? width / 2 : sprite.width;
-    const bHeight = height ? height / 2 : sprite.height;
-    const bounds = new PIXI.Rectangle(
-      position.x - bWidth / 2,
-      position.y - bHeight,
-      bWidth,
-      bHeight,
+    this.bWidth = width ? width / 2 : sprite.width;
+    this.bHeight = height ? height / 2 : sprite.height;
+    this.bounds = new PIXI.Rectangle(
+      position.x - this.bWidth / 2,
+      position.y - this.bHeight,
+      this.bWidth,
+      this.bHeight,
     );
 
     if (collidable) {
-      container.getCollisionBox = () => bounds;
+      container.getCollisionBox = () => this.bounds;
     }
 
     if (los) {
-      container.getLosBounds = () => bounds;
+      container.getLosBounds = () => this.bounds;
     }
 
     this.container = container;
@@ -71,10 +71,19 @@ class StaticObject {
     this.sprite = sprite;
     this.fogSprite = fogSprite;
     this.backgroundObject = backgroundObject;
+    this.recalculateBounds = this.recalculateBounds.bind(this);
     this.addVisibleFilter = this.addVisibleFilter.bind(this);
     this.addFogFilter = this.addFogFilter.bind(this);
     this.removeVisibleFilter = this.removeVisibleFilter.bind(this);
     this.removeFogFilter = this.removeFogFilter.bind(this);
+  }
+  recalculateBounds() {
+    this.bounds = new PIXI.Rectangle(
+      this.container.position.x - this.bWidth / 2,
+      this.container.position.y - this.bHeight,
+      this.bWidth,
+      this.bHeight,
+    );
   }
   addVisibleFilter(key, filter) {
     if (!this.container.filters) {

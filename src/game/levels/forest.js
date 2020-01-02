@@ -75,25 +75,6 @@ class ForestLevel extends Level {
       window.location.reload();
     }
   };
-  // onEnter() {
-  //   if (!this.ambience) return;
-  //   console.log('play');
-  //   this.ambienceId = this.ambience.play();
-  //   console.log(this.ambienceId);
-  //   this.ambience.fade(0, 1, 1000, this.ambienceId);
-  //   console.log('done');
-  // }
-  //
-  // onLeave() {
-  //   console.log(this);
-  //   if (!this.ambience) return;
-  //   console.log(this.ambienceId);
-  //   this.ambience.pause(this.ambienceId);
-  //   console.log('wtf?');
-
-  // this.ambience.fade(1, 0, 1000, this.ambienceId);
-  // this.ambience.on('fade', () => this.ambience.pause(this.ambienceId));
-  // }
 }
 
 export default ForestLevel;

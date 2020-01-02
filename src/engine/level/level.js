@@ -75,6 +75,7 @@ class Level {
     visible.mask = this.visibleMask;
     this.visibleMasks = {};
     this.visibleObjects = [];
+    this.allObjects = [];
 
     const staticBackground = new PIXI.Sprite(map);
     staticBackground.zIndex = -staticBackground / 2;
@@ -129,29 +130,29 @@ class Level {
 
   addChild(entity: PIXI.Container, fogOfWarEntity?: PIXI.Container) {
     if (entity) {
-      this.visible.addChild(entity);
-      this.visibleObjects.push(entity);
+      // this.visible.addChild(entity);
+      //this.visibleObjects.push(entity);
+      this.allObjects.push(entity);
     }
     // if (fogOfWarEntity) {
     //   this.fogOfWar.addChild(fogOfWarEntity);
     // }
 
     // TODO:
-    if (entity) {
-      const { square, x, y } = pointToSquare(
-        { x: entity.position.x, y: entity.position.y },
-        this.grid,
-        this.sceneSize,
-      );
-      square.push(entity);
-    }
+    // if (entity) {
+    //   const { square, x, y } = pointToSquare(
+    //     { x: entity.position.x, y: entity.position.y },
+    //     this.grid,
+    //     this.sceneSize,
+    //   );
+    //   square.push(entity);
+    // }
   }
 
-  removeChild(container) {
-    this.visible.removeChild(container);
-    const i = this.visibleObjects.findIndex((c) => c === container);
-    this.visibleObjects.splice(i, 1);
-    this.fogOfWar.removeChild(container);
+  removeChild(child) {
+    const i = this.allObjects.findIndex((c) => c === child);
+    this.allObjects.splice(i, 1);
+    this.fogOfWar.removeChild(child);
   }
 
   getObstacles(point, range) {
@@ -166,11 +167,6 @@ class Level {
     const s4 = pointToSquare(p4, this.grid, this.sceneSize);
 
     const result = includeAdjecentSquares({ s1, s2, s3, s4 }, this.grid);
-
-    const showDebug = range < 150;
-    result.forEach((e) => {
-      return e && showDebug && e.showDebug && e.showDebug(true);
-    });
 
     return Array.from(result);
   }
@@ -213,25 +209,21 @@ class Level {
   update(delta, player) {
     this.camera.updateCamera(player.position);
     this.updateFov(player);
+    this.updateGrid();
     this.cull(player.position);
     this.animate(delta);
-    //this.updateGrid();
   }
 
   updateGrid() {
-    // Oh so broken
-    // We never delete it from the old square...
     this.grid = generateGrid(this.sceneSize, 100);
 
-    for (let entity of this.visible.children) {
-      if (entity.getCollisionBox && entity.getLosBounds) {
-        const { square, x, y } = pointToSquare(
-          { x: entity.position.x, y: entity.position.y },
-          this.grid,
-          this.sceneSize,
-        );
-        square.push(entity);
-      }
+    for (let entity of this.allObjects) {
+      const { square, x, y } = pointToSquare(
+        { x: entity.position.x, y: entity.position.y },
+        this.grid,
+        this.sceneSize,
+      );
+      square.push(entity);
     }
   }
 
@@ -249,18 +241,13 @@ class Level {
     }
   }
   onEnter() {
-    console.log('entering: ', this);
     if (!this.ambience) return;
-    console.log('old: ', this.ambienceId);
     this.ambienceId = this.ambience.play();
-    console.log('new: ', this.ambienceId);
     this.ambience.fade(0, 1, 1000, this.ambienceId);
   }
 
   onLeave() {
-    console.log('leaving: ', this);
     if (!this.ambience) return;
-    console.log(this.ambienceId);
     this.ambience.fade(1, 0, 1000, this.ambienceId);
     this.ambience.once('fade', () => this.ambience.pause(this.ambienceId));
   }

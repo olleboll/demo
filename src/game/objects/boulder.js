@@ -3,6 +3,8 @@ import { StaticObject } from 'engine/objects';
 class Boulder extends StaticObject {
   constructor(props) {
     super(props);
+    this.container.cacheAsBitmap = false;
+    this.container._debug = true;
   }
   interact(medallion) {
     medallion.currentLevel.removeChild(this.container);
@@ -24,6 +26,8 @@ class Boulder extends StaticObject {
     this.fogOfWarContainer.position.x = player.position.x;
     this.fogOfWarContainer.position.y = player.position.y;
     this.fogOfWarContainer.zIndex = player.position.y;
+
+    this.recalculateBounds();
   }
 }
 
