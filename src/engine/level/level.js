@@ -249,15 +249,20 @@ class Level {
     }
   }
   onEnter() {
+    console.log('entering: ', this);
     if (!this.ambience) return;
+    console.log('old: ', this.ambienceId);
     this.ambienceId = this.ambience.play();
+    console.log('new: ', this.ambienceId);
     this.ambience.fade(0, 1, 1000, this.ambienceId);
   }
 
   onLeave() {
+    console.log('leaving: ', this);
     if (!this.ambience) return;
+    console.log(this.ambienceId);
     this.ambience.fade(1, 0, 1000, this.ambienceId);
-    this.ambience.on('fade', () => this.ambience.pause(this.ambienceId));
+    this.ambience.once('fade', () => this.ambience.pause(this.ambienceId));
   }
 }
 

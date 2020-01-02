@@ -1,6 +1,6 @@
 {
   "meta": {
-    "image": "winter_big.png",
+    "image": "forest_big.png",
     "size": {"w":3200,"h":3200},
 		"scale": "1"
   },
@@ -15,7 +15,7 @@
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {"x":0,"y":0,"w":3200,"h":3200},
-      "sourceSize": {"w":1600,"h":1600},
+      "sourceSize": {"w":3200,"h":3200},
       "anchor": {"x":0,"y":0}
     }
   }
