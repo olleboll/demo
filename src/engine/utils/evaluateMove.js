@@ -89,13 +89,9 @@ export const evaluateMove = (
   for (let obj of obstacles) {
     if (obj === entity.container) continue;
     if (!collisionX && checkCollision(obj, { x: newX, y: entity.position.y })) {
-      console.log('collisionX');
-      console.log(obj);
       collisionX = true;
     }
     if (!collisionY && checkCollision(obj, { x: entity.position.x, y: newY })) {
-      console.log('collisionY');
-      console.log(obj);
       collisionY = true;
     }
   }
