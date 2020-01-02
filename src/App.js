@@ -66,7 +66,6 @@ function App() {
             <h4 className="instructions">
               R: swap universe <br />
               E: interact with the pink tree when close <br />
-              Mouse1: Arrows, Hold for more effect on ememies <br />
               Space: Dash
             </h4>
           </div>

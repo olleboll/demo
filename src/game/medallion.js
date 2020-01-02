@@ -19,15 +19,16 @@ class Medallion {
     this.currentLevel.addChild(this.player.container);
     this.universal = [];
 
-    // const boulder = new Boulder({
-    //   spritesheet: 'outside',
-    //   spriteKey: 'pink_tree',
-    //   position: { x: player.position.x + 30, y: player.position.y },
-    //   width: 64,
-    //   height: 64,
-    // });
-    // this.currentLevel.addChild(boulder.container, boulder.fogOfWarContainer);
-    // this.universal = [boulder];
+    const boulder = new Boulder({
+      spritesheet: 'outside',
+      spriteKey: 'pink_tree',
+      position: { x: player.position.x + 30, y: player.position.y },
+      width: 64,
+      height: 64,
+      los: false,
+    });
+    this.currentLevel.addChild(boulder.container, boulder.fogOfWarContainer);
+    this.universal = [boulder];
     this.interacting = false;
     this.interactingObject = null;
     this.stage.addChild(this.currentLevel.scene);
