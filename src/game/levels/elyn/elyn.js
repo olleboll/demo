@@ -12,6 +12,7 @@ import { createRain } from 'game/weather';
 
 import { generateRNGTrees, generateRandomEnemies } from '../utils';
 import { objects } from 'game/sprites';
+import { createFire, LavaObject } from 'game/objects';
 
 import { createFromLayer } from 'game/levels/utils/createFromLayer';
 
@@ -44,7 +45,25 @@ class Elyn extends Level {
       false,
     );
 
-    fall.forEach((tree) => {
+    const fall2 = createFromLayer(
+      resource,
+      'abyss',
+      this.sceneWidth,
+      this.sceneHeight,
+      (data, i) => {
+        return new LavaObject({
+          position: data,
+          width: 16,
+          height: 16,
+          jumpable: true,
+        });
+      },
+      false,
+    );
+
+    const collidable = fall.concat(fall2);
+
+    collidable.forEach((tree) => {
       console.log(tree);
       this.addChild(tree.container);
     });
@@ -67,61 +86,11 @@ class Elyn extends Level {
     );
     const w = 928;
     const h = 1008;
-    //const randomTrees = [];
-    const randomTrees = generateRNGTrees({
-      startX: this.sceneWidth / 2,
-      startY: 0,
-      w: this.sceneWidth / 2,
-      h: this.sceneHeight,
-      mapWidth: this.sceneWidth,
-      mapHeight: this.sceneHeight,
-      size: 25,
-      chanceToStartAsOpen: 0.2,
-    }).map((pos) => {
-      const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
-      return new StaticObject({
-        spritesheet: 'outside',
-        spriteKey: sprite,
-        position: pos,
-        width: 64,
-        height: 64,
-      });
-    });
-
-    const randomTrees2 = generateRNGTrees({
-      startX: 0,
-      startY: this.sceneHeight / 2,
-      w: this.sceneWidth,
-      h: this.sceneHeight / 2,
-      mapWidth: this.sceneWidth,
-      mapHeight: this.sceneHeight,
-      size: 25,
-      chanceToStartAsOpen: 0.2,
-    }).map((pos) => {
-      const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
-      return new StaticObject({
-        spritesheet: 'outside',
-        spriteKey: sprite,
-        position: pos,
-        width: 64,
-        height: 64,
-      });
-    });
-
-    const universalTrees = props.trees.map((pos) => {
-      const sprite = Math.random() > 0.7 ? 'tree' : 'pine_tree';
-      return new StaticObject({
-        spritesheet: 'outside',
-        spriteKey: sprite,
-        position: pos,
-        width: 64,
-        height: 64,
-      });
-    });
+    const randomTrees = [];
 
     const genericTrees = [];
 
-    this.trees = levelTrees.concat(randomTrees, randomTrees2);
+    this.trees = levelTrees.concat(randomTrees);
 
     this.trees.forEach((tree) => {
       this.addChild(tree.container, tree.fogOfWarContainer);
@@ -145,20 +114,38 @@ class Elyn extends Level {
     this.addChild(sign.container, sign.fogOfWarContainer);
     this.addChild(sign.textContainer);
 
+    this.fires = createFromLayer(
+      resource,
+      'fires',
+      this.sceneWidth,
+      this.sceneHeight,
+      (data, i) => {
+        return createFire({ position: data, radius: 50 });
+      },
+    );
+
+    this.fires.forEach((fire) => {
+      this.addChild(fire.container);
+    });
+
     this.interactiveObjects = [sign];
     this.enemies = [];
 
     this.ambience = new Howl({
       src: ['/static/audio/helios/city_above_the_clouds.mp3'],
-      loop: true,
+      loop: false,
     });
-    // this.onEnter = this.onEnter.bind(this);
-    // this.onLeave = this.onLeave.bind(this);
   }
   update(delta, player) {
     super.update(delta, player);
     this.enemies.forEach((enemy) => {
       enemy.update(delta, this.visible.children, player, this.sceneSize);
+    });
+
+    this.fires.forEach((fire) => {
+      const r = fire.getNewRadius();
+      const mask = this.camera.generateMask(fire.container.position, r);
+      this.setMask(fire.id, mask);
     });
   }
   removeEnemy(entity) {

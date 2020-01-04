@@ -40,7 +40,7 @@ class Player extends Entity {
     this.defaultSpeed = speed;
     this.actions = actions;
     this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
-    this.dashDistance = 200;
+    this.dashDistance = 150;
 
     this.sightRange = 300;
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
@@ -67,12 +67,20 @@ class Player extends Entity {
       }
     });
 
-    const { x, y } = evaluateMove(delta, this, obstacles, {
+    const { x, y, collidingObject } = evaluateMove(delta, this, obstacles, {
       maxX: world.width / 2,
       maxY: world.height / 2,
       minX: -world.width / 2,
       minY: -world.height / 2,
     });
+
+    if (collidingObject) {
+      console.log(collidingObject);
+    }
+
+    if (collidingObject && collidingObject.onCollision) {
+      collidingObject.onCollision(this);
+    }
 
     this.hpBar.width = (this.hpbg.width * this.hp) / 100;
 

@@ -46,7 +46,7 @@ const Game = (opts: GameOptions) => {
   const player = createPlayer({
     spritesheet: 'movements',
     spriteKey: _characters.player,
-    position: { x: -1000, y: -1300 },
+    position: { x: 150, y: -400 },
     controls,
     speed: 2,
     dealDamage,

@@ -11,6 +11,7 @@ const createFire = ({ position, radius }) => {
   animationSprite.loop = true;
   animationSprite.visible = true;
   animationSprite.play();
+  animationSprite.anchor.set(0.47, 0.65);
 
   container.addChild(animationSprite);
 

@@ -7,12 +7,49 @@ import { objects } from 'game/sprites';
 
 import { createSnow } from 'game/weather';
 
+import { generateRNGTrees, generateRandomEnemies } from './utils';
+
+import { createFromLayer } from 'game/levels/utils/createFromLayer';
+
+import { blackBorderFilter } from 'game/shaders/blackBorder';
+
+import resource from './elyn/elyn_big.json';
+
 class WinterLevel extends Level {
   constructor(props) {
     super(props);
     this.name = 'winter';
     this.dealDamage = props.dealDamage;
-    this.trees = props.trees.map((pos) => {
+
+    const levelTrees = createFromLayer(
+      resource,
+      'tree_collision',
+      this.sceneWidth,
+      this.sceneHeight,
+      (data, i) => {
+        const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
+        return new StaticObject({
+          spritesheet: 'winter_outside',
+          spriteKey: sprite,
+          position: data,
+          width: 64,
+          height: 64,
+        });
+      },
+    );
+    const w = 928;
+    const h = 1008;
+    //const randomTrees = [];
+    const randomTrees = generateRNGTrees({
+      startX: this.sceneWidth / 2,
+      startY: 0,
+      w: this.sceneWidth / 2,
+      h: this.sceneHeight,
+      mapWidth: this.sceneWidth,
+      mapHeight: this.sceneHeight,
+      size: 25,
+      chanceToStartAsOpen: 0.2,
+    }).map((pos) => {
       const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
       return new StaticObject({
         spritesheet: 'winter_outside',
@@ -22,9 +59,57 @@ class WinterLevel extends Level {
         height: 64,
       });
     });
-    this.trees.forEach((tree) =>
-      this.addChild(tree.container, tree.fogOfWarContainer),
-    );
+
+    const randomTrees2 = generateRNGTrees({
+      startX: 0,
+      startY: this.sceneHeight / 2,
+      w: this.sceneWidth,
+      h: this.sceneHeight / 2,
+      mapWidth: this.sceneWidth,
+      mapHeight: this.sceneHeight,
+      size: 25,
+      chanceToStartAsOpen: 0.2,
+    }).map((pos) => {
+      const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
+      return new StaticObject({
+        spritesheet: 'winter_outside',
+        spriteKey: sprite,
+        position: pos,
+        width: 64,
+        height: 64,
+      });
+    });
+
+    const universalTrees = props.trees.map((pos) => {
+      const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
+      return new StaticObject({
+        spritesheet: 'winter_outside',
+        spriteKey: sprite,
+        position: pos,
+        width: 64,
+        height: 64,
+      });
+    });
+
+    this.trees = levelTrees.concat(randomTrees, randomTrees2);
+
+    this.trees.forEach((tree) => {
+      this.addChild(tree.container, tree.fogOfWarContainer);
+    });
+
+    // this.trees = props.trees.map((pos) => {
+    //   const sprite = Math.random() > 0.7 ? 'w_pine_tree' : 'w_med_tree';
+    //   return new StaticObject({
+    //     spritesheet: 'winter_outside',
+    //     spriteKey: sprite,
+    //     position: pos,
+    //     width: 64,
+    //     height: 64,
+    //   });
+    // });
+    // this.trees.forEach((tree) =>
+    //   this.addChild(tree.container, tree.fogOfWarContainer),
+    // );
 
     this.reindeer = [];
 

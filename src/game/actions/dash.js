@@ -33,6 +33,7 @@ const dash = (
     entity.position,
     target,
   );
+  const originalSpeed = speed;
 
   const { animations } = getResource('dash', 'spritesheet');
   const animation = new PIXI.AnimatedSprite(animations['dash']);
@@ -60,12 +61,12 @@ const dash = (
   const update = (delta, entity, obstacles) => {
     const { distance } = calculateDistance(entity.position, target);
 
-    if (distance < 60) {
-      speed = 6;
+    if (distance < totalDistance / 2) {
+      speed = originalSpeed / 2;
     }
 
-    if (distance < 30) {
-      speed = 3;
+    if (distance < totalDistance / 3 && speed > entity.speed) {
+      speed -= 1;
     }
 
     const speedX = velocity.x * speed * delta;

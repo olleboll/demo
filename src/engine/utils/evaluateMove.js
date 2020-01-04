@@ -85,13 +85,16 @@ export const evaluateMove = (
 
   let collisionX = false;
   let collisionY = false;
+  let collidingObject = null;
 
   for (let obj of obstacles) {
     if (obj === entity.container) continue;
     if (!collisionX && checkCollision(obj, { x: newX, y: entity.position.y })) {
       collisionX = true;
+      collidingObject = obj;
     }
     if (!collisionY && checkCollision(obj, { x: entity.position.x, y: newY })) {
+      collidingObject = obj;
       collisionY = true;
     }
   }
@@ -111,5 +114,5 @@ export const evaluateMove = (
   let newPosX = collisionX ? entity.position.x : newX;
   let newPosY = collisionY ? entity.position.y : newY;
 
-  return { x: newPosX, y: newPosY, collisionX, collisionY };
+  return { x: newPosX, y: newPosY, collisionX, collisionY, collidingObject };
 };
