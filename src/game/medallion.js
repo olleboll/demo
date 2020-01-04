@@ -16,7 +16,7 @@ class Medallion {
     this.levelIndex = this.levelsOrder.findIndex((l) => l === startingLevel);
     this.player = player;
     this.swappingUniverse = false;
-    this.currentLevel.addChild(this.player.container);
+    this.currentLevel.addChild(this.player);
     this.universal = [];
 
     const boulder = new Boulder({
@@ -27,7 +27,7 @@ class Medallion {
       height: 64,
       los: false,
     });
-    this.currentLevel.addChild(boulder.container, boulder.fogOfWarContainer);
+    this.currentLevel.addChild(boulder, boulder.fogOfWarContainer);
     this.universal = [boulder];
     this.interacting = false;
     this.interactingObject = null;
@@ -63,7 +63,7 @@ class Medallion {
         40,
       );
       for (let o of arr) {
-        const { x, y } = o.container.position;
+        const { x, y } = o.position;
         if (aoe.contains(x, y)) {
           if (o.interact) {
             o.interact(this);
@@ -97,15 +97,15 @@ class Medallion {
     };
 
     const onSwap = (delta) => {
-      this.currentLevel.visible.removeChild(this.player.container);
+      this.currentLevel.visible.removeChild(this.player);
       this.stage.removeChild(this.currentLevel.scene);
       this.currentLevel = this.levels[newWorld];
       this.universal.forEach((obj) => {
-        this.currentLevel.addChild(obj.container, obj.fogOfWarContainer);
+        this.currentLevel.addChild(obj, obj.fogOfWarContainer);
       });
       this.currentLevel.camera.updateCamera(this.player.position, 30);
       this.currentLevel.updateFov(this.player);
-      this.currentLevel.visible.addChild(this.player.container);
+      this.currentLevel.visible.addChild(this.player);
       this.stage.addChild(this.currentLevel.scene);
 
       this.levels[newWorld].scene.alpha = 0;

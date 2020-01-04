@@ -94,7 +94,7 @@ class WinterLevel extends Level {
     this.trees = levelTrees.concat(randomTrees, randomTrees2);
 
     this.trees.forEach((tree) => {
-      this.addChild(tree.container, tree.fogOfWarContainer);
+      this.addChild(tree, tree.fogOfWarContainer);
     });
 
     // this.trees = props.trees.map((pos) => {
@@ -122,7 +122,7 @@ class WinterLevel extends Level {
       speed: 1,
     });
 
-    this.reindeer.forEach((reindeer) => this.addChild(reindeer.container));
+    this.reindeer.forEach((reindeer) => this.addChild(reindeer));
 
     const snow = createSnow({
       position: { x: -750, y: -750 },

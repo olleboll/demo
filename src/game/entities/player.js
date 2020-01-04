@@ -22,10 +22,10 @@ class Player extends Entity {
     super({ spritesheet, spriteKey, position, speed });
 
     this.currentSprite.animationSpeed = 0.1;
-    this.container.sortableChildren = true;
-    this.container.los = true;
+    this.sortableChildren = true;
+    this.los = true;
     this.controls = controls;
-    this.container.isPlayer = true;
+    this.isPlayer = true;
 
     this.moveRequest = {
       up: false,
@@ -44,7 +44,7 @@ class Player extends Entity {
 
     this.sightRange = 300;
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
-    this.container.addChild(hpContainer);
+    this.addChild(hpContainer);
     this.hpBar = hpBar;
     this.hpbg = hpbg;
     this.hpContainer = hpContainer;
@@ -74,10 +74,6 @@ class Player extends Entity {
       minY: -world.height / 2,
     });
 
-    if (collidingObject) {
-      console.log(collidingObject);
-    }
-
     if (collidingObject && collidingObject.onCollision) {
       collidingObject.onCollision(this);
     }
@@ -86,9 +82,9 @@ class Player extends Entity {
 
     this.position.x = x;
     this.position.y = y;
-    this.container.position.x = position.x;
-    this.container.position.y = position.y;
-    this.container.zIndex = position.y;
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.zIndex = position.y;
 
     for (let action of this.actionsArray) {
       action.update(delta, obstacles);

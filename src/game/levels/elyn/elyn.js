@@ -64,8 +64,7 @@ class Elyn extends Level {
     const collidable = fall.concat(fall2);
 
     collidable.forEach((tree) => {
-      console.log(tree);
-      this.addChild(tree.container);
+      this.addChild(tree);
     });
 
     const levelTrees = createFromLayer(
@@ -93,7 +92,7 @@ class Elyn extends Level {
     this.trees = levelTrees.concat(randomTrees);
 
     this.trees.forEach((tree) => {
-      this.addChild(tree.container, tree.fogOfWarContainer);
+      this.addChild(tree, tree.fogOfWarContainer);
     });
 
     const [sign] = createFromLayer(
@@ -111,7 +110,7 @@ class Elyn extends Level {
       },
     );
 
-    this.addChild(sign.container, sign.fogOfWarContainer);
+    this.addChild(sign, sign.fogOfWarContainer);
     this.addChild(sign.textContainer);
 
     this.fires = createFromLayer(

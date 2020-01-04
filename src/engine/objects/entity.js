@@ -9,8 +9,7 @@ export type EntityOptions = {
   speed: number,
 };
 
-class Entity {
-  container: PIXI.Container;
+class Entity extends PIXI.Container {
   speed: number;
   position: Point;
   movementSprites: {
@@ -28,16 +27,15 @@ class Entity {
   };
 
   constructor(opts: EntityOptions) {
+    super();
     const { spritesheet, spriteKey, position, speed } = opts;
 
-    const container = new PIXI.Container();
-    container.position.x = position.x;
-    container.position.y = position.y;
-    container.zIndex = container.position.y;
+    this.position.x = position.x;
+    this.position.y = position.y;
+    this.zIndex = this.position.y;
 
-    this.container = container;
-    this.container.noCull = true;
-    this.container.filters = [];
+    this.noCull = true;
+    this.filters = [];
     this.speed = speed;
     this.position = position;
     this.movementSprites = setUpSprites(spritesheet, spriteKey);
@@ -48,13 +46,13 @@ class Entity {
       left: false,
       right: false,
     };
-    this.container.addChild(this.currentSprite);
+    this.addChild(this.currentSprite);
     this.addVisibleFilter = this.addVisibleFilter.bind(this);
     this.addFogFilter = this.addFogFilter.bind(this);
     this.removeVisibleFilter = this.removeVisibleFilter.bind(this);
     this.removeFogFilter = this.removeFogFilter.bind(this);
-    container.addVisibleFilter = this.addVisibleFilter.bind(this);
-    container.removeVisibleFilter = this.removeVisibleFilter.bind(this);
+    this.addVisibleFilter = this.addVisibleFilter.bind(this);
+    this.removeVisibleFilter = this.removeVisibleFilter.bind(this);
   }
 
   swapSprite(newSprite: PIXI.AnimatedSprite) {
@@ -68,21 +66,21 @@ class Entity {
       this.currentSprite.stop();
     }
     newSprite.position = this.currentSprite.position;
-    this.container.removeChild(this.currentSprite);
-    this.container.addChild(newSprite);
+    this.removeChild(this.currentSprite);
+    this.addChild(newSprite);
     this.currentSprite = newSprite;
     this.currentSprite.play();
   }
   addVisibleFilter(key, filter) {
-    const i = this.container.filters.findIndex((f) => f.key === key);
+    const i = this.filters.findIndex((f) => f.key === key);
     if (i !== -1) return;
     filter.key = key;
-    this.container.filters.push(filter);
+    this.filters.push(filter);
   }
 
   removeVisibleFilter(key) {
-    const i = this.container.filters.findIndex((f) => f.key === key);
-    this.container.filters.splice(i, 1);
+    const i = this.filters.findIndex((f) => f.key === key);
+    this.filters.splice(i, 1);
   }
 
   addFogFilter(key, filter) {

@@ -26,9 +26,7 @@ class ForestLevel extends Level {
         height: 64,
       });
     });
-    this.trees.forEach((tree) =>
-      this.addChild(tree.container, tree.fogOfWarContainer),
-    );
+    this.trees.forEach((tree) => this.addChild(tree, tree.fogOfWarContainer));
     this.interactiveObjects = [];
     this.enemies = [];
     this.enemies = generateRandomEnemies(10, {
@@ -38,7 +36,7 @@ class ForestLevel extends Level {
       dealDamage: this.dealDamage,
       remove: this.removeEnemy,
     });
-    this.enemies.forEach((enemy) => this.addChild(enemy.container));
+    this.enemies.forEach((enemy) => this.addChild(enemy));
 
     const rain = createRain({
       position: { x: -750, y: -750 },

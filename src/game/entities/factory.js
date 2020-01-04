@@ -51,7 +51,7 @@ export const createPlayer = ({
     actions: playerAbilities,
   });
 
-  bow.setParent(player.container);
+  bow.setParent(player);
 
   console.log('player created');
   console.log(player);
@@ -96,7 +96,7 @@ export const createEnemy = ({
     actions: enemyAbilities,
   });
 
-  sword.setParent(enemy.container);
+  sword.setParent(enemy);
 
   return enemy;
 };

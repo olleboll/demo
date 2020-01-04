@@ -54,7 +54,7 @@ const dash = (
   let rotation = Math.atan(dy / dx) + Math.PI / 2;
   if (dx < 0) rotation += Math.PI;
   animation.rotation = rotation + Math.PI;
-  entity.container.addChild(animation);
+  entity.addChild(animation);
 
   const soundId = sound.play('dash');
 
@@ -119,18 +119,13 @@ const dash = (
     if (done.x && done.y) {
       entity.position.x = target.x;
       entity.position.y = target.y;
-      entity.container.position.x = entity.position.x;
-      entity.container.position.y = entity.position.y;
-      entity.container.zIndex = entity.position.y;
+      entity.zIndex = entity.position.y;
       animation.destroy();
 
       world.background.filters = [];
 
       for (let o of initalObstacles) {
         if (o.removeVisibleFilter) {
-          o.removeVisibleFilter('dash');
-        }
-        if (o.removeFogFilter) {
           o.removeVisibleFilter('dash');
         }
       }
@@ -143,16 +138,11 @@ const dash = (
       if (o.addVisibleFilter && !o.isPlayer) {
         o.addVisibleFilter('dash', filter);
       }
-      if (o.addFogFilter && !o.isPlayer) {
-        o.addFogFilter('dash', filter);
-      }
     }
 
     entity.position.x = newX;
     entity.position.y = newY;
-    entity.container.position.x = entity.position.x;
-    entity.container.position.y = entity.position.y;
-    entity.container.zIndex = entity.position.y;
+    entity.zIndex = entity.position.y;
   };
 
   return { update };

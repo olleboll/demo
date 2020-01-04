@@ -45,8 +45,8 @@ class Sword {
     this.parent = null;
   }
 
-  setParent(container) {
-    this.parent = container;
+  setParent(parent) {
+    this.parent = parent;
     this.parent.addChildAt(this.animationSprite);
     this.parent.addChildAt(this.animationSprite2);
   }

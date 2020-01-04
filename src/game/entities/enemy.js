@@ -38,8 +38,8 @@ class Enemy extends Entity {
     this.level = level;
     this.currentSprite.animationSpeed = 0.1;
 
-    this.container.sortableChildren = true;
-    this.container.los = true;
+    this.sortableChildren = true;
+    this.los = true;
     this.moveRequest = {
       up: false,
       down: false,
@@ -54,7 +54,7 @@ class Enemy extends Entity {
     this.sightRange = 300;
     this.swingRange = 30;
 
-    this.container.getCollisionBox = () => {
+    this.getCollisionBox = () => {
       return new PIXI.Rectangle(
         this.position.x - 15,
         this.position.y - 15,
@@ -63,10 +63,10 @@ class Enemy extends Entity {
       );
     };
 
-    this.container.takeDamage = this.takeDamage.bind(this);
+    this.takeDamage = this.takeDamage.bind(this);
 
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
-    this.container.addChild(hpContainer);
+    this.addChild(hpContainer);
     this.hpBar = hpBar;
     this.hpbg = hpbg;
     this.hpContainer = hpContainer;
@@ -76,7 +76,7 @@ class Enemy extends Entity {
   }
 
   update(delta, obstacles, target, world) {
-    const { moveRequest, position, container } = this;
+    const { moveRequest, position } = this;
 
     const view = new PIXI.Circle(position.x, position.y, this.sightRange);
     this.hpBar.width = (this.hpbg.width * this.hp) / 100;
@@ -102,18 +102,17 @@ class Enemy extends Entity {
 
         const _obstacles = this.level.getObstacles(this.position, 200);
 
-        const { x, y } = evaluateMove(delta, this, obstacles, {
+        const move = evaluateMove(delta, this, obstacles, {
           maxX: world.width / 2,
           maxY: world.height / 2,
           minX: -world.width / 2,
           minY: -world.height / 2,
         });
+        const { x, y } = move;
 
         this.position.x = x;
         this.position.y = y;
-        this.container.position.x = position.x;
-        this.container.position.y = position.y;
-        this.container.zIndex = position.y;
+        this.zIndex = position.y;
       }
     } else {
       this.currentSprite.stop();
@@ -148,16 +147,11 @@ class Enemy extends Entity {
   die() {
     const onDone = () => {
       this.remove(this);
-      this.container.destroy({ children: true });
+      this.destroy({ children: true });
     };
 
     this.update = (delta) => {
-      fadeOut(
-        delta,
-        this.container,
-        { endAlpha: 0, fadeSpeed: 0.05 },
-        onDone.bind(this),
-      );
+      fadeOut(delta, this, { endAlpha: 0, fadeSpeed: 0.05 }, onDone.bind(this));
     };
   }
 

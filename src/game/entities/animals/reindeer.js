@@ -26,9 +26,9 @@ class ReinDeer extends Entity {
     this.remove = remove;
     this.level = level;
     this.currentSprite.animationSpeed = 0.1;
-    this.container.sortableChildren = true;
-    this.container.los = true;
-    this.position = this.container.position;
+    this.sortableChildren = true;
+    this.los = true;
+    this.position = this.position;
     this.moving = false;
     this.moveRequest = {
       up: false,
@@ -44,7 +44,7 @@ class ReinDeer extends Entity {
     this.actions = actions;
     this.sightRange = 300;
 
-    this.container.getCollisionBox = () => {
+    this.getCollisionBox = () => {
       return new PIXI.Rectangle(
         this.position.x - 15,
         this.position.y - 15,
@@ -53,10 +53,10 @@ class ReinDeer extends Entity {
       );
     };
 
-    this.container.takeDamage = this.takeDamage.bind(this);
+    this.takeDamage = this.takeDamage.bind(this);
 
     const { hpBar, hpbg, hpContainer } = this.setUpHealthBar();
-    this.container.addChild(hpContainer);
+    this.addChild(hpContainer);
     this.hpBar = hpBar;
     this.hpbg = hpbg;
     this.hpContainer = hpContainer;
@@ -112,9 +112,9 @@ class ReinDeer extends Entity {
 
         this.position.x = x;
         this.position.y = y;
-        this.container.position.x = position.x;
-        this.container.position.y = position.y;
-        this.container.zIndex = position.y;
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.zIndex = position.y;
       }
     } else if (shouldStartMove) {
       this.target = generateRandomPoint({
@@ -157,11 +157,11 @@ class ReinDeer extends Entity {
   die() {
     const onDone = () => {
       this.remove(this);
-      this.container.destroy({ children: true });
+      this.destroy({ children: true });
     };
 
     this.update = (delta) => {
-      fadeOut(delta, this.container, { endAlpha: 0, fadeSpeed: 0.05 }, onDone);
+      fadeOut(delta, this, { endAlpha: 0, fadeSpeed: 0.05 }, onDone);
     };
   }
 
