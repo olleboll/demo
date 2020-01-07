@@ -16,7 +16,6 @@ class CollideableObject extends PIXI.Container {
     const bounds = new PIXI.Rectangle(position.x, position.y, width, height);
 
     this.getCollisionBox = () => bounds;
-
     this.jumpable = opts.jumpable ? opts.jumpable : false;
   }
 }

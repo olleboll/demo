@@ -4,7 +4,7 @@ import PIXI, { getResource } from 'engine';
 import { evaluateMove, calculateDistance } from 'engine/utils';
 import Entity from 'engine/objects/entity';
 
-import { dash } from 'game/actions';
+import { dash, MagicLaser } from 'game/actions';
 
 import { characters } from 'game/sprites';
 
@@ -38,8 +38,6 @@ class Player extends Entity {
     this.aim = {};
     this.speed = speed;
     this.defaultSpeed = speed;
-    this.actions = actions;
-    this.actionsArray = Object.keys(this.actions).map((a) => this.actions[a]);
     this.dashDistance = 150;
 
     this.sightRange = 300;
@@ -53,6 +51,12 @@ class Player extends Entity {
     this.debug = 0;
     this.defaultUpdate = this.update.bind(this);
     this.setAim = this.setAim.bind(this);
+
+    this.magicLaser = new MagicLaser({});
+    this.magicLaser.equip(this);
+    this.equipped = [];
+    this.equipped.push(this.magicLaser);
+    this.shootMagicParticle = this.shootMagicParticle.bind(this);
   }
 
   setAim({ x, y }) {
@@ -67,11 +71,13 @@ class Player extends Entity {
       }
     });
 
+    const { sceneSize } = world;
+
     const { x, y, collidingObject } = evaluateMove(delta, this, obstacles, {
-      maxX: world.width / 2,
-      maxY: world.height / 2,
-      minX: -world.width / 2,
-      minY: -world.height / 2,
+      maxX: sceneSize.width / 2,
+      maxY: sceneSize.height / 2,
+      minX: -sceneSize.width / 2,
+      minY: -sceneSize.height / 2,
     });
 
     if (collidingObject && collidingObject.onCollision) {
@@ -86,8 +92,8 @@ class Player extends Entity {
     this.position.y = position.y;
     this.zIndex = position.y;
 
-    for (let action of this.actionsArray) {
-      action.update(delta, obstacles);
+    for (let item of this.equipped) {
+      item.update(delta, world);
     }
   }
   setUpHealthBar() {
@@ -120,6 +126,15 @@ class Player extends Entity {
       return;
     }
     const dest = {};
+    target = { x: this.position.x, y: this.position.y };
+    target.x += this.moveRequest.right ? 10 : 0;
+    target.x -= this.moveRequest.left ? 10 : 0;
+    target.y += this.moveRequest.down ? 10 : 0;
+    target.y -= this.moveRequest.up ? 10 : 0;
+
+    if (target.x === 0 && target.y === 0) {
+    }
+
     const { dx, dy, distance } = calculateDistance(this.position, target);
     if (distance === 0) return;
 
@@ -146,8 +161,16 @@ class Player extends Entity {
       obstacles: world.getObstacles(this.position, 350),
     });
 
-    this.update = (delta, obstacles, world) =>
+    this.update = (delta, obstacles, world) => {
+      for (let item of this.equipped) {
+        item.update(delta, world);
+      }
       performDash.update(delta, this, obstacles);
+    };
+  }
+
+  shootMagicParticle(target, world) {
+    this.magicLaser.shoot(target, world);
   }
 
   takeDamage(damage) {

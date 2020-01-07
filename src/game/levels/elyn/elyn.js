@@ -51,7 +51,7 @@ class Elyn extends Level {
       this.sceneWidth,
       this.sceneHeight,
       (data, i) => {
-        return new LavaObject({
+        return new CollideableObject({
           position: data,
           width: 16,
           height: 16,

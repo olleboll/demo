@@ -68,6 +68,7 @@ class Level {
     this.background = background;
     visible.addChild(background);
     visible.sortableChildren = true;
+    this.light = light;
     const visibleAlphaFilter = new PIXI.filters.AlphaFilter(light);
     visible.filters = [];
     this.addVisibleFilter('_alpha', visibleAlphaFilter);
@@ -133,7 +134,12 @@ class Level {
       // this.visible.addChild(entity);
       //this.visibleObjects.push(entity);
       this.allObjects.push(entity);
+      if (entity.noCull) {
+        this.visibleObjects.push(entity);
+        this.visible.addChild(entity);
+      }
     }
+
     // if (fogOfWarEntity) {
     //   this.fogOfWar.addChild(fogOfWarEntity);
     // }
@@ -150,9 +156,13 @@ class Level {
   }
 
   removeChild(child) {
-    const i = this.allObjects.findIndex((c) => c === child);
-    this.allObjects.splice(i, 1);
-    this.fogOfWar.removeChild(child);
+    const iO = this.allObjects.findIndex((c) => c === child);
+    this.allObjects.splice(iO, 1);
+
+    const iV = this.visibleObjects.findIndex((c) => c === child);
+    this.visibleObjects.splice(iV, 1);
+    this.visible.removeChild(child);
+    this.updateGrid();
   }
 
   getObstacles(point, range) {

@@ -44,7 +44,7 @@ class Medallion {
     const { currentLevel, player } = this;
     const obstacles = currentLevel.getObstacles(player.position, 150);
     //const obstacles = currentLevel.visible.children;
-    player.update(delta, obstacles, currentLevel.sceneSize);
+    player.update(delta, obstacles, currentLevel);
     currentLevel.update(delta, player);
   }
 

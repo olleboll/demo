@@ -144,7 +144,7 @@ const Game = (opts: GameOptions) => {
     elyn,
   };
   const medallion = new Medallion(levels, 'elyn', player, stage, gui);
-  medallion.currentLevel.onEnter();
+  //medallion.currentLevel.onEnter();
 
   const globalKeys = {
     e: 69,
@@ -172,23 +172,29 @@ const Game = (opts: GameOptions) => {
     player.setAim(aim);
   };
 
+  const shootMagicParticle = (event, level) => {
+    const { x, y } = event.data.global;
+    const target = level.scene.toLocal({ x, y });
+    player.shootMagicParticle(target, level);
+  };
+
   forestLevel.scene.on('mousemove', (event) => setAim(event, forestLevel));
   forestLevel.scene.on('mousedown', (event) =>
-    player.actions.bow.execute('draw'),
+    shootMagicParticle(event, forestLevel),
   );
 
   winterLevel.scene.on('mousemove', (event) => setAim(event, winterLevel));
   winterLevel.scene.on('mousedown', (event) =>
-    player.actions.bow.execute('draw'),
+    shootMagicParticle(event, winterLevel),
   );
 
   desertLevel.scene.on('mousemove', (event) => setAim(event, desertLevel));
   desertLevel.scene.on('mousedown', (event) =>
-    player.actions.bow.execute('draw'),
+    shootMagicParticle(event, forestLevel),
   );
 
   elyn.scene.on('mousemove', (event) => setAim(event, elyn));
-  elyn.scene.on('mousedown', (event) => player.actions.bow.execute('draw'));
+  elyn.scene.on('mousedown', (event) => shootMagicParticle(event, elyn));
 
   const init = () => {
     console.log('LAUNCHING GAME');

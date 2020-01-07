@@ -18,29 +18,6 @@ export const createPlayer = ({
   dealDamage,
   renderer,
 }) => {
-  // const sword = new Sword({
-  //   spriteKey: 'sword_swing_4',
-  //   range: 50,
-  //   dealDamage,
-  //   player: true,
-  // });
-
-  const bow = new Bow({
-    spriteKey: 'sword_swing_4',
-    dealDamage,
-    player: true,
-    world,
-    renderer,
-  });
-
-  const playerAbilities = {
-    // sword: {
-    //   swing: sword.swing,
-    //   coolDown: () => false,
-    // },
-    bow,
-  };
-
   const player = new Player({
     spritesheet,
     spriteKey,
@@ -48,13 +25,7 @@ export const createPlayer = ({
     controls,
     world,
     speed,
-    actions: playerAbilities,
   });
-
-  bow.setParent(player);
-
-  console.log('player created');
-  console.log(player);
 
   return player;
 };

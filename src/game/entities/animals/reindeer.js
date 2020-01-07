@@ -156,6 +156,7 @@ class ReinDeer extends Entity {
 
   die() {
     const onDone = () => {
+      this.level.removeChild(this);
       this.remove(this);
       this.destroy({ children: true });
     };

@@ -39,12 +39,13 @@ class ForestLevel extends Level {
     this.enemies.forEach((enemy) => this.addChild(enemy));
 
     const rain = createRain({
-      position: { x: -750, y: -750 },
-      width: 1400,
-      height: 1400,
-      intensity: 4,
+      position: { x: -1600, y: -1600 },
+      width: 3200,
+      height: 3200,
+      intensity: 12,
       container: this.visible,
-      brightness: 1.0,
+      lightningLight: 1.7,
+      normalLight: this.light,
     });
 
     this.setEffect(rain);

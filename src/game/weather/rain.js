@@ -6,13 +6,14 @@ const createRain = ({
   height,
   intensity,
   container,
-  brightness,
+  lightningLight,
+  normalLight,
 }) => {
   const drops = [];
   let active = true;
   let thunderCouldActivate = true;
   let thunder = null;
-  const particleContainer = new PIXI.ParticleContainer();
+  const particleContainer = new PIXI.ParticleContainer(intensity * 500);
   const bounds = {
     x: position.x,
     y: position.y,
@@ -56,13 +57,13 @@ const createRain = ({
 
   const initThunder = () => {
     clearTimeout(thunder);
-    container.filters = [new PIXI.filters.AlphaFilter(1.5)];
+    container.filters = [new PIXI.filters.AlphaFilter(lightningLight)];
     thunder = setTimeout(() => {
-      container.filters = [new PIXI.filters.AlphaFilter(brightness)];
+      container.filters = [new PIXI.filters.AlphaFilter(normalLight)];
       setTimeout(() => {
-        container.filters = [new PIXI.filters.AlphaFilter(1.5)];
+        container.filters = [new PIXI.filters.AlphaFilter(lightningLight)];
         setTimeout(() => {
-          container.filters = [new PIXI.filters.AlphaFilter(brightness)];
+          container.filters = [new PIXI.filters.AlphaFilter(normalLight)];
           thunder = null;
         }, Math.random() * 100 + 100);
       }, Math.random() * 100 + 100);
