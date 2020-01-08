@@ -1,10 +1,8 @@
-import { StaticObject } from 'engine/objects';
+import { InteractiveObject } from 'engine/objects';
 
-class Boulder extends StaticObject {
+class Boulder extends InteractiveObject {
   constructor(props) {
     super(props);
-    this.cacheAsBitmap = false;
-    this._debug = true;
   }
   interact(medallion) {
     medallion.currentLevel.removeChild(this);
@@ -29,6 +27,7 @@ class Boulder extends StaticObject {
 
     this.recalculateBounds();
   }
+  update(delta, medallion) {}
 }
 
 export default Boulder;

@@ -12,7 +12,7 @@ import { createRain } from 'game/weather';
 
 import { generateRNGTrees, generateRandomEnemies } from '../utils';
 import { objects } from 'game/sprites';
-import { createFire, LavaObject } from 'game/objects';
+import { createFire, LavaObject, Sign } from 'game/objects';
 
 import { createFromLayer } from 'game/levels/utils/createFromLayer';
 
@@ -51,7 +51,7 @@ class Elyn extends Level {
       this.sceneWidth,
       this.sceneHeight,
       (data, i) => {
-        return new CollideableObject({
+        return new LavaObject({
           position: data,
           width: 16,
           height: 16,
@@ -101,11 +101,14 @@ class Elyn extends Level {
       this.sceneWidth,
       this.sceneHeight,
       (pos) => {
-        return new InteractiveObject({
+        return new Sign({
           spritesheet: 'outside',
-          spriteKey: 'sign_small',
+          spriteKey: 'sign_big',
           position: pos,
           los: false,
+          radius: 40,
+          text:
+            'Beware! Without basic magic skills you should not enter here...',
         });
       },
     );
@@ -155,22 +158,6 @@ class Elyn extends Level {
       window.location.reload();
     }
   }
-  // onEnter() {
-  //   if (!this.ambience) return;
-  //   console.log('play');
-  //   this.ambienceId = this.ambience.play();
-  //   console.log(this.ambienceId);
-  //   this.ambience.fade(0, 1, 1000, this.ambienceId);
-  //   console.log('done');
-  // }
-  //
-  // onLeave() {
-  //   console.log(this);
-  //   if (!this.ambience) return;
-  //   console.log(this.ambienceId);
-  //   this.ambience.pause(this.ambienceId);
-  //   console.log('wtf?');
-  // }
 }
 
 export default Elyn;

@@ -5,7 +5,7 @@ class LavaObject extends CollideableObject {
     super(props);
   }
   onCollision(entity) {
-    console.log('colliding with lava');
+    entity.die();
   }
 }
 

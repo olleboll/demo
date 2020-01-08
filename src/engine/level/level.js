@@ -208,9 +208,10 @@ class Level {
       if (o.noCull) return;
       this.visible.removeChild(o);
     });
-    this.visibleObjects = this.getObstacles(centerPoint, 400).filter(
-      (o) => o.transform,
-    );
+    this.visibleObjects = this.getObstacles(centerPoint, 500);
+    // .filter(
+    //   (o) => o.transform,
+    // );
     this.visibleObjects.forEach((o) => {
       this.visible.addChild(o);
     });

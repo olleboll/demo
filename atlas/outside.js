@@ -25,6 +25,21 @@ let sign_small = {
 };
 atlas.frames['sign_small'] = sign_small;
 
+let sign_big = {
+  rotated: false,
+  trimmed: false,
+  spriteSourceSize: { x: 0, y: 0, w: 832, h: 384 },
+  sourceSize: { w: 832, h: 384 },
+  anchor: { x: 0.5, y: 0.5 },
+  frame: {
+    x: 48,
+    y: 24,
+    w: 32,
+    h: 32,
+  },
+};
+atlas.frames['sign_big'] = sign_big;
+
 let tree = {
   rotated: false,
   trimmed: false,

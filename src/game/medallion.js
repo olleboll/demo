@@ -33,6 +33,7 @@ class Medallion {
     this.interactingObject = null;
     this.stage.addChild(this.currentLevel.scene);
     this.stage.addChild(this.gui);
+
     this.update = this.update.bind(this);
     this.defaultUpdate = this.update;
     this.playerInteract = this.playerInteract.bind(this);
@@ -46,12 +47,17 @@ class Medallion {
     //const obstacles = currentLevel.visible.children;
     player.update(delta, obstacles, currentLevel);
     currentLevel.update(delta, player);
+    if (this.interactingObject) {
+      this.interactingObject.update(delta, this);
+    }
   }
 
   playerInteract(active) {
+    console.log('player interact called');
+    console.log(active);
     // create a set with all interactive objects in this level. including universal
     const local = this.currentLevel.interactiveObjects;
-    if (this.interacting && active) {
+    if (this.interactingObject && active) {
       return;
     } else if (active) {
       // started interacting
@@ -74,6 +80,7 @@ class Medallion {
       }
     } else if (this.interactingObject && !active) {
       // stopped interacting
+      console.log('eh?');
       this.interactingObject.stopInteract(this);
       this.interactingObject = null;
     }

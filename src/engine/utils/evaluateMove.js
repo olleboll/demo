@@ -114,5 +114,12 @@ export const evaluateMove = (
   let newPosX = collisionX ? entity.position.x : newX;
   let newPosY = collisionY ? entity.position.y : newY;
 
-  return { x: newPosX, y: newPosY, collisionX, collisionY, collidingObject };
+  return {
+    x: newPosX,
+    y: newPosY,
+    collisionX,
+    collisionY,
+    collidingObject,
+    moving,
+  };
 };

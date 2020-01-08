@@ -8,7 +8,7 @@ import Stats from './stats';
 
 import Game from './game/game';
 
-const SCALE = 1.3;
+const SCALE = 1.2;
 
 function App() {
   const [app, setApp] = useState();

@@ -43,10 +43,13 @@ const Game = (opts: GameOptions) => {
     }
   };
 
+  const villagePos = { x: -1100, y: -1400 };
+  const cliffPos = { x: 150, y: -400 };
+
   const player = createPlayer({
     spritesheet: 'movements',
     spriteKey: _characters.player,
-    position: { x: 150, y: -400 },
+    position: villagePos,
     controls,
     speed: 2,
     dealDamage,
