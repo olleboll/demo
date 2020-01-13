@@ -146,7 +146,7 @@ const Game = (opts: GameOptions) => {
     //desert: desertLevel,
     elyn,
   };
-  const medallion = new Medallion(levels, 'elyn', player, stage, gui);
+  const medallion = new Medallion(levels, 'elyn', player, stage, gui, renderer);
   //medallion.currentLevel.onEnter();
 
   const globalKeys = {
@@ -201,6 +201,8 @@ const Game = (opts: GameOptions) => {
 
   const init = () => {
     console.log('LAUNCHING GAME');
+    // On enter music?
+    //medallion.currentLevel.onEnter();
   };
 
   return {

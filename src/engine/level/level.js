@@ -42,6 +42,7 @@ class Level {
     this.update = this.update.bind(this);
     this.updateFov = this.updateFov.bind(this);
     this.updateGrid = this.updateGrid.bind(this);
+    this.moveObjectInGrid = this.moveObjectInGrid.bind(this);
     this.onEnter = this.onEnter.bind(this);
     this.onLeave = this.onLeave.bind(this);
 
@@ -97,7 +98,7 @@ class Level {
       width: this.sceneWidth,
       height: this.sceneHeight,
     };
-    console.log(this.sceneSize);
+
     this.grid = generateGrid(this.sceneSize, 100);
 
     this.camera = new Camera({
@@ -130,37 +131,44 @@ class Level {
   }
 
   addChild(entity: PIXI.Container, fogOfWarEntity?: PIXI.Container) {
-    if (entity) {
-      // this.visible.addChild(entity);
-      //this.visibleObjects.push(entity);
+    const iO = this.allObjects.findIndex((c) => c === entity);
+
+    if (!entity) return;
+
+    if (iO === -1) {
       this.allObjects.push(entity);
-      if (entity.noCull) {
-        this.visibleObjects.push(entity);
-        this.visible.addChild(entity);
-      }
+    }
+    const iV = this.visibleObjects.findIndex((c) => c === entity);
+    if (entity.noCull && iV === -1) {
+      this.visibleObjects.push(entity);
+      this.visible.addChild(entity);
     }
 
-    // if (fogOfWarEntity) {
-    //   this.fogOfWar.addChild(fogOfWarEntity);
-    // }
-
-    // TODO:
-    // if (entity) {
-    //   const { square, x, y } = pointToSquare(
-    //     { x: entity.position.x, y: entity.position.y },
-    //     this.grid,
-    //     this.sceneSize,
-    //   );
-    //   square.push(entity);
-    // }
+    if (entity) {
+      const { square, x, y } = pointToSquare(
+        { x: entity.position.x, y: entity.position.y },
+        this.grid,
+        this.sceneSize,
+      );
+      square.push(entity);
+    }
   }
 
   removeChild(child) {
+    console.log(child);
     const iO = this.allObjects.findIndex((c) => c === child);
-    this.allObjects.splice(iO, 1);
+    console.log(iO);
+    if (iO > -1) {
+      this.allObjects.splice(iO, 1);
+      let test = this.allObjects.findIndex((c) => c === child);
+      console.log(test);
+    }
 
     const iV = this.visibleObjects.findIndex((c) => c === child);
-    this.visibleObjects.splice(iV, 1);
+    console.log(iV);
+    if (iV > -1) {
+      this.visibleObjects.splice(iV, 1);
+    }
     this.visible.removeChild(child);
     this.updateGrid();
   }
@@ -220,9 +228,30 @@ class Level {
   update(delta, player) {
     this.camera.updateCamera(player.position);
     this.updateFov(player);
-    this.updateGrid();
+    //this.updateGrid();
     this.cull(player.position);
     this.animate(delta);
+  }
+
+  moveObjectInGrid(entity, oldPos) {
+    const { square: oldSquare } = pointToSquare(
+      { x: oldPos.x, y: oldPos.y },
+      this.grid,
+      this.sceneSize,
+    );
+
+    const oldI = oldSquare.findIndex((e) => e === entity);
+    if (oldI > -1) {
+      oldSquare.splice(oldI, 1);
+    }
+
+    const { square } = pointToSquare(
+      { x: entity.position.x, y: entity.position.y },
+      this.grid,
+      this.sceneSize,
+    );
+
+    square.push(entity);
   }
 
   updateGrid() {

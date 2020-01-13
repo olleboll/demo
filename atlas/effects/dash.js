@@ -36,8 +36,29 @@ const createAtlas = (source) => {
     }
   }
 
+  atlas.animations[`magic_missile`] = [];
+  for (let j = 0; j < 7; j++) {
+    for (let i = 0; i < 6; i++) {
+      let frame = {
+        frame: {
+          x: width * i,
+          y: height * j,
+          w: width,
+          h: height,
+        },
+        rotated: false,
+        trimmed: false,
+        spriteSourceSize: { x: 0, y: 0, w: 700, h: 700 },
+        sourceSize: { w: 700, h: 700 },
+        anchor: { x: 0.5, y: 0.8 },
+      };
+      atlas.frames[`magic_missile${j * 6 + i}`] = frame;
+      atlas.animations[`magic_missile`].push(`magic_missile${j * 6 + i}`);
+    }
+  }
+
   fs.writeFile(
-    './public/static/assets/effects/dash/dash.json',
+    './public/static/assets/effects/magic/magic.json',
     JSON.stringify(atlas),
     function(err) {
       if (err) {

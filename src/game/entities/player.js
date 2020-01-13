@@ -24,6 +24,7 @@ class Player extends Entity {
     super({ spritesheet, spriteKey, position, speed });
 
     this.controls = controls;
+    this.medallion = medallion;
     this.currentSprite.animationSpeed = 0.1;
 
     this.sortableChildren = true;
@@ -74,6 +75,10 @@ class Player extends Entity {
 
   update(delta, obstacles, world) {
     const { controls, moveRequest, position, container } = this;
+    const oldPos = {};
+    oldPos.x = position.x;
+    oldPos.y = position.y;
+
     Object.keys(controls).forEach((key) => {
       if (moveRequest[key] !== undefined) {
         moveRequest[key] = controls[key].isDown;
@@ -114,6 +119,8 @@ class Player extends Entity {
     if (collidingObject && collidingObject.onCollision) {
       collidingObject.onCollision(this);
     }
+
+    world.moveObjectInGrid(this, oldPos);
   }
   setUpHealthBar() {
     const hpContainer = new PIXI.Container();
@@ -141,7 +148,7 @@ class Player extends Entity {
   }
 
   dash(target, world) {
-    if (this.performingDash) {
+    if (this.performingDash || this.isBusy) {
       return;
     }
     const dest = {};
@@ -189,12 +196,20 @@ class Player extends Entity {
   }
 
   shootMagicParticle(target, world) {
+    if (this.isBusy) {
+      return;
+    }
     this.magicLaser.shoot(target, world);
   }
 
   die() {
+    // MAybe sonehting like a priority order?
+    // is busy takes a number?
+    // for now only bool
+    this.isBusy = true;
     const alive = () => {
       this.update = this.defaultUpdate;
+      this.isBusy = false;
     };
 
     const respawn = () => {

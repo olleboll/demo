@@ -7,8 +7,9 @@ import { generateRNGTrees, generateRandomEnemies } from './levels/utils';
 import Boulder from 'game/objects/boulder';
 
 class Medallion {
-  constructor(levels, startingLevel, player, stage, gui) {
+  constructor(levels, startingLevel, player, stage, gui, renderer) {
     this.stage = stage;
+    this.renderer = renderer;
     this.gui = gui;
     this.levels = levels;
     this.currentLevel = this.levels[startingLevel];
@@ -34,6 +35,9 @@ class Medallion {
     this.stage.addChild(this.currentLevel.scene);
     this.stage.addChild(this.gui);
 
+    this.gui.width = renderer.width;
+    this.gui.height = renderer.height;
+
     this.update = this.update.bind(this);
     this.defaultUpdate = this.update;
     this.playerInteract = this.playerInteract.bind(this);
@@ -53,8 +57,6 @@ class Medallion {
   }
 
   playerInteract(active) {
-    console.log('player interact called');
-    console.log(active);
     // create a set with all interactive objects in this level. including universal
     const local = this.currentLevel.interactiveObjects;
     if (this.interactingObject && active) {
@@ -80,7 +82,6 @@ class Medallion {
       }
     } else if (this.interactingObject && !active) {
       // stopped interacting
-      console.log('eh?');
       this.interactingObject.stopInteract(this);
       this.interactingObject = null;
     }
@@ -94,7 +95,6 @@ class Medallion {
       this.levelIndex + 1 < this.levelsOrder.length ? this.levelIndex + 1 : 0;
     newWorld = this.levelsOrder[this.levelIndex];
     this.swappingUniverse = true;
-    console.log(this);
     this.currentLevel.onLeave();
 
     const onComplete = () => {
@@ -105,15 +105,14 @@ class Medallion {
 
     const onSwap = (delta) => {
       this.currentLevel.visible.removeChild(this.player);
+      const index = this.stage.getChildIndex(this.currentLevel.scene);
       this.stage.removeChild(this.currentLevel.scene);
       this.currentLevel = this.levels[newWorld];
-      this.universal.forEach((obj) => {
-        this.currentLevel.addChild(obj, obj.fogOfWarContainer);
-      });
+      this.universal.forEach((obj) => this.currentLevel.addChild(obj));
       this.currentLevel.camera.updateCamera(this.player.position, 30);
       this.currentLevel.updateFov(this.player);
       this.currentLevel.visible.addChild(this.player);
-      this.stage.addChild(this.currentLevel.scene);
+      this.stage.addChildAt(this.currentLevel.scene, index);
 
       this.levels[newWorld].scene.alpha = 0;
       this.update = (delta) => {

@@ -1,4 +1,4 @@
-import PIXI from 'engine';
+import PIXI, { getResource } from 'engine';
 
 import {
   calculateDistance,
@@ -102,6 +102,21 @@ class MagicLaser {
     shootingParticle.sprite.destroy();
     console.log('destroyed');
     console.log(level);
+
+    const { animations } = getResource('dash', 'spritesheet');
+    const missile = new PIXI.AnimatedSprite(animations[`magic_missile`]);
+    missile.anchor.set(0.5, 0.8);
+    missile.scale.x = 2;
+    missile.scale.y = 2;
+    let rotation = Math.atan(dy / dx) + Math.PI / 2;
+    if (dx < 0) rotation += Math.PI;
+    missile.rotation = rotation + Math.PI;
+
+    missile.animationSpeed = 1;
+    missile.play();
+    missile.position = shootingParticle.position;
+    shootingParticle.missile = missile;
+    shootingParticle.trailContainer.addChild(missile);
   }
 
   update(delta, world) {
@@ -131,7 +146,7 @@ class MagicLaser {
       if (particle.reachedTarget) {
         if (particle.counter < 0) {
           world.removeChild(particle.trailContainer);
-          particle.trailContainer.destroy();
+          particle.trailContainer.destroy({ children: true });
           particle.done = true;
           const newParticle = this.createParticle(
             this.width,
@@ -151,22 +166,23 @@ class MagicLaser {
           offset: { x: particle.speed.x * delta, y: particle.speed.y * delta },
         })
       ) {
+        particle.missile.position = particle.target;
         particle.reachedTarget = true;
         particle.counter = 10;
-        particle.trail
-          .clear()
-          .lineStyle(2, 0)
-          .beginFill(0xaa0000, 1)
-          .moveTo(particle.start.x, particle.start.y)
-          .lineTo(particle.target.x, particle.target.y)
-          .endFill();
-
-        const aoeGraphic = new PIXI.Graphics()
-          .lineStyle(1, 0)
-          .beginFill(0xaa0000, 0.3)
-          .drawCircle(particle.target.x, particle.target.y, this.aoe)
-          .endFill();
-        particle.trailContainer.addChild(aoeGraphic);
+        // particle.trail
+        //   .clear()
+        //   .lineStyle(2, 0)
+        //   .beginFill(0xaa0000, 1)
+        //   .moveTo(particle.start.x, particle.start.y)
+        //   .lineTo(particle.target.x, particle.target.y)
+        //   .endFill();
+        //
+        // const aoeGraphic = new PIXI.Graphics()
+        //   .lineStyle(1, 0)
+        //   .beginFill(0xaa0000, 0.3)
+        //   .drawCircle(particle.target.x, particle.target.y, this.aoe)
+        //   .endFill();
+        // particle.trailContainer.addChild(aoeGraphic);
         // Deal damage!
         const objectsInAoe = world
           .getObstacles(particle.target, 150)
@@ -190,15 +206,16 @@ class MagicLaser {
       } else {
         const newX = particle.position.x + particle.speed.x * delta;
         const newY = particle.position.y + particle.speed.y * delta;
-        particle.trail
-          .clear()
-          .lineStyle(2, 0)
-          .beginFill(0xaa0000, 1)
-          .moveTo(particle.start.x, particle.start.y)
-          .lineTo(newX, newY)
-          .endFill();
+        // particle.trail
+        //   .clear()
+        //   .lineStyle(2, 0)
+        //   .beginFill(0xaa0000, 1)
+        //   .moveTo(particle.start.x, particle.start.y)
+        //   .lineTo(newX, newY)
+        //   .endFill();
         const newPos = { x: newX, y: newY };
         particle.position = newPos;
+        particle.missile.position = newPos;
       }
     }
     this.shootingParticles = this.shootingParticles.filter((p) => !p.done);

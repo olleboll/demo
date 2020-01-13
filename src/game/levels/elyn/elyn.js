@@ -114,7 +114,6 @@ class Elyn extends Level {
     );
 
     this.addChild(sign, sign.fogOfWarContainer);
-    this.addChild(sign.textContainer);
 
     this.fires = createFromLayer(
       resource,

@@ -18,27 +18,28 @@ export const calculateFieldOfView = (
   mid: Point,
   parent: PIXI.Container,
 ) => {
-  const visibleObjects = obstacles.filter((sprite) => {
-    if (!sprite) {
-      return false;
-    }
-    if (sprite.los) {
-      return false;
-    }
-
-    if (!sprite.getLosBounds) {
-      return false;
-    }
-
-    if (sprite.name === 'backgroundImage') {
-      return false;
-    }
-    return fov.contains(sprite.x, sprite.y);
-  });
+  const visibleObjects = obstacles;
+  // const visibleObjects = obstacles.filter((sprite) => {
+  //   if (!sprite) {
+  //     return false;
+  //   }
+  //   if (sprite.los) {
+  //     return false;
+  //   }
+  //
+  //   if (!sprite.getLosBounds) {
+  //     return false;
+  //   }
+  //
+  //   if (sprite.name === 'backgroundImage') {
+  //     return false;
+  //   }
+  //   return fov.contains(sprite.x, sprite.y);
+  // });
   const lines = visibleObjects
     .filter((obj) => obj.getLosBounds)
     .map((obj) => {
-      let { x: bX, y: bY, width, height } = obj.getLosBounds(); // (obj.getBox !== undefined) ?  obj.getBox() : obj.getBounds()
+      let { x: bX, y: bY, width, height } = obj.getLosBounds();
 
       let p1: BoxPoint = {
         x: bX + width / 6,
@@ -67,15 +68,14 @@ export const calculateFieldOfView = (
       p4.distance = calculateDistance(pos, p4).distance;
 
       let possiblePoints = _.sortBy([p1, p2, p3, p4], (a) => a.distance);
-      let returnPoints = [possiblePoints[1], possiblePoints[2]]; //.sort( (a, b) => a.distance.dx - b.distance.dx)
-      //console.log({returnPoints})
+      let returnPoints = [possiblePoints[1], possiblePoints[2]];
       let lines = {
         p1: returnPoints[0],
         p2: returnPoints[1],
         p3: possiblePoints[3],
       };
       let { dx, dy } = calculateDistance(lines.p1, lines.p2);
-      let midpoint = obj.position; //{x: lines.p2.x + dx, y: lines.p2.y + dy}
+      let midpoint = obj.position;
       return {
         p1: lines.p1,
         p2: lines.p2,
@@ -90,12 +90,12 @@ export const calculateFieldOfView = (
   let rotation = 722;
   let lastI = -1;
   for (let i = 0; i < rotation; i++) {
-    let angle = (0.5 * i * Math.PI) / 180;
+    const angle = (0.5 * i * Math.PI) / 180;
     let x = pos.x + Math.cos(angle) * r;
     let y = pos.y + Math.sin(angle) * r;
-    let far = { x, y };
-    let check = { p1: pos, p2: far };
-    let intersectingLines = [];
+    const far = { x, y };
+    const check = { p1: pos, p2: far };
+    const intersectingLines = [];
     for (let line of lines) {
       if (intersects(check.p1, check.p2, line.p1, line.p2)) {
         intersectingLines.push(line);
@@ -103,10 +103,10 @@ export const calculateFieldOfView = (
     }
 
     if (intersectingLines.length > 0) {
-      let closestLine = findClosestIntersectingLines(pos, intersectingLines);
+      const closestLine = findClosestIntersectingLines(pos, intersectingLines);
 
-      let g = { p1: pos, p2: closestLine };
-      let { distance, dx, dy } = calculateDistance(pos, closestLine.p1);
+      const g = { p1: pos, p2: closestLine };
+      const { distance, dx, dy } = calculateDistance(pos, closestLine.p1);
       x = pos.x + Math.cos(angle) * (distance + 10);
       y = pos.y + Math.sin(angle) * (distance + 10);
       drawingPoints.push({ x, y });

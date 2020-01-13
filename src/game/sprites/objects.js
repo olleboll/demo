@@ -6,6 +6,10 @@ const objects = {
       key: 'winter_outside',
       src: '/static/assets/objects/winter/winter_outside.json',
     },
+    {
+      key: 'icons',
+      src: '/static/assets/objects/icons.json',
+    },
   ],
   firespin: 'firespin',
   fire: 'firex',
