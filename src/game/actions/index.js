@@ -1,6 +1,6 @@
 import createSword from './sword';
 import createBow from './bow';
 import dash from './dash';
-import MagicMissile from './MagicMissile';
+import MagicMissile from './magicMissile';
 
 export { createSword, createBow, dash, MagicMissile };
