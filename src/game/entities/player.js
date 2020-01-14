@@ -5,7 +5,7 @@ import { evaluateMove, calculateDistance } from 'engine/utils';
 import Entity from 'engine/objects/entity';
 import { fadeOut, fadeIn } from 'engine/animations/fade';
 
-import { dash, MagicLaser } from 'game/actions';
+import { dash, MagicMissile } from 'game/actions';
 
 import { characters } from 'game/sprites';
 
@@ -60,12 +60,16 @@ class Player extends Entity {
     this.defaultUpdate = this.update.bind(this);
     this.setAim = this.setAim.bind(this);
 
-    this.magicLaser = new MagicLaser({});
-    this.magicLaser.equip(this);
+    this.actions = {};
     this.equipped = [];
-    this.equipped.push(this.magicLaser);
     this.shootMagicParticle = this.shootMagicParticle.bind(this);
     this.die = this.die.bind(this);
+    this.equipItem = this.equipItem.bind(this);
+  }
+
+  equipItem(name, item) {
+    this.actions[name] = item;
+    this.equipped.push(item);
   }
 
   setAim({ x, y }) {
@@ -193,6 +197,12 @@ class Player extends Entity {
       }
       performDash.update(delta, this, obstacles);
     };
+  }
+
+  executeAction(name, target, level) {
+    if (this.actions[name] && !this.busy) {
+      this.actions[name].execute(target, level);
+    }
   }
 
   shootMagicParticle(target, world) {

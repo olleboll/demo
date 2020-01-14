@@ -4,7 +4,7 @@ import { fadeOut, fadeIn } from 'engine/animations/fade';
 
 import { generateRNGTrees, generateRandomEnemies } from './levels/utils';
 
-import Boulder from 'game/objects/boulder';
+import CarryObject from 'game/objects/carry';
 
 class Medallion {
   constructor(levels, startingLevel, player, stage, gui, renderer) {
@@ -20,16 +20,16 @@ class Medallion {
     this.currentLevel.addChild(this.player);
     this.universal = [];
 
-    const boulder = new Boulder({
-      spritesheet: 'outside',
-      spriteKey: 'pink_tree',
-      position: { x: player.position.x + 30, y: player.position.y },
-      width: 64,
-      height: 64,
-      los: false,
-    });
-    this.currentLevel.addChild(boulder, boulder.fogOfWarContainer);
-    this.universal = [boulder];
+    // const boulder = new CarryObject({
+    //   spritesheet: 'outside',
+    //   spriteKey: 'pink_tree',
+    //   position: { x: player.position.x + 30, y: player.position.y },
+    //   width: 64,
+    //   height: 64,
+    //   los: false,
+    // });
+    // this.currentLevel.addChild(boulder, boulder.fogOfWarContainer);
+    // this.universal = [boulder];
     this.interacting = false;
     this.interactingObject = null;
     this.stage.addChild(this.currentLevel.scene);
@@ -65,6 +65,7 @@ class Medallion {
       // started interacting
       const setOfObjects = new Set(this.universal.concat(local));
       const arr = [...setOfObjects];
+      console.log(arr);
       const aoe = new PIXI.Circle(
         this.player.position.x,
         this.player.position.y,
@@ -109,10 +110,11 @@ class Medallion {
       this.stage.removeChild(this.currentLevel.scene);
       this.currentLevel = this.levels[newWorld];
       this.universal.forEach((obj) => this.currentLevel.addChild(obj));
-      this.currentLevel.camera.updateCamera(this.player.position, 30);
-      this.currentLevel.updateFov(this.player);
       this.currentLevel.visible.addChild(this.player);
       this.stage.addChildAt(this.currentLevel.scene, index);
+      // this.currentLevel.camera.updateCamera(this.player.position, 30);
+      // this.currentLevel.updateFov(this.player);
+      this.currentLevel.update(delta, this.player);
 
       this.levels[newWorld].scene.alpha = 0;
       this.update = (delta) => {

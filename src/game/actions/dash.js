@@ -56,7 +56,7 @@ const dash = (
   animation.rotation = rotation + Math.PI;
   entity.addChild(animation);
 
-  const soundId = sound.play('dash');
+  //const soundId = sound.play('dash');
 
   const update = (delta, entity, obstacles) => {
     const { distance } = calculateDistance(entity.position, target);

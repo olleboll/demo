@@ -155,17 +155,12 @@ class Level {
   }
 
   removeChild(child) {
-    console.log(child);
     const iO = this.allObjects.findIndex((c) => c === child);
-    console.log(iO);
     if (iO > -1) {
       this.allObjects.splice(iO, 1);
-      let test = this.allObjects.findIndex((c) => c === child);
-      console.log(test);
     }
 
     const iV = this.visibleObjects.findIndex((c) => c === child);
-    console.log(iV);
     if (iV > -1) {
       this.visibleObjects.splice(iV, 1);
     }

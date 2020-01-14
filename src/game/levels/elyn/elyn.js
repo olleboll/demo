@@ -12,7 +12,13 @@ import { createRain } from 'game/weather';
 
 import { generateRNGTrees, generateRandomEnemies } from '../utils';
 import { objects } from 'game/sprites';
-import { createFire, LavaObject, Sign } from 'game/objects';
+import {
+  createFire,
+  LavaObject,
+  Sign,
+  Pickup,
+  CarryObject,
+} from 'game/objects';
 
 import { createFromLayer } from 'game/levels/utils/createFromLayer';
 
@@ -29,7 +35,7 @@ class Elyn extends Level {
 
     console.log(resource);
 
-    const fall = createFromLayer(
+    const waterBorder = createFromLayer(
       resource,
       'water',
       this.sceneWidth,
@@ -45,7 +51,7 @@ class Elyn extends Level {
       false,
     );
 
-    const fall2 = createFromLayer(
+    const abyss = createFromLayer(
       resource,
       'abyss',
       this.sceneWidth,
@@ -61,11 +67,49 @@ class Elyn extends Level {
       false,
     );
 
-    const collidable = fall.concat(fall2);
+    this.magicMissile = createFromLayer(
+      resource,
+      'pickup_magic_missile',
+      this.sceneWidth,
+      this.sceneHeight,
+      (data, i) => {
+        return new Pickup({
+          position: data,
+          spritesheet: 'icons',
+          spriteKey: 'icon_32',
+          width: 16,
+          height: 16,
+          los: false,
+          world: this,
+        });
+      },
+    );
 
-    collidable.forEach((tree) => {
-      this.addChild(tree);
-    });
+    this.fishingRod = createFromLayer(
+      resource,
+      'quest_fishingrod',
+      this.sceneWidth,
+      this.sceneHeight,
+      (data, i) => {
+        return new CarryObject({
+          position: data,
+          spritesheet: 'icons',
+          spriteKey: 'icon_260',
+          width: 16,
+          height: 16,
+          los: false,
+          world: this,
+        });
+      },
+    );
+
+    const collidable = waterBorder.concat(
+      abyss,
+      this.magicMissile,
+      this.fishingRod,
+    );
+
+    collidable.forEach(this.addChild);
 
     const levelTrees = createFromLayer(
       resource,
@@ -129,7 +173,7 @@ class Elyn extends Level {
       this.addChild(fire.container);
     });
 
-    this.interactiveObjects = [sign];
+    this.interactiveObjects = [sign, this.fishingRod[0]];
     this.enemies = [];
 
     this.ambience = new Howl({

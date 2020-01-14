@@ -8,7 +8,7 @@ import {
   generateRandomPoint,
 } from 'engine/utils';
 
-class MagicLaser {
+class MagicMissile {
   constructor(opts) {
     const {
       damage = 10,
@@ -18,6 +18,7 @@ class MagicLaser {
       speed = 1,
       aoe = 30,
     } = opts;
+    this.name = 'magic_missile';
     this.container = new PIXI.Container();
     this.width = width;
     this.height = height;
@@ -31,7 +32,7 @@ class MagicLaser {
     this.shootingParticles = [];
 
     this.update = this.update.bind(this);
-    this.shoot = this.shoot.bind(this);
+    this.execute = this.execute.bind(this);
   }
 
   setUpParticles(no, width, height, speed) {
@@ -59,13 +60,8 @@ class MagicLaser {
     return particle;
   }
 
-  shoot(target, level) {
-    console.log(this.idleParticles);
+  execute(target, level) {
     if (this.idleParticles.length === 0) return;
-    console.log('length is more than 0');
-    // const i = parseInt(
-    //   Math.floor(Math.random() * this.idleParticles.length - 1),
-    // );
     const i = Math.floor(Math.random() * this.idleParticles.length);
     if (i === -1) return;
 
@@ -86,9 +82,6 @@ class MagicLaser {
     shootingParticle.position = start;
     shootingParticle.target = target;
 
-    console.log('genereated path');
-    console.log(shootingParticle);
-
     shootingParticle.trailContainer = new PIXI.Container();
     shootingParticle.trail = new PIXI.Graphics();
     shootingParticle.trailContainer.noCull = true;
@@ -100,19 +93,17 @@ class MagicLaser {
     this.idleParticles.splice(i, 1);
     this.container.removeChild(shootingParticle.sprite);
     shootingParticle.sprite.destroy();
-    console.log('destroyed');
-    console.log(level);
 
     const { animations } = getResource('dash', 'spritesheet');
     const missile = new PIXI.AnimatedSprite(animations[`magic_missile`]);
     missile.anchor.set(0.5, 0.8);
     missile.scale.x = 2;
     missile.scale.y = 2;
+    missile.animationSpeed = 1;
     let rotation = Math.atan(dy / dx) + Math.PI / 2;
     if (dx < 0) rotation += Math.PI;
     missile.rotation = rotation + Math.PI;
 
-    missile.animationSpeed = 1;
     missile.play();
     missile.position = shootingParticle.position;
     shootingParticle.missile = missile;
@@ -227,11 +218,11 @@ class MagicLaser {
     // this will only work when anchor is by the characters feet
     this.container.position.x = 0;
     this.container.position.y = -this.parent.height / 2;
+    this.parent.equipItem(this.name, this);
   }
   unEquip() {
     this.parent.removeChild(this.container);
-    this.container.destroy();
   }
 }
 
-export default MagicLaser;
+export default MagicMissile;

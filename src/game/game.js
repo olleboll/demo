@@ -178,7 +178,7 @@ const Game = (opts: GameOptions) => {
   const shootMagicParticle = (event, level) => {
     const { x, y } = event.data.global;
     const target = level.scene.toLocal({ x, y });
-    player.shootMagicParticle(target, level);
+    player.executeAction('magic_missile', target, level);
   };
 
   forestLevel.scene.on('mousemove', (event) => setAim(event, forestLevel));

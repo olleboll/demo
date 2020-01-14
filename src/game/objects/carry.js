@@ -1,19 +1,13 @@
 import { InteractiveObject } from 'engine/objects';
 
-class Boulder extends InteractiveObject {
+class CarryObject extends InteractiveObject {
   constructor(props) {
     super(props);
     this.oldPos = {};
   }
   interact(medallion) {
-    console.log('ibnteracting');
     medallion.currentLevel.removeChild(this);
-    console.log(medallion.player.children);
     medallion.player.addChild(this);
-    console.log(medallion.player.children);
-
-    console.log(this);
-
     this.oldPos.x = this.position.x;
     this.oldPos.y = this.position.y;
     this.position.x = 0;
@@ -21,7 +15,6 @@ class Boulder extends InteractiveObject {
     this.zIndex = 0;
   }
   stopInteract(medallion) {
-    console.log('stopped interacting');
     const { player, currentLevel } = medallion;
     medallion.player.removeChild(this);
     currentLevel.addChild(this);
@@ -36,4 +29,4 @@ class Boulder extends InteractiveObject {
   update(delta, medallion) {}
 }
 
-export default Boulder;
+export default CarryObject;

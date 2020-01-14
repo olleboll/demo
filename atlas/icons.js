@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const atlas = {
   meta: {
-    image: 'fire.png',
+    image: 'icons.png',
     size: { w: 512, h: 672 },
     scale: '1',
   },
@@ -13,8 +13,8 @@ const atlas = {
 let width = 32;
 let height = 32;
 
-for (let j = 0; j < 15; j++) {
-  for (let i = 0; i < 20; i++) {
+for (let j = 0; j < 21; j++) {
+  for (let i = 0; i < 16; i++) {
     let frame = {
       frame: {
         x: width * i,
@@ -28,7 +28,7 @@ for (let j = 0; j < 15; j++) {
       sourceSize: { w: 512, h: 672 },
       anchor: { x: 0.5, y: 0.5 },
     };
-    atlas.frames[`icon_${j * 15 + i}`] = frame;
+    atlas.frames[`icon_${j * 16 + i}`] = frame;
   }
 }
 
