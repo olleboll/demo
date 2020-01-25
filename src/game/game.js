@@ -1,20 +1,16 @@
 //@flow
 import PIXI from 'engine';
 import { createKeyboardControls } from 'engine/controls';
-import { createEntity, StaticObject } from 'engine/objects';
-import { createEffect } from 'engine/effects';
-import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { characters as _characters, objects } from './sprites';
 
 import { WinterLevel, ForestLevel, DesertLevel, Elyn } from './levels';
 import { generateRNGTrees } from './levels/utils';
-import Medallion from './medallion';
-import { Enemy } from './entities';
-import { createPlayer, createEnemy } from './entities/factory';
-import { createRain } from './weather';
-import { createFire } from './objects';
+import { createPlayer } from './entities/factory';
 import Controller from './controller';
+import Medallion from './medallion';
+
+import { MagicMissile } from 'game/actions';
 
 // TYPES
 import type { LevelOptions } from 'engine/level';
@@ -56,6 +52,9 @@ const Game = (opts: GameOptions) => {
     renderer,
   });
 
+  // const magicLaser = new MagicMissile({});
+  // magicLaser.equip(player);
+
   const xTreeStart = 56 * 16;
   const yTreeStart = 37 * 16;
 
@@ -68,18 +67,6 @@ const Game = (opts: GameOptions) => {
     mapHeight: 3200,
     size: 25,
   });
-
-  // const trees2 = generateRNGTrees({
-  //   startX: 0,
-  //   startY: yTreeStart,
-  //   w: 3200,
-  //   h: 3200 - yTreeStart,
-  //   mapWidth: 3200,
-  //   mapHeight: 3200,
-  //   size: 25,
-  // });
-  //
-  // const trees = trees1.concat(trees2);
 
   const levelOptions: LevelOptions = {
     name: 'map',
@@ -110,20 +97,6 @@ const Game = (opts: GameOptions) => {
     trees,
   };
   const winterLevel = new WinterLevel(levelOptions2); //createLevel(levelOptions);
-  const levelOptions3: LevelOptions = {
-    name: 'map',
-    spriteKey: 'desert',
-    centerCamera: true,
-    renderer,
-    dark: 0,
-    light: 1.1,
-    sceneWidth: 3200,
-    sceneHeight: 3200,
-    hasCamera: true,
-    dealDamage,
-    trees,
-  };
-  const desertLevel = new DesertLevel(levelOptions3); //createLevel(levelOptions);
 
   const levelOptions4: LevelOptions = {
     name: 'map',
@@ -143,11 +116,9 @@ const Game = (opts: GameOptions) => {
   const levels = {
     forest: forestLevel,
     winter: winterLevel,
-    //desert: desertLevel,
     elyn,
   };
   const medallion = new Medallion(levels, 'elyn', player, stage, gui, renderer);
-  //medallion.currentLevel.onEnter();
 
   const globalKeys = {
     e: 69,
@@ -166,7 +137,6 @@ const Game = (opts: GameOptions) => {
   // Ok for now...
   forestLevel.scene.interactive = true;
   winterLevel.scene.interactive = true;
-  desertLevel.scene.interactive = true;
   elyn.scene.interactive = true;
 
   const setAim = (event, level) => {
@@ -191,11 +161,6 @@ const Game = (opts: GameOptions) => {
     shootMagicParticle(event, winterLevel),
   );
 
-  desertLevel.scene.on('mousemove', (event) => setAim(event, desertLevel));
-  desertLevel.scene.on('mousedown', (event) =>
-    shootMagicParticle(event, forestLevel),
-  );
-
   elyn.scene.on('mousemove', (event) => setAim(event, elyn));
   elyn.scene.on('mousedown', (event) => shootMagicParticle(event, elyn));
 
@@ -210,46 +175,6 @@ const Game = (opts: GameOptions) => {
     init,
     update,
   };
-};
-
-const generateRandomTorches = (number, { width, height }) => {
-  const lightSources = [];
-  for (let i = 0; i < number; i++) {
-    const { x, y } = generateRandomPoint({
-      minX: -width / 2,
-      maxX: width / 2,
-      minY: -height / 2,
-      maxY: height / 2,
-      sizeX: 30,
-      sizeY: 30,
-    });
-    let torch = createFire({ position: { x, y }, radius: 30 });
-    lightSources.push(torch);
-  }
-  return lightSources;
-};
-
-const generateRandomTrees = (number, { width, height }) => {
-  const trees = [];
-  for (let i = 0; i < number; i++) {
-    const { x, y } = generateRandomPoint({
-      minX: -width / 2,
-      maxX: width / 2,
-      minY: -height / 2,
-      maxY: height / 2,
-      sizeX: 64,
-      sizeY: 64,
-    });
-    let tree = new StaticObject({
-      spritesheet: 'outside',
-      spriteKey: objects.tree,
-      position: { x, y },
-      width: 64,
-      height: 64,
-    });
-    trees.push(tree);
-  }
-  return trees;
 };
 
 export default Game;

@@ -1,3 +1,4 @@
+import Ola from 'ola';
 import { DropShadowFilter } from 'pixi-filters';
 
 import PIXI, { getResource } from 'engine';
@@ -16,7 +17,7 @@ class Player extends Entity {
     position,
     controls,
     world,
-    speed = 2,
+    speed = 3,
     dealDamage,
     actions,
     medallion,
@@ -40,8 +41,10 @@ class Player extends Entity {
     this.world = world;
 
     this.aim = {};
-    this.speed = speed;
-    this.defaultSpeed = speed;
+    this.speed = 0;
+    this.defaultSpeed = 0;
+    this.maxSpeed = speed;
+    this.acceleratingSpeed = null;
     this.dashDistance = 150;
 
     this.saveTimer = 0;
@@ -83,11 +86,27 @@ class Player extends Entity {
     oldPos.x = position.x;
     oldPos.y = position.y;
 
+    let isMoving = false;
     Object.keys(controls).forEach((key) => {
       if (moveRequest[key] !== undefined) {
         moveRequest[key] = controls[key].isDown;
+        if (moveRequest[key]) {
+          isMoving = true;
+        }
       }
     });
+
+    if (isMoving) {
+      if (this.acceleratingSpeed !== null) {
+        this.speed = this.acceleratingSpeed.x;
+      } else {
+        this.acceleratingSpeed = Ola({ x: 1 });
+        this.acceleratingSpeed.set({ x: this.maxSpeed }, 200);
+        this.speed = this.acceleratingSpeed.x;
+      }
+    } else {
+      this.acceleratingSpeed = null;
+    }
 
     const { sceneSize } = world;
 
@@ -155,21 +174,18 @@ class Player extends Entity {
     if (this.performingDash || this.isBusy) {
       return;
     }
-    const dest = {};
     target = { x: this.position.x, y: this.position.y };
     target.x += this.moveRequest.right ? 10 : 0;
     target.x -= this.moveRequest.left ? 10 : 0;
     target.y += this.moveRequest.down ? 10 : 0;
     target.y -= this.moveRequest.up ? 10 : 0;
 
-    if (target.x === 0 && target.y === 0) {
-    }
-
     const { dx, dy, distance } = calculateDistance(this.position, target);
     if (distance === 0) return;
 
     const normX = dx / distance;
     const normY = dy / distance;
+    const dest = {};
     dest.x = this.position.x + normX * this.dashDistance;
     dest.y = this.position.y + normY * this.dashDistance;
     const { distance: d } = calculateDistance(this.position, dest);
@@ -179,10 +195,8 @@ class Player extends Entity {
       this.performingDash = false;
     };
     this.performingDash = true;
-
     this.aim.x = this.aim.x + dx;
     this.aim.y = this.aim.y + dy;
-
     const performDash = dash(this, {
       target: dest,
       velocity: { x: normX, y: normY },

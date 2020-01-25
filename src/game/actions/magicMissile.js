@@ -1,3 +1,6 @@
+import Ola from 'ola';
+import { OutlineFilter } from 'pixi-filters';
+
 import PIXI, { getResource } from 'engine';
 
 import {
@@ -17,12 +20,15 @@ class MagicMissile {
       height = 25,
       speed = 1,
       aoe = 30,
+      chargeRefresh = 500,
     } = opts;
     this.name = 'magic_missile';
     this.container = new PIXI.Container();
     this.width = width;
     this.height = height;
     this.speed = speed;
+    this.maxParticles = particles;
+    this.chargeRefresh = chargeRefresh;
     this.damage = damage;
     this.aoe = aoe;
     this.idleParticles = this.setUpParticles(particles, width, height, speed);
@@ -30,7 +36,6 @@ class MagicMissile {
       this.container.addChild(particle.sprite),
     );
     this.shootingParticles = [];
-
     this.update = this.update.bind(this);
     this.execute = this.execute.bind(this);
   }
@@ -106,8 +111,12 @@ class MagicMissile {
 
     missile.play();
     missile.position = shootingParticle.position;
+    missile.filters = [new OutlineFilter()];
     shootingParticle.missile = missile;
+
     shootingParticle.trailContainer.addChild(missile);
+    shootingParticle.cooldown =
+      this.chargeRefresh * (this.maxParticles - this.idleParticles.length);
   }
 
   update(delta, world) {
@@ -139,13 +148,15 @@ class MagicMissile {
           world.removeChild(particle.trailContainer);
           particle.trailContainer.destroy({ children: true });
           particle.done = true;
-          const newParticle = this.createParticle(
-            this.width,
-            this.height,
-            this.speed,
-          );
-          this.idleParticles.push(newParticle);
-          this.container.addChild(newParticle.sprite);
+          setTimeout(() => {
+            const newParticle = this.createParticle(
+              this.width,
+              this.height,
+              this.speed,
+            );
+            this.idleParticles.push(newParticle);
+            this.container.addChild(newParticle.sprite);
+          }, particle.cooldown);
         } else {
           particle.counter--;
         }

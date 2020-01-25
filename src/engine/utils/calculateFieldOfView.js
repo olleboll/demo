@@ -68,20 +68,16 @@ export const calculateFieldOfView = (
       p4.distance = calculateDistance(pos, p4).distance;
 
       let possiblePoints = _.sortBy([p1, p2, p3, p4], (a) => a.distance);
-      let returnPoints = [possiblePoints[1], possiblePoints[2]];
       let lines = {
-        p1: returnPoints[0],
-        p2: returnPoints[1],
+        p1: possiblePoints[1],
+        p2: possiblePoints[2],
         p3: possiblePoints[3],
       };
-      let { dx, dy } = calculateDistance(lines.p1, lines.p2);
       let midpoint = obj.position;
       return {
         p1: lines.p1,
         p2: lines.p2,
         midpoint,
-        p3: lines.p3,
-        intersect: false,
       };
     });
 

@@ -1,3 +1,4 @@
+import Ola from 'ola';
 import { Howl, Howler } from 'howler';
 
 import PIXI, { getResource } from 'engine';
@@ -58,17 +59,13 @@ const dash = (
 
   //const soundId = sound.play('dash');
 
+  const currentSpeed = Ola({ value: speed });
+  currentSpeed.set({ value: speed / 2 }, 200);
+
   const update = (delta, entity, obstacles) => {
     const { distance } = calculateDistance(entity.position, target);
 
-    if (distance < totalDistance / 2) {
-      speed = originalSpeed / 2;
-    }
-
-    if (distance < totalDistance / 3 && speed > entity.speed) {
-      speed -= 1;
-    }
-
+    const speed = currentSpeed.value;
     const speedX = velocity.x * speed * delta;
     const speedY = velocity.y * speed * delta;
     let newX = entity.position.x + speedX;
@@ -88,8 +85,6 @@ const dash = (
     for (let o of obstacles) {
       if (o.takeDamage || o.jumpable) continue;
       if (!done.x && checkCollision(o, { x: newX, y: entity.position.y })) {
-        console.log('colidding :O');
-        console.log(o);
         done.x = true;
         target.x = entity.position.x;
         newX = entity.position.x;
