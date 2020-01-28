@@ -40,6 +40,7 @@ export const createEnemy = ({
   dealDamage,
   remove,
   level,
+  ai,
 }) => {
   const sword = new Sword({
     spriteKey: 'sword_swing_4',
@@ -65,6 +66,7 @@ export const createEnemy = ({
     dealDamage,
     remove,
     actions: enemyAbilities,
+    ai,
   });
 
   sword.setParent(enemy);

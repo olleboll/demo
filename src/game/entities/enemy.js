@@ -32,8 +32,10 @@ class Enemy extends Entity {
     remove,
     actions,
     level,
+    ai,
   }) {
     super({ spritesheet, spriteKey, position, speed });
+    this.ai = ai;
     this.remove = remove;
     this.level = level;
     this.currentSprite.animationSpeed = 0.1;
@@ -57,7 +59,7 @@ class Enemy extends Entity {
     this.getCollisionBox = () => {
       return new PIXI.Rectangle(
         this.position.x - 15,
-        this.position.y - 15,
+        this.position.y - 30,
         30,
         30,
       );
@@ -76,46 +78,51 @@ class Enemy extends Entity {
   }
 
   update(delta, obstacles, target, world) {
-    const { moveRequest, position } = this;
-
-    const view = new PIXI.Circle(position.x, position.y, this.sightRange);
     this.hpBar.width = (this.hpbg.width * this.hp) / 100;
+    if (this.ai !== 'idle') {
+      const { moveRequest, position } = this;
 
-    if (view.contains(target.position.x, target.position.y)) {
-      const { dx, dy, distance } = calculateDistance(position, target.position);
+      const view = new PIXI.Circle(position.x, position.y, this.sightRange);
+      if (view.contains(target.position.x, target.position.y)) {
+        const { dx, dy, distance } = calculateDistance(
+          position,
+          target.position,
+        );
 
-      const attackRadius = new PIXI.Circle(
-        position.x,
-        position.y,
-        this.swingRange,
-      );
-      if (attackRadius.contains(target.position.x, target.position.y)) {
-        if (!this.actions.sword.coolDown()) {
-          const soundId = sound.play('swing');
-          this.actions.sword.swing(target.position);
+        const attackRadius = new PIXI.Circle(
+          position.x,
+          position.y,
+          this.swingRange,
+        );
+        if (attackRadius.contains(target.position.x, target.position.y)) {
+          if (!this.actions.sword.coolDown()) {
+            const soundId = sound.play('swing');
+            this.actions.sword.swing(target.position);
+          }
+        } else {
+          moveRequest['right'] = dx > 0 && Math.abs(dx) > this.speed * delta;
+          moveRequest['left'] = dx < 0 && Math.abs(dx) > this.speed * delta;
+          moveRequest['down'] = dy > 0 && Math.abs(dy) > this.speed * delta;
+          moveRequest['up'] = dy < 0 && Math.abs(dy) > this.speed * delta;
+
+          const _obstacles = this.level.getObstacles(this.position, 200);
+
+          const move = evaluateMove(delta, this, obstacles, {
+            maxX: world.width / 2,
+            maxY: world.height / 2,
+            minX: -world.width / 2,
+            minY: -world.height / 2,
+          });
+          const { x, y } = move;
+
+          this.position.x = x;
+          this.position.y = y;
+          this.zIndex = position.y;
         }
       } else {
-        moveRequest['right'] = dx > 0 && Math.abs(dx) > this.speed * delta;
-        moveRequest['left'] = dx < 0 && Math.abs(dx) > this.speed * delta;
-        moveRequest['down'] = dy > 0 && Math.abs(dy) > this.speed * delta;
-        moveRequest['up'] = dy < 0 && Math.abs(dy) > this.speed * delta;
-
-        const _obstacles = this.level.getObstacles(this.position, 200);
-
-        const move = evaluateMove(delta, this, obstacles, {
-          maxX: world.width / 2,
-          maxY: world.height / 2,
-          minX: -world.width / 2,
-          minY: -world.height / 2,
-        });
-        const { x, y } = move;
-
-        this.position.x = x;
-        this.position.y = y;
-        this.zIndex = position.y;
+        this.currentSprite.stop();
       }
     } else {
-      this.currentSprite.stop();
     }
   }
 
@@ -158,7 +165,6 @@ class Enemy extends Entity {
 
   takeDamage(damage) {
     this.hp -= damage;
-    console.log('enemy taking damage');
     if (this.hp <= 0) {
       this.die();
     }

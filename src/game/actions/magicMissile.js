@@ -179,15 +179,15 @@ class MagicMissile {
         //   .lineTo(particle.target.x, particle.target.y)
         //   .endFill();
         //
-        // const aoeGraphic = new PIXI.Graphics()
-        //   .lineStyle(1, 0)
-        //   .beginFill(0xaa0000, 0.3)
-        //   .drawCircle(particle.target.x, particle.target.y, this.aoe)
-        //   .endFill();
-        // particle.trailContainer.addChild(aoeGraphic);
+        const aoeGraphic = new PIXI.Graphics()
+          .lineStyle(1, 0)
+          .beginFill(0xaa0000, 0.3)
+          .drawCircle(particle.target.x, particle.target.y, this.aoe)
+          .endFill();
+        particle.trailContainer.addChild(aoeGraphic);
         // Deal damage!
         const objectsInAoe = world
-          .getObstacles(particle.target, 150)
+          .getObstacles(particle.target, 450)
           .filter((o) => o.takeDamage && !o.isPlayer);
         const damageArea = new PIXI.Circle(
           particle.target.x,
@@ -199,10 +199,15 @@ class MagicMissile {
             points: { p1, p2, p3, p4 },
           } = getLinesOfRect(o.getCollisionBox());
           const pointsArray = [p1, p2, p3, p4];
+          let hits = 0;
           for (let p of pointsArray) {
             if (damageArea.contains(p.x, p.y)) {
+              hits++;
               o.takeDamage(this.damage);
             }
+          }
+          if (hits > 0) {
+            console.log(`took ${hits} hits`);
           }
         }
       } else {

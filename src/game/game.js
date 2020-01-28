@@ -4,7 +4,13 @@ import { createKeyboardControls } from 'engine/controls';
 
 import { characters as _characters, objects } from './sprites';
 
-import { WinterLevel, ForestLevel, DesertLevel, Elyn } from './levels';
+import {
+  WinterLevel,
+  ForestLevel,
+  DesertLevel,
+  Elyn,
+  CombatLevel,
+} from './levels';
 import { generateRNGTrees } from './levels/utils';
 import { createPlayer } from './entities/factory';
 import Controller from './controller';
@@ -52,9 +58,6 @@ const Game = (opts: GameOptions) => {
     renderer,
   });
 
-  // const magicLaser = new MagicMissile({});
-  // magicLaser.equip(player);
-
   const xTreeStart = 56 * 16;
   const yTreeStart = 37 * 16;
 
@@ -82,6 +85,21 @@ const Game = (opts: GameOptions) => {
     trees,
   };
   const forestLevel = new ForestLevel(levelOptions); //createLevel(levelOptions);
+
+  const combatOptions: LevelOptions = {
+    name: 'map',
+    spriteKey: 'forest',
+    centerCamera: true,
+    renderer,
+    dark: 0.0,
+    light: 1.0,
+    sceneWidth: 3200,
+    sceneHeight: 3200,
+    hasCamera: true,
+    dealDamage,
+    trees,
+  };
+  const combatLevel = new CombatLevel(combatOptions); //createLevel(levelOptions);
 
   const levelOptions2: LevelOptions = {
     name: 'map',
@@ -113,12 +131,27 @@ const Game = (opts: GameOptions) => {
   };
   const elyn = new Elyn(levelOptions4); //createLevel(levelOptions);
 
-  const levels = {
+  const realLevels = {
     forest: forestLevel,
     winter: winterLevel,
     elyn,
   };
-  const medallion = new Medallion(levels, 'elyn', player, stage, gui, renderer);
+
+  /** FOR DEV */
+  // const magicLaser = new MagicMissile({});
+  // magicLaser.equip(player);
+
+  const devLevels = {
+    combat: combatLevel,
+  };
+  const medallion = new Medallion(
+    realLevels,
+    'elyn',
+    player,
+    stage,
+    gui,
+    renderer,
+  );
 
   const globalKeys = {
     e: 69,
@@ -138,6 +171,7 @@ const Game = (opts: GameOptions) => {
   forestLevel.scene.interactive = true;
   winterLevel.scene.interactive = true;
   elyn.scene.interactive = true;
+  combatLevel.scene.interactive = true;
 
   const setAim = (event, level) => {
     const { x, y } = event.data.global;
@@ -163,6 +197,11 @@ const Game = (opts: GameOptions) => {
 
   elyn.scene.on('mousemove', (event) => setAim(event, elyn));
   elyn.scene.on('mousedown', (event) => shootMagicParticle(event, elyn));
+
+  combatLevel.scene.on('mousemove', (event) => setAim(event, combatLevel));
+  combatLevel.scene.on('mousedown', (event) =>
+    shootMagicParticle(event, combatLevel),
+  );
 
   const init = () => {
     console.log('LAUNCHING GAME');

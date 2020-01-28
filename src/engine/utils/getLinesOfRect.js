@@ -5,15 +5,15 @@ export const getLinesOfRect = ({ x, y, width, height }) => {
   };
   let p2 = {
     x: x + width,
-    y: y + height,
+    y: y,
   };
   let p3 = {
-    x: x - width,
+    x: x + width,
     y: y + height,
   };
   let p4 = {
-    x: x - width,
-    y: y - height,
+    x: x,
+    y: y + height,
   };
 
   return {
