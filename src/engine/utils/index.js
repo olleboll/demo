@@ -1,4 +1,4 @@
-import { evaluateMove } from './evaluateMove';
+import { evaluateMove, evaluateMove2 } from './evaluateMove';
 import { calculateFieldOfView } from './calculateFieldOfView';
 import {
   adjustCoordToViewPort,
@@ -28,6 +28,7 @@ import { aStar } from './pathfinding';
 
 export {
   evaluateMove,
+  evaluateMove2,
   calculateDistance,
   calculateFieldOfView,
   adjustCoordToViewPort,

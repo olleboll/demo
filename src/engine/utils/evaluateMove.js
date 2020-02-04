@@ -123,3 +123,125 @@ export const evaluateMove = (
     moving,
   };
 };
+
+export const evaluateMove2 = (
+  delta: number,
+  entity: Entity,
+  obstacles: Array<any>,
+  bounds: Bounds,
+): Point => {
+  const { maxX, maxY, minX, minY } = bounds;
+  // TODO: Clean this shit up....
+  // This is bad and I should feel bad
+  // Make the check smoother and make sure the sprite only swaps maximum once per loop.
+  let newX = entity.position.x;
+  let newY = entity.position.y;
+
+  if (entity.velocity.x.value !== 0) {
+    newX += entity.velocity.x.value * delta;
+  }
+
+  if (entity.velocity.y.value !== 0) {
+    newY += entity.velocity.y.value * delta;
+  }
+
+  let dir = entity.dir;
+  if (entity.aim) {
+    const { x, y } = entity.aim;
+
+    const dx = x - entity.position.x;
+    const dy = y - entity.position.y;
+
+    const dimension = Math.abs(dx) - Math.abs(dy) > 0 ? 'x' : 'y';
+
+    if (dimension === 'x') {
+      if (dx > 0) {
+        if (entity.currentSprite !== entity.movementSprites.right) {
+          entity.swapSprite(entity.movementSprites.right);
+          dir = 'right';
+        }
+      } else {
+        if (entity.currentSprite !== entity.movementSprites.left) {
+          entity.swapSprite(entity.movementSprites.left);
+          dir = 'left';
+        }
+      }
+    } else {
+      if (dy > 0) {
+        if (entity.currentSprite !== entity.movementSprites.down) {
+          entity.swapSprite(entity.movementSprites.down);
+          dir = 'down';
+        }
+      } else {
+        if (entity.currentSprite !== entity.movementSprites.up) {
+          entity.swapSprite(entity.movementSprites.up);
+          dir = 'up';
+        }
+      }
+    }
+  } else {
+    if (entity.moveRequest.up) {
+      if (entity.currentSprite !== entity.movementSprites.up) {
+        entity.swapSprite(entity.movementSprites.up);
+      }
+    } else if (entity.moveRequest.down) {
+      if (entity.currentSprite !== entity.movementSprites.down) {
+        entity.swapSprite(entity.movementSprites.down);
+      }
+    } else if (entity.moveRequest.right) {
+      if (entity.currentSprite !== entity.movementSprites.right) {
+        entity.swapSprite(entity.movementSprites.right);
+      }
+    } else if (entity.moveRequest.left) {
+      if (entity.currentSprite !== entity.movementSprites.left) {
+        entity.swapSprite(entity.movementSprites.left);
+      }
+    }
+  }
+
+  if (!entity.isMoving) {
+    entity.currentSprite.stop();
+  } else if (entity.isMoving && !entity.currentSprite.playing) {
+    entity.currentSprite.play();
+  }
+
+  let collisionX = false;
+  let collisionY = false;
+  let collidingObject = null;
+
+  for (let obj of obstacles) {
+    if (obj === entity) continue;
+    if (!collisionX && checkCollision(obj, { x: newX, y: entity.position.y })) {
+      collisionX = true;
+      collidingObject = obj;
+    }
+    if (!collisionY && checkCollision(obj, { x: entity.position.x, y: newY })) {
+      collidingObject = obj;
+      collisionY = true;
+    }
+  }
+
+  if (!collisionX && (newX < minX || newX > maxX)) {
+    collisionX = true;
+  }
+
+  // Divide by tree to accomodate anchor of sprite
+  if (
+    !collisionY &&
+    (newY - entity.currentSprite.height / 3 < minY || newY > maxY)
+  ) {
+    collisionY = true;
+  }
+
+  let newPosX = collisionX ? entity.position.x : newX;
+  let newPosY = collisionY ? entity.position.y : newY;
+
+  return {
+    x: newPosX,
+    y: newPosY,
+    collisionX,
+    collisionY,
+    collidingObject,
+    dir,
+  };
+};

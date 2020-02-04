@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "image": "clouds.png",
+    "size": {"w":800,"h":800},
+		"scale": "1"
+  },
+  "frames": {
+    "map": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 800
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {"x":0,"y":0,"w":800,"h":800},
+      "sourceSize": {"w":800,"h":800},
+      "anchor": {"x":0,"y":0}
+    }
+  }
+}

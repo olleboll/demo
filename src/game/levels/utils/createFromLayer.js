@@ -19,7 +19,8 @@ export const createFromLayer = (
         const spreadY = spread ? Math.random() * 5 : 0;
         const last = current[current.length - 1];
         const x = -sceneWidth / 2 + ((i * 16) % sceneWidth) + spreadX;
-        const y = -sceneHeight / 2 + Math.floor(i / 200) * 16 + spreadY;
+        const y =
+          -sceneHeight / 2 + Math.floor(i / (sceneWidth / 16)) * 16 + spreadY;
         current.push({ x, y, i });
       }
       return current;

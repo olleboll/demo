@@ -47,8 +47,8 @@ class Medallion {
   update(delta) {
     if (!this.player) return;
     const { currentLevel, player } = this;
-    const obstacles = currentLevel.getObstacles(player.position, 150);
-    //const obstacles = currentLevel.visible.children;
+    //const obstacles = currentLevel.getObstacles(player.position, 150);
+    const obstacles = currentLevel.visible.children;
     player.update(delta, obstacles, currentLevel);
     currentLevel.update(delta, player);
     if (this.interactingObject) {
@@ -102,6 +102,7 @@ class Medallion {
       this.currentLevel.onEnter();
       this.swappingUniverse = false;
       this.update = this.defaultUpdate.bind(this);
+      this.player.resumeDash();
     };
 
     const onSwap = (delta) => {
@@ -126,7 +127,7 @@ class Medallion {
         );
       };
     };
-
+    this.player.pausDash();
     this.update = (delta) => {
       fadeOut(
         delta,

@@ -1,0 +1,17 @@
+{
+  "name": "demo",
+  "main": "index.html",
+  "window": {
+  "title": "game demo",
+  "icon": "down-stand.png",
+  "toolbar": true,
+  "frame": true,
+  "width": 900,
+  "height": 700,
+  "position": "center",
+  "min_width": 400,
+  "min_height": 200,
+  "max_width": 1600,
+  "max_height": 1200
+}
+}

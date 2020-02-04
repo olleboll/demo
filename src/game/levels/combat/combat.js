@@ -7,11 +7,22 @@ import { generateRandomPoint, generateFreePosition } from 'engine/utils';
 
 import { createEnemy, createReinDeer } from 'game/entities/factory';
 
+const combatOptions = {
+  name: 'map',
+  spriteKey: 'forest',
+  centerCamera: true,
+  dark: 0.0,
+  light: 1.0,
+  sceneWidth: 3200,
+  sceneHeight: 3200,
+  hasCamera: true,
+};
+
 class CombatLevel extends Level {
   constructor(props) {
-    super(props);
+    super({ ...props, ...combatOptions });
     this.name = 'combat';
-    this.dealDamage = props.dealDamage;
+    this.dealDamage = combatOptions.dealDamage;
     this.enemies = [];
 
     const enemyPos = { x: -1200, y: -1200 };

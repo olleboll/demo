@@ -22,6 +22,11 @@ class Camera {
     this.updateCamera = this.updateCamera.bind(this);
     this.generateFieldOfView = this.generateFieldOfView.bind(this);
     this.generateMask = this.generateMask.bind(this);
+
+    console.log('initalized camera');
+    console.log(sceneSize);
+    console.log(this.SCREEN_MID_X);
+    console.log(this.SCREEN_MID_Y);
   }
 
   updateCamera(center: Point, fovRange: number) {
@@ -32,21 +37,26 @@ class Camera {
       SCREEN_MID_X,
       SCREEN_MID_Y,
     } = this;
-    if (Math.abs(center.x) < SCENE_WIDTH / 2 - SCREEN_MID_X) {
-      scene.pivot.x = center.x;
-      scene.position.x = SCREEN_MID_X;
-    } else if (center.x > 0) {
-      scene.pivot.x = SCENE_WIDTH / 2 - SCREEN_MID_X;
-    } else {
-      scene.pivot.x = -SCENE_WIDTH / 2 + SCREEN_MID_X;
+    if (SCENE_WIDTH / 2 > SCREEN_MID_X) {
+      if (Math.abs(center.x) < SCENE_WIDTH / 2 - SCREEN_MID_X) {
+        scene.pivot.x = center.x;
+        scene.position.x = SCREEN_MID_X;
+      } else if (center.x > 0) {
+        scene.pivot.x = SCENE_WIDTH / 2 - SCREEN_MID_X;
+      } else {
+        scene.pivot.x = -SCENE_WIDTH / 2 + SCREEN_MID_X;
+      }
     }
-    if (Math.abs(center.y) < SCENE_HEIGHT / 2 - SCREEN_MID_Y) {
-      scene.pivot.y = center.y;
-      scene.position.y = SCREEN_MID_Y;
-    } else if (center.y > 0) {
-      scene.pivot.y = SCENE_HEIGHT / 2 - SCREEN_MID_Y;
-    } else {
-      scene.pivot.y = -SCENE_HEIGHT / 2 + SCREEN_MID_Y;
+
+    if (SCENE_HEIGHT / 2 > SCREEN_MID_Y) {
+      if (Math.abs(center.y) < SCENE_HEIGHT / 2 - SCREEN_MID_Y) {
+        scene.pivot.y = center.y;
+        scene.position.y = SCREEN_MID_Y;
+      } else if (center.y > 0) {
+        scene.pivot.y = SCENE_HEIGHT / 2 - SCREEN_MID_Y;
+      } else {
+        scene.pivot.y = -SCENE_HEIGHT / 2 + SCREEN_MID_Y;
+      }
     }
   }
 

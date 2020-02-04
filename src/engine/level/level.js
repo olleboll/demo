@@ -74,7 +74,7 @@ class Level {
     visible.filters = [];
     this.addVisibleFilter('_alpha', visibleAlphaFilter);
 
-    visible.mask = this.visibleMask;
+    //visible.mask = this.visibleMask;
     this.visibleMasks = {};
     this.visibleObjects = [];
     this.allObjects = [];

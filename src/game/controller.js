@@ -17,7 +17,7 @@ class Controller {
       keysDown[key] = this.keyboard[key].isDown;
     });
 
-    if (keysDown.space && !this.keysCooldown.space) {
+    if (false && keysDown.space && !this.keysCooldown.space) {
       this.player.dash(this.player.aim, this.medallion.currentLevel);
       this.keysCooldown.space = true;
       setTimeout(() => {

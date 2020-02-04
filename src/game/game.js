@@ -10,6 +10,7 @@ import {
   DesertLevel,
   Elyn,
   CombatLevel,
+  DashLevel,
 } from './levels';
 import { generateRNGTrees } from './levels/utils';
 import { createPlayer } from './entities/factory';
@@ -47,11 +48,12 @@ const Game = (opts: GameOptions) => {
 
   const villagePos = { x: -1100, y: -1400 };
   const cliffPos = { x: 150, y: -400 };
+  const cloudsPos = { x: 0, y: 0 };
 
   const player = createPlayer({
     spritesheet: 'movements',
     spriteKey: _characters.player,
-    position: villagePos,
+    position: cloudsPos,
     controls,
     speed: 2,
     dealDamage,
@@ -87,19 +89,16 @@ const Game = (opts: GameOptions) => {
   const forestLevel = new ForestLevel(levelOptions); //createLevel(levelOptions);
 
   const combatOptions: LevelOptions = {
-    name: 'map',
-    spriteKey: 'forest',
-    centerCamera: true,
     renderer,
-    dark: 0.0,
-    light: 1.0,
-    sceneWidth: 3200,
-    sceneHeight: 3200,
-    hasCamera: true,
     dealDamage,
     trees,
   };
   const combatLevel = new CombatLevel(combatOptions); //createLevel(levelOptions);
+
+  const dashOptions: LevelOptions = {
+    renderer,
+  };
+  const dashLevel = new DashLevel(dashOptions); //createLevel(levelOptions);
 
   const levelOptions2: LevelOptions = {
     name: 'map',
@@ -143,10 +142,11 @@ const Game = (opts: GameOptions) => {
 
   const devLevels = {
     combat: combatLevel,
+    dash: dashLevel,
   };
   const medallion = new Medallion(
-    realLevels,
-    'elyn',
+    devLevels,
+    'dash',
     player,
     stage,
     gui,
@@ -172,6 +172,7 @@ const Game = (opts: GameOptions) => {
   winterLevel.scene.interactive = true;
   elyn.scene.interactive = true;
   combatLevel.scene.interactive = true;
+  dashLevel.scene.interactive = true;
 
   const setAim = (event, level) => {
     const { x, y } = event.data.global;
@@ -203,10 +204,34 @@ const Game = (opts: GameOptions) => {
     shootMagicParticle(event, combatLevel),
   );
 
+  dashLevel.scene.on('mousemove', (event) => setAim(event, dashLevel));
+  dashLevel.scene.on('mousedown', (event) =>
+    shootMagicParticle(event, dashLevel),
+  );
+
   const init = () => {
     console.log('LAUNCHING GAME');
     // On enter music?
     //medallion.currentLevel.onEnter();
+
+    window.addEventListener('keydown', (event) => {
+      if (event.isComposing || event.keyCode === 229) {
+        return;
+      }
+      if (event.keyCode === 32) {
+        console.log('charging');
+        player.chargeDash();
+      }
+    });
+
+    window.addEventListener('keyup', (event) => {
+      if (event.isComposing || event.keyCode === 229) {
+        return;
+      }
+      if (event.keyCode === 32) {
+        player.dash(null, medallion.currentLevel);
+      }
+    });
   };
 
   return {
